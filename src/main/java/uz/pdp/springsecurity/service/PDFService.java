@@ -16,6 +16,7 @@ import org.springframework.util.FileCopyUtils;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.repository.CurrencyRepository;
 import uz.pdp.springsecurity.repository.CurrentCourceRepository;
+import uz.pdp.springsecurity.repository.PurchaseProductRepository;
 import uz.pdp.springsecurity.repository.TradeProductRepository;
 
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +38,10 @@ public class PDFService {
 
     @Autowired
     TradeProductRepository tradeProductRepository;
+
+
+    @Autowired
+    PurchaseProductRepository purchaseProductRepository;
 
     static String path = "src/main/resources/invoice.pdf";
 
@@ -377,7 +382,7 @@ public class PDFService {
         cel6.setBorderLeft(new SolidBorder(1));
         cel7.setBorderLeft(new SolidBorder(1));
         Integer tr = 1;
-        for (PurchaseProduct purchaseProduct : purchase.getPurchaseProductList()) {
+        for (PurchaseProduct purchaseProduct : purchaseProductRepository.findAllByPurchaseId(purchase.getId())) {
             cel1.add(new Paragraph(new Text(String.valueOf(tr))));
             cel2.add(new Paragraph(new Text(purchaseProduct.getProduct().getName())));
             cel3.add(new Paragraph(new Text(String.valueOf(purchaseProduct.getProduct().getBarcode()))));
@@ -410,7 +415,7 @@ public class PDFService {
 
         double value1 = 0;
         double value3 = 0;
-        for (PurchaseProduct purchaseProduct : purchase.getPurchaseProductList()) {
+        for (PurchaseProduct purchaseProduct : purchaseProductRepository.findAllByPurchaseId(purchase.getId())) {
             value1=value1+purchaseProduct.getPurchasedQuantity()*purchaseProduct.getProduct().getBuyPrice();
             value3=value3+purchaseProduct.getProduct().getTax();
         }

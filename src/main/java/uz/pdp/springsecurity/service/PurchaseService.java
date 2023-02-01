@@ -71,6 +71,7 @@ public class PurchaseService {
         Optional<Supplier> optionalSupplier = supplierRepository.findById(purchaseDto.getSupplerId());
         if (optionalSupplier.isEmpty()) return new ApiResponse("SUPPLIER NOT FOUND", false);
         Supplier supplier = optionalSupplier.get();
+        purchase.setSupplier(supplier);
 
         Optional<User> optionalUser = userRepository.findById(purchaseDto.getSeller());
         if (optionalUser.isEmpty()) return new ApiResponse("SELLER NOT FOUND", false);
@@ -89,8 +90,19 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
+        if (purchaseDto.getDebtSum() > 0) {
+            supplier.setDebt(supplier.getDebt() + purchaseDto.getTotalSum() - purchaseDto.getPaidSum());
+            supplierRepository.save(supplier);
+        }
+
+        purchase.setTotalSum(purchaseDto.getTotalSum());
+        purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
+        purchase.setPaidSum(purchaseDto.getPaidSum());
         purchase.setDate(purchaseDto.getDate());
         purchase.setDescription(purchaseDto.getDescription());
+
+        purchaseRepository.save(purchase);
+
 
 //        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(branch.getBusiness().getId());
 //        CurrentCource course = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
@@ -99,7 +111,7 @@ public class PurchaseService {
 
         for (PurchaseProductDto purchaseProductDto : purchaseProductDtoList) {
             PurchaseProduct purchaseProduct = new PurchaseProduct();
-
+            purchaseProduct.setPurchase(purchase);
             //SINGLE TYPE
             if (purchaseProductDto.getProductId()!=null) {
                 UUID productId = purchaseProductDto.getProductId();
@@ -122,7 +134,6 @@ public class PurchaseService {
             purchaseProduct.setBuyPrice(purchaseProductDto.getBuyPrice());
             purchaseProduct.setTotalSum(purchaseDto.getTotalSum());
 
-            purchaseProduct = purchaseProductRepository.save(purchaseProduct);
             purchaseProductList.add(purchaseProduct);
 
                 /*if (!currency.getName().equalsIgnoreCase("SO'M")){
@@ -145,17 +156,7 @@ public class PurchaseService {
                     purchaseProduct.setTotalSum(purchaseDto.getTotalSum());
                 }*/
             }
-
-        purchase.setPurchaseProductList(purchaseProductList);
-
-        if (purchaseDto.getAvans() < purchaseDto.getTotalSum()) {
-            supplier.setStoreDebt(supplier.getStoreDebt() + purchaseDto.getTotalSum() - purchaseDto.getAvans());
-            supplier = supplierRepository.save(supplier);
-        }
-        purchase.setSupplier(supplier);
-        purchase.setTotalSum(purchaseDto.getTotalSum());
-        purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
-        purchase.setAvans(purchaseDto.getAvans());
+        purchaseProductRepository.saveAll(purchaseProductList);
 
         /*if (!currency.getName().equalsIgnoreCase("SO'M")){
             double deliveryPrice = purchaseDto.getDeliveryPrice();
@@ -168,8 +169,6 @@ public class PurchaseService {
             purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
             purchase.setAvans(purchaseDto.getAvans());
         }*/
-
-        purchaseRepository.save(purchase);
 
         //TO SAVE AMOUNTS OF PRODUCTS TO WAREHOUSE
         warehouseService.addPurchase(purchase);
@@ -204,13 +203,13 @@ public class PurchaseService {
             double deliveryPrice = purchase.getDeliveryPrice();
             deliveryPrice = deliveryPrice / cource.getCurrentCourse();
             purchase.setDeliveryPrice(deliveryPrice);
-            double avans = purchase.getAvans();
+            double avans = purchase.getPaidSum();
             avans = avans / cource.getCurrentCourse();
-            purchase.setAvans(avans);
+            purchase.setPaidSum(avans);
             double totalSum = purchase.getTotalSum();
             totalSum = totalSum / cource.getCurrentCourse();
             purchase.setTotalSum(totalSum);
-            List<PurchaseProduct> productList = purchase.getPurchaseProductList();
+            List<PurchaseProduct> productList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
             for (PurchaseProduct product : productList) {
                 double salePrice = product.getSalePrice();
                 salePrice = salePrice / cource.getCurrentCourse();
@@ -323,9 +322,9 @@ public class PurchaseService {
         double debt = 0;
         List<Purchase> purchaseList = purchaseRepository.findAllByBusinessId(businessId);
         for (Purchase purchase : purchaseList) {
-            if (purchase.getTotalSum()>=purchase.getAvans() && purchase.getAvans()!=0){
-                cost += purchase.getAvans();
-                debt += (purchase.getTotalSum() - purchase.getAvans());
+            if (purchase.getTotalSum()>=purchase.getPaidSum() && purchase.getPaidSum()!=0){
+                cost += purchase.getPaidSum();
+                debt += (purchase.getTotalSum() - purchase.getPaidSum());
             }else {
                 debt += purchase.getTotalSum();
             }

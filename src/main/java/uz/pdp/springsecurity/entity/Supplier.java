@@ -36,7 +36,7 @@ public class Supplier extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
-    private double storeDebt;
+    private double debt;
 
 
     public Supplier( String name, String phoneNumber, String telegram, Business business) {

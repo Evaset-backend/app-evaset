@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.repository.FifoCalculationRepository;
+import uz.pdp.springsecurity.repository.PurchaseProductRepository;
 import uz.pdp.springsecurity.repository.TradeProductRepository;
 
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ public class FifoCalculationService {
     @Autowired
     private FifoCalculationRepository fifoRepository;
     @Autowired
-    private TradeProductRepository tradeProductRepository;
+    private PurchaseProductRepository purchaseProductRepository;
 
     public ApiResponse addProduct(Purchase purchase) {
         Branch branch = purchase.getBranch();
-        List<PurchaseProduct> purchaseProductList = purchase.getPurchaseProductList();
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
 
         List<FifoCalculation> fifoCalculationList = new ArrayList<>();
 

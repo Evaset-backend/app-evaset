@@ -42,13 +42,12 @@ public class Purchase extends AbsEntity {
 
     private double totalSum;
 
-    @Column(nullable = false)
-    private double avans;
+    private double paidSum;
 
-    @OneToMany
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn
-    private List<PurchaseProduct> purchaseProductList;
+    private double debtSum;
 
-
+//    @OneToMany
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+//    @JoinColumn
+//    private List<PurchaseProduct> purchaseProductList;
 }

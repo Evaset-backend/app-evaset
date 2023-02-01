@@ -30,10 +30,13 @@ public class PurchaseDto {
 
     private double totalSum;
 
+    private double debtSum;
+
+    @NotNull(message = "required line")
+    private Double paidSum;
+
     @NotNull(message = "required line")
     private List<PurchaseProductDto> purchaseProductsDto;
 
-    @NotNull(message = "required line")
-    private Double avans;
 
 }
