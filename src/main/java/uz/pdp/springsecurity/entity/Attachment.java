@@ -30,5 +30,6 @@ public class Attachment extends AbsEntity {
         this.fileOriginalName = fileOriginalName;
         this.size = size;
         this.contentType = contentType;
+        
     }
 }
