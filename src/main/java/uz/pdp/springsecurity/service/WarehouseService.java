@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.payload.TradeProductDto;
 import uz.pdp.springsecurity.repository.WarehouseRepository;
 
 import java.util.ArrayList;
@@ -49,5 +50,35 @@ public class WarehouseService {
             warehouseList.add(warehouse);
         }
         warehouseRepository.saveAll(warehouseList);
+    }
+
+    /**
+     * RETURN TRADEPRODUCT BY TRADEPRODUCTDTO AFTER CHECK AMOUNT
+     * @param branch
+     * @param tradeProductDto
+     * @return
+     */
+    public TradeProduct trade(Branch branch, TradeProductDto tradeProductDto) {
+        TradeProduct tradeProduct = new TradeProduct();
+        if (tradeProductDto.getProductId() != null){
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
+            if (optionalWarehouse.isEmpty()) return null;
+            Warehouse warehouse = optionalWarehouse.get();
+            if (warehouse.getAmount() < tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() - tradeProductDto.getTradedQuantity());
+            warehouseRepository.save(warehouse);
+            tradeProduct.setProduct(warehouse.getProduct());
+        }else {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
+            if (optionalWarehouse.isEmpty()) return null;
+            Warehouse warehouse = optionalWarehouse.get();
+            if (warehouse.getAmount() < tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() - tradeProductDto.getTradedQuantity());
+            warehouseRepository.save(warehouse);
+            tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
+        }
+        tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
+        tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
+        return tradeProduct;
     }
 }
