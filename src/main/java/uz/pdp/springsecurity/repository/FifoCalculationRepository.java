@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface FifoCalculationRepository extends JpaRepository<FifoCalculation, UUID> {
     List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
+
+    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
 }
