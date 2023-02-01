@@ -1,2 +1,2 @@
 # evabackDemo
-evaback uchun Demo versiya
+evaback uchun Demo versiyasi
