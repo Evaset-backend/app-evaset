@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.TradeProductDto;
+import uz.pdp.springsecurity.repository.PurchaseProductRepository;
 import uz.pdp.springsecurity.repository.WarehouseRepository;
 
 import java.util.ArrayList;
@@ -14,10 +15,12 @@ import java.util.Optional;
 public class WarehouseService {
     @Autowired
     WarehouseRepository warehouseRepository;
+    @Autowired
+    PurchaseProductRepository purchaseProductRepository;
 
     public void addPurchase(Purchase purchase) {
         Branch branch = purchase.getBranch();
-        List<PurchaseProduct> purchaseProductList = purchase.getPurchaseProductList();
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
         List<Warehouse> warehouseList = new ArrayList<>();
 
         for (PurchaseProduct purchaseProduct : purchaseProductList) {

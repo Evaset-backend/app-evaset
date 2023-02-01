@@ -13,10 +13,11 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
     List<Purchase> findAllByPaymentStatus_Id(UUID paymentStatus_id);
     List<Purchase> findAllByBranch_Id(UUID branch_id);
     List<Purchase> findAllByDate(Date date);
-    List<Purchase> findAllByTotalSum(double totalSum);
     List<Purchase> findAllBySupplierId(UUID dealer_id);
+    List<Purchase> findAllByBranch_BusinessId(UUID businessId);
 
-    @Query(value = "select * from purchase inner join branches b on b.business_id = ?1",nativeQuery = true)
-    List<Purchase> findAllByBusinessId(UUID businessId);
+    List<Purchase> findAllByTotalSum(double totalSum);
 
+    /*@Query(value = "select * from purchase inner join branches b on b.business_id = ?1",nativeQuery = true)
+    List<Purchase> findAllByBusinessId(UUID businessId);*/
 }

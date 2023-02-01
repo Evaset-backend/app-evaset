@@ -18,6 +18,9 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor
 @Data
 public class PurchaseProduct extends AbsEntity {
+    @ManyToOne
+    private Purchase purchase;
+
     // USE FOR SINGLE TYPE
     @ManyToOne
     private Product product;

@@ -92,7 +92,7 @@ public class SupplierService {
             Supplier supplier = supplierOptional.get();
 
             if (repaymentDto.getRepayment() != null) {
-                supplier.setStoreDebt(supplier.getStoreDebt() - repaymentDto.getRepayment());
+                supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
                 supplierRepository.save(supplier);
                 return new ApiResponse("Repayment Store !", true);
 
