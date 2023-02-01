@@ -48,6 +48,19 @@ public class PurchaseController {
     }
 
     /**
+     * BUSINESS ID'SI ORQALI BARCHA XARIDLARNI OLIB CHIQISH
+     *
+     * @param businessId
+     * @return ApiResponse(success - > true message - > FOUND)
+     */
+    @CheckPermission("VIEW_PURCHASE_ADMIN")
+    @GetMapping("/get-by-business/{businessId}")
+    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = purchaseService.getAllByBusiness(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    /**
      * ID ORQALI XARIDNI OLIB CHIQISH
      *
      * @param id
@@ -55,7 +68,7 @@ public class PurchaseController {
      */
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("/{id}")
-    public HttpEntity<?> get(@PathVariable UUID id) {
+    public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = purchaseService.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -139,19 +152,6 @@ public class PurchaseController {
     }
 
     /**
-     * JAMI SUMMA ORQALI BARCHA XARIDLARNI OLIB CHIQISH
-     *
-     * @param totalSum
-     * @return ApiResponse(success - > true message - > FOUND)
-     */
-    @CheckPermission("VIEW_PURCHASE")
-    @GetMapping("get-purchase-by-totalSum/{totalSum}")
-    public HttpEntity<?> getByTotalSum(@PathVariable double totalSum) {
-        ApiResponse apiResponse = purchaseService.getByTotalSum(totalSum);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    /**
      * XARID ID'SI ORQALI XARIDNING PDF CHEKINI DOWNLOAD QILISH
      *
      * @param id
@@ -165,22 +165,22 @@ public class PurchaseController {
     }
 
     /**
-     * BUSINESS ID'SI ORQALI BARCHA XARIDLARNI OLIB CHIQISH
+     * JAMI SUMMA ORQALI BARCHA XARIDLARNI OLIB CHIQISH
      *
-     * @param businessId
+     * @param totalSum
      * @return ApiResponse(success - > true message - > FOUND)
      */
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = purchaseService.getAllByBusiness(businessId);
+    /*@CheckPermission("VIEW_PURCHASE")
+    @GetMapping("get-purchase-by-totalSum/{totalSum}")
+    public HttpEntity<?> getByTotalSum(@PathVariable double totalSum) {
+        ApiResponse apiResponse = purchaseService.getByTotalSum(totalSum);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
+    /*@CheckPermission("VIEW_PURCHASE_ADMIN")
     @GetMapping("/get-cost-by-business/{businessId}")
     public HttpEntity<?> getCostByBusiness(@PathVariable UUID businessId){
-        ApiResponse response = purchaseService.getCostbyBusiness(businessId);
+        ApiResponse response = purchaseService.getCostByBusiness(businessId);
         return ResponseEntity.ok().body(response);
-    }
+    }*/
 }

@@ -178,6 +178,27 @@ public class PurchaseService {
         return new ApiResponse("ADDED", true);
     }
 
+    public ApiResponse getAllByBusiness(UUID businessId) {
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
+        return new ApiResponse("FOUND", true, purchaseList);
+        /*if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        List<Purchase> purchaseList = new ArrayList<>();
+        for (Purchase purchase : allByBusinessId) {
+            Purchase changePrices = changePrices(purchase);
+            purchaseList.add(changePrices);
+        }
+        return new ApiResponse("FOUND", true, purchaseList);*/
+    }
+
+    public ApiResponse get(UUID id) {
+        if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        Purchase purchase = purchaseRepository.findById(id).get();
+        return new ApiResponse("FOUND", true, purchase);
+
+        /*Purchase changePrices = changePrices(purchase);
+        return new ApiResponse("FOUND", true, changePrices);*/
+    }
+
     public ApiResponse edit(UUID id, PurchaseDto purchaseDto) {
         Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
         if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
@@ -189,111 +210,75 @@ public class PurchaseService {
         return new ApiResponse("EDITED", true);
     }
 
-    public ApiResponse get(UUID id) {
-        if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
-        Purchase purchase = purchaseRepository.findById(id).get();
-        Purchase changePrices = changePrices(purchase);
-        return new ApiResponse("FOUND", true, changePrices);
-    }
-
-    private Purchase changePrices(Purchase purchase){
-        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(purchase.getBranch().getBusiness().getId());
-        CurrentCource cource = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
-        if (!currency.getName().equalsIgnoreCase("SO'M")){
-            double deliveryPrice = purchase.getDeliveryPrice();
-            deliveryPrice = deliveryPrice / cource.getCurrentCourse();
-            purchase.setDeliveryPrice(deliveryPrice);
-            double avans = purchase.getPaidSum();
-            avans = avans / cource.getCurrentCourse();
-            purchase.setPaidSum(avans);
-            double totalSum = purchase.getTotalSum();
-            totalSum = totalSum / cource.getCurrentCourse();
-            purchase.setTotalSum(totalSum);
-            List<PurchaseProduct> productList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-            for (PurchaseProduct product : productList) {
-                double salePrice = product.getSalePrice();
-                salePrice = salePrice / cource.getCurrentCourse();
-                product.setSalePrice(salePrice);
-                double buyPrice = product.getBuyPrice();
-                buyPrice = buyPrice / cource.getCurrentCourse();
-                product.setBuyPrice(buyPrice);
-            }
-        }
-        return purchase;
-    }
-
     public ApiResponse delete(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         purchaseRepository.deleteById(id);
         return new ApiResponse("DELETED", false);
     }
 
-
-
     public ApiResponse getByDealerId(UUID dealer_id) {
         List<Purchase> allByDealer_id = purchaseRepository.findAllBySupplierId(dealer_id);
         if (allByDealer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
+        return new ApiResponse("FOUND", true, allByDealer_id);
+
+        /*List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByDealer_id) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
+        return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
     public ApiResponse getByPurchaseStatusId(UUID purchaseStatus_id) {
         List<Purchase> allByPurchaseStatus_id = purchaseRepository.findAllByPurchaseStatus_Id(purchaseStatus_id);
         if (allByPurchaseStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
+        return new ApiResponse("FOUND", true, allByPurchaseStatus_id);
+
+        /*List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByPurchaseStatus_id) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
+        return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
     public ApiResponse getByPaymentStatusId(UUID paymentStatus_id) {
         List<Purchase> allByPaymentStatus_id = purchaseRepository.findAllByPaymentStatus_Id(paymentStatus_id);
         if (allByPaymentStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
+        return new ApiResponse("FOUND", true, allByPaymentStatus_id);
+
+        /*List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByPaymentStatus_id) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
+        return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
     public ApiResponse getByBranchId(UUID branch_id) {
         List<Purchase> allByBranch_id = purchaseRepository.findAllByBranch_Id(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
+        return new ApiResponse("FOUND", true, allByBranch_id);
+
+        /*List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByBranch_id) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
+        return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
     public ApiResponse getByDate(Date date) {
         List<Purchase> allByDate = purchaseRepository.findAllByDate(date);
         if (allByDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
+        return new ApiResponse("FOUND", true, allByDate);
+
+        /*List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByDate) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
-    }
-
-    public ApiResponse getByTotalSum(double totalSum) {
-        List<Purchase> allByTotalSum = purchaseRepository.findAllByTotalSum(totalSum);
-        if (allByTotalSum.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
-        for (Purchase purchase : allByTotalSum) {
-            Purchase changePrices = changePrices(purchase);
-            purchaseList.add(changePrices);
-        }
-        return new ApiResponse("FOUND", true, purchaseList);
+        return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
     public ApiResponse getPdfFile(UUID id, HttpServletResponse response) throws IOException {
@@ -306,18 +291,20 @@ public class PurchaseService {
         return new ApiResponse("CREATED", true);
     }
 
-    public ApiResponse getAllByBusiness(UUID businessId) {
-        List<Purchase> allByBusinessId = purchaseRepository.findAllByBusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Purchase> purchaseList = new ArrayList<>();
-        for (Purchase purchase : allByBusinessId) {
+    /*public ApiResponse getByTotalSum(double totalSum) {
+        List<Purchase> allByTotalSum = purchaseRepository.findAllByTotalSum(totalSum);
+        if (allByTotalSum.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, allByTotalSum);
+
+        *//*List<Purchase> purchaseList = new ArrayList<>();
+        for (Purchase purchase : allByTotalSum) {
             Purchase changePrices = changePrices(purchase);
             purchaseList.add(changePrices);
         }
-        return new ApiResponse("FOUND", true, purchaseList);
-    }
+        return new ApiResponse("FOUND", true, purchaseList);*//*
+    }*/
 
-    public ApiResponse getCostbyBusiness(UUID businessId) {
+    /*public ApiResponse getCostByBusiness(UUID businessId) {
         double cost = 0;
         double debt = 0;
         List<Purchase> purchaseList = purchaseRepository.findAllByBusinessId(businessId);
@@ -331,5 +318,31 @@ public class PurchaseService {
         }
         Statistic statistic = new Statistic(cost, debt);
         return new ApiResponse("Succesly", true, statistic);
-    }
+    }*/
+
+    /*private Purchase changePrices(Purchase purchase){
+        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(purchase.getBranch().getBusiness().getId());
+        CurrentCource course = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
+        if (!currency.getName().equalsIgnoreCase("SO'M")){
+            double deliveryPrice = purchase.getDeliveryPrice();
+            deliveryPrice = deliveryPrice / course.getCurrentCourse();
+            purchase.setDeliveryPrice(deliveryPrice);
+            double avans = purchase.getPaidSum();
+            avans = avans / course.getCurrentCourse();
+            purchase.setPaidSum(avans);
+            double totalSum = purchase.getTotalSum();
+            totalSum = totalSum / course.getCurrentCourse();
+            purchase.setTotalSum(totalSum);
+            List<PurchaseProduct> productList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
+            for (PurchaseProduct product : productList) {
+                double salePrice = product.getSalePrice();
+                salePrice = salePrice / course.getCurrentCourse();
+                product.setSalePrice(salePrice);
+                double buyPrice = product.getBuyPrice();
+                buyPrice = buyPrice / course.getCurrentCourse();
+                product.setBuyPrice(buyPrice);
+            }
+        }
+        return purchase;
+    }*/
 }
