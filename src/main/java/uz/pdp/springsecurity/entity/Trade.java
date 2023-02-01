@@ -8,9 +8,10 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.util.Date;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -26,36 +27,30 @@ public class Trade extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User trader;
 
-    @OneToMany
+   /* @OneToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn
-    private List<TradeProduct> tradeProductList;
+    private List<TradeProduct> tradeProductList;*/
+
+    @OneToOne
+    private Branch branch;
+
+    @ManyToOne
+    private PaymentStatus paymentStatus;
+
+    @ManyToOne
+    private PaymentMethod payMethod;
 
     private Date payDate;
 
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Branch branch;
-
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private PaymentStatus paymentStatus;
-
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private PaymentMethod payMethod;
-
     private Double totalSum;
+
+    private Double paidSum;
+
+    private Double debtSum;
 
     private Double totalProfit = 0.0;
 
-    private Double avans;
-
-//    @OneToOne
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    private Currency currency;
-
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne
     private Address address;
 }

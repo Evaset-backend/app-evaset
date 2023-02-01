@@ -3,15 +3,12 @@ package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Trade;
 
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByTrader_Id(UUID trader_id);

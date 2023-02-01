@@ -1,16 +1,23 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.TradeDTO;
+import uz.pdp.springsecurity.payload.TradeProductDto;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TradeService {
@@ -53,262 +60,95 @@ public class TradeService {
     @Autowired
     CurrencyService currencyService;
 
-    /*@Transactional
-    public ApiResponse create(TradeDTO tradeDTO) {
-        return null;
-    }*/
+    @Autowired
+    WarehouseService warehouseService;
 
-    /*@SneakyThrows
+    @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
         Trade trade = new Trade();
 
 
         return addTrade(trade, tradeDTO);
-    }*/
-//
-//    public ApiResponse addTrade(Trade trade, TradeDTO tradeDTO) {
-//        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(tradeDTO.getBusinessId());
-//        CurrentCource currentCource = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
-//        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-//        if (optionalCustomer.isEmpty()) {
-//            return new ApiResponse("CUSTOMER NOT FOUND", false);
-//        }
-//        Customer customer = optionalCustomer.get();
-////        trade.setCustomer(optionalCustomer.get());
-//
-//        /*
-//          SOTUVCHI SAQLANDI
-//         */
-//        Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
-//        if (optionalUser.isEmpty()) {
-//            return new ApiResponse("TRADER NOT FOUND", false);
-//        }
-//        trade.setTrader(optionalUser.get());
-//
-//        /**
-//         * BRANCH SAQLANDI
-//         */
-//        Optional<Branch> optionalBranch = branchRepository.findById(tradeDTO.getBranchId());
-//        if (optionalBranch.isEmpty()) {
-//            return new ApiResponse("BRANCH NOT FOUND", false);
-//        }
-//        Branch branch = optionalBranch.get();
-//        trade.setBranch(branch);
-//
-//        /**
-//         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
-//         */
-//        List<ProductTradeDto> productTraderDto = tradeDTO.getProductTraderDto();
-//        List<TradeProduct> tradeProducts = new ArrayList<>();
-//
-//            for (ProductTradeDto productTradeDto : productTraderDto) {
-//
-//                Double tradedQuantity = productTradeDto.getTradedQuantity();
-//                Optional<Product> optionalProduct = productRepository.findById(productTradeDto.getProductTradeId());
-//                Product product = optionalProduct.get();
-//                TradeProduct tradeProduct = new TradeProduct();
-//
-//                if (tradedQuantity > product.getQuantity()) {
-//                    return new ApiResponse("OMBORDA YETARLICHA MAXSULOT YO'Q", false);
-//                }
-//                product.setQuantity(product.getQuantity() - tradedQuantity);
-//                if (!currency.getName().equalsIgnoreCase("SO'M")){
-//                    double salePrice = product.getSalePrice();
-//                    salePrice = salePrice * currentCource.getCurrentCourse();
-//                    tradeProduct.setSalePrice(salePrice);
-//                }else {
-//                    tradeProduct.setSalePrice(product.getSalePrice());
-//                }
-//                productRepository.save(product);
-//
-//                tradeProduct.setTradedQuantity(productTradeDto.getTradedQuantity());
-//                tradeProduct.setProduct(product);
-//
-//                tradeProduct = tradeProductRepository.save(tradeProduct);
-//                tradeProducts.add(tradeProduct);
-//
-//            }
-//
-//        /**
-//         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
-//         */
-//        trade.setTradeProductList(tradeProducts);
-//
-//
-//        /**
-//         * UMUMIY SUMMA SAQLANDI
-//         */
-//        if (!currency.getName().equalsIgnoreCase("SO'M")){
-//            double totalSum = tradeDTO.getTotalSum();
-//            totalSum = totalSum * currentCource.getCurrentCourse();
-//            trade.setTotalSum(totalSum);
-//        }else {
-//            trade.setTotalSum(tradeDTO.getTotalSum());
-//        }
-////        double sum = 0d;
-////        for (ProductTradeDto productTradeDto : productTraderDto) {
-////            double salePrice = productRepository.findById(productTradeDto.getProductTradeId()).get().getSalePrice();
-////            Double tradedQuantity = productTradeDto.getTradedQuantity();
-////            double parseDouble = Double.parseDouble(String.valueOf(tradedQuantity));
-////            sum = sum + (salePrice * parseDouble);
-////        }
-////        trade.setTotalSum(sum);
-//
-//        /**
-//         * AMOUNT LOAN PRICE SAQLANDI
-//         */
-//        if (tradeDTO.getAmountPaid() == 0){
-//            if (!currency.getName().equalsIgnoreCase("SO'M")){
-//                double totalSum = tradeDTO.getTotalSum();
-//                totalSum = totalSum * currentCource.getCurrentCourse();
-//                customer.setDebt(customer.getDebt() + totalSum);
-//            }else {
-//                customer.setDebt(customer.getDebt() + tradeDTO.getTotalSum());
-//            }
-//            trade.setAvans(0d);
-//            PaymentStatus status = paymentStatusRepository.findByStatus("To'lanmagan");
-//            trade.setPaymentStatus(status);
-//        }else if (tradeDTO.getAmountPaid() > 0 && tradeDTO.getAmountPaid() < tradeDTO.getTotalSum()){
-//            if (!currency.getName().equalsIgnoreCase("SO'M")){
-//                Double amountPaid = tradeDTO.getAmountPaid();
-//                amountPaid = amountPaid * currentCource.getCurrentCourse();
-//                double totalSum = tradeDTO.getTotalSum();
-//                totalSum = totalSum * currentCource.getCurrentCourse();
-//                trade.setAvans(amountPaid);
-//                customer.setDebt(customer.getDebt() + totalSum - amountPaid);
-//            }else {
-//                trade.setAvans(tradeDTO.getAmountPaid());
-//                customer.setDebt(customer.getDebt() + tradeDTO.getTotalSum() - tradeDTO.getAmountPaid());
-//            }
-//            PaymentStatus status = paymentStatusRepository.findByStatus("Qisman to'langan");
-//            trade.setPaymentStatus(status);
-//        }else if (tradeDTO.getAmountPaid() == tradeDTO.getTotalSum()){
-//            if (!currency. getName().equalsIgnoreCase("SO'M")){
-//                Double amountPaid = tradeDTO.getAmountPaid();
-//                amountPaid = amountPaid * currentCource.getCurrentCourse();
-//                trade.setAvans(amountPaid);
-//            }else {
-//                trade.setAvans(tradeDTO.getAmountPaid());
-//            }
-//            PaymentStatus status = paymentStatusRepository.findByStatus("To'langan");
-//            trade.setPaymentStatus(status);
-//        }else if (tradeDTO.getAmountPaid() > tradeDTO.getTotalSum()){
-//            return new ApiResponse("A LOT OF MONEY PAID", false);
-//        }
-//
-////        if (tradeDTO.getAmountPaid() == 0d) {
-////
-////            trade.setAmountPaid(0.0);
-////            trade.setLoan(sum - tradeDTO.getAmountPaid());
-////
-////            PaymentStatus statusName = paymentStatusRepository.findByStatus("To'langan");
-////
-////            trade.setPaymentStatus(statusName);
-////        } else if (sum < tradeDTO.getAmountPaid()) {
-////            return new ApiResponse("A LOT OF MONEY PAID", false);
-////        } else {
-////            if (trade.getAmountPaid() != null) {
-////                if ((trade.getTotalSum() < (trade.getAmountPaid() + tradeDTO.getAmountPaid()))) {
-////                    return new ApiResponse("A LOT OF MONEY PAID", false);
-////                } else {
-////                    trade.setAmountPaid(trade.getAmountPaid() + tradeDTO.getAmountPaid());
-////                    trade.setLoan(trade.getLoan() - tradeDTO.getAmountPaid());
-////                }
-////            } else if (trade.getAmountPaid() == null || trade.getAmountPaid() == 0.0) {
-////                trade.setAmountPaid(tradeDTO.getAmountPaid());
-////                trade.setLoan(sum - tradeDTO.getAmountPaid());
-////            } else {
-////                trade.setAmountPaid(trade.getAmountPaid() + tradeDTO.getAmountPaid());
-////                trade.setLoan(trade.getLoan() - tradeDTO.getAmountPaid());
-////            }
-////
-////            if ((trade.getTotalSum() - tradeDTO.getAmountPaid() == 0) || trade.getLoan() == 0.0) {
-////                PaymentStatus statusName = paymentStatusRepository.findByStatus("To'lanmagan");
-////                trade.setPaymentStatus(statusName);
-////            } else {
-////                PaymentStatus statusName = paymentStatusRepository.findByStatus("Qisman to'langan");
-////                trade.setPaymentStatus(statusName);
-////
-////                customer.setDebt();
-////            }
-////        }
-//
-////        /**
-////         * CURRENCY SAQALANDI
-////         */
-////        Optional<Currency> optionalCurrency = currencyRepository.findById(tradeDTO.getCurrencyId());
-////        if (optionalCurrency.isEmpty()) {
-////            return new ApiResponse("NOT FOUND CURRENCY", false);
-////        }
-////        trade.setCurrency(optionalCurrency.get());
-//
-//
-//
-//        /**
-//         * PAYMAENTMETHOD SAQLANDI
-//         */
-//        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(tradeDTO.getPayMethodId());
-//        if (optionalPaymentMethod.isEmpty()) {
-//            return new ApiResponse("PAYMAENTMETHOD NOT FOUND", false);
-//        }
-//        trade.setPayMethod(optionalPaymentMethod.get());
-//
-//
-//        /**
-//         * ADDRESS SAQLANDI
-//         */
-//        Optional<Address> optionalAddress = addressRepository.findById(tradeDTO.getAddressId());
-//        if (optionalAddress.isEmpty()) {
-//            return new ApiResponse("ADDRESS NOT FOUND", false);
-//        }
-//        trade.setAddress(optionalAddress.get());
-//        /**
-//         * PAYDATE SAQLANDI
-//         */
-//        Date payDate = tradeDTO.getPayDate();
-//        trade.setPayDate(payDate);
-//
-////        if (customer.getDebt() != null) {
-////            customer.setDebt(customer.getDebt() + trade.getLoan());
-////        }else {
-////            customer.setDebt(trade.getLoan());
-////        }
-//        customer = customerRepository.save(customer);
-//
-//        trade.setCustomer(customer);
-//        tradeRepository.save(trade);
-//
-//        /**
-//         * TRADE HISTORY QOSHILYAPTI
-//         */
-//
-//        TradeHistory tradeHistory = new TradeHistory();
-//        tradeHistory.setPaidAmount(tradeDTO.getAmountPaid());
-//        Date date = new Date(System.currentTimeMillis());
-//        tradeHistory.setPaidDate(date);
-//        tradeHistory.setTrade(trade);
-//        PaymentMethod payMethod = trade.getPayMethod();
-//        tradeHistory.setPaymentMethod(payMethod.getType());
-//
-//        tradeHistoryRepository.save(tradeHistory);
-//
-//
-//        return new ApiResponse("SAVED!", true);
-//    }
-//
-//    public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
-//        Optional<Trade> optionalTrade = tradeRepository.findById(id);
-//        if (optionalTrade.isEmpty()) {
-//            return new ApiResponse("NOT FOUND TRADE", false);
-//        }
-//        Trade trade = optionalTrade.get();
-//        ApiResponse apiResponse = addTrade(trade, tradeDTO);
-//
-//        if (!apiResponse.isSuccess()) {
-//            return new ApiResponse("ERROR", false);
-//        }
-//        return new ApiResponse("UPDATED", true);
-//    }
+    }
+
+    public ApiResponse addTrade(Trade trade, TradeDTO tradeDTO) {
+
+        /**
+         * SET LATER
+         */
+        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("CUSTOMER NOT FOUND", false);
+        }
+        Customer customer = optionalCustomer.get();
+        trade.setCustomer(customer);
+
+        Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
+        if (optionalUser.isEmpty()) {
+            return new ApiResponse("TRADER NOT FOUND", false);
+        }
+        trade.setTrader(optionalUser.get());
+
+        Optional<Branch> optionalBranch = branchRepository.findById(tradeDTO.getBranchId());
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("BRANCH NOT FOUND", false);
+        }
+        Branch branch = optionalBranch.get();
+        trade.setBranch(branch);
+
+        Optional<PaymentStatus> optionalPaymentStatus = paymentStatusRepository.findById(tradeDTO.getPaymentStatusId());
+        if(optionalPaymentStatus.isEmpty()){
+            return new ApiResponse("PAYMENTSTATUS NOT FOUND", false);
+        }
+        trade.setPaymentStatus(optionalPaymentStatus.get());
+
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(tradeDTO.getPayMethodId());
+        if (optionalPaymentMethod.isEmpty()) {
+            return new ApiResponse("PAYMAENTMETHOD NOT FOUND", false);
+        }
+        trade.setPayMethod(optionalPaymentMethod.get());
+
+        double loanSum = tradeDTO.getDebtSum();
+        if (loanSum > 0) {
+            customer.setDebt(customer.getDebt() + loanSum);
+        }
+
+        trade.setPayDate(tradeDTO.getPayDate());
+        trade.setTotalSum(tradeDTO.getTotalSum());
+        trade.setPaidSum(tradeDTO.getPaidSum());
+        trade.setDebtSum(loanSum);
+        tradeRepository.save(trade);
+
+        /**
+         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
+         */
+        List<TradeProductDto> productTraderDto = tradeDTO.getProductTraderDto();
+        List<TradeProduct> tradeProductList = new ArrayList<>();
+
+        for (TradeProductDto tradeProductDto : productTraderDto) {
+            TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
+            if (tradeProduct != null) {
+                tradeProduct.setTrade(trade);
+                tradeProductList.add(tradeProduct);
+            }
+        }
+        tradeProductRepository.saveAll(tradeProductList);
+        return new ApiResponse("SAVED!", true);
+    }
+
+    public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
+        Optional<Trade> optionalTrade = tradeRepository.findById(id);
+        if (optionalTrade.isEmpty()) {
+            return new ApiResponse("NOT FOUND TRADE", false);
+        }
+        Trade trade = optionalTrade.get();
+        ApiResponse apiResponse = addTrade(trade, tradeDTO);
+
+        if (!apiResponse.isSuccess()) {
+            return new ApiResponse("ERROR", false);
+        }
+        return new ApiResponse("UPDATED", true);
+    }
 
     public ApiResponse getOne(UUID id) {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);
@@ -437,15 +277,16 @@ public class TradeService {
 
     private Trade generateTradeByActiveCourse(Trade trade){
         UUID busnessId = trade.getBranch().getBusiness().getId();
-        double avans = currencyService.getValueByActiveCourse(trade.getAvans(), busnessId);
-        trade.setAvans(avans);
+        double avans = currencyService.getValueByActiveCourse(trade.getPaidSum(), busnessId);
+        trade.setPaidSum(avans);
         double totalSum = currencyService.getValueByActiveCourse(trade.getTotalSum(), busnessId);
         trade.setTotalSum(totalSum);
 //        sac
 
-        for (TradeProduct tradeProduct : trade.getTradeProductList()) {
-            double salePrice = currencyService.getValueByActiveCourse(tradeProduct.getSalePrice(), busnessId);
-            tradeProduct.setSalePrice(salePrice);
+
+        for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
+            double salePrice = currencyService.getValueByActiveCourse(tradeProduct.getTotalSalePrice(), busnessId);
+            tradeProduct.setTotalSalePrice(salePrice);
             Product product = tradeProduct.getProduct();
             product.setSalePrice(salePrice);
             double buyPrice = currencyService.getValueByActiveCourse(product.getBuyPrice(), busnessId);

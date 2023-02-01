@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID> {
 List<TradeProduct> findAllByProduct_Id(UUID product_id);
+List<TradeProduct> findAllByTradeId(UUID tradeId);
 }

@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -17,17 +15,23 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor
 @Entity
 public class TradeProduct extends AbsEntity {
+    @ManyToOne
+    private Trade trade;
+
+    //USE FOR SINGLE TYPE// OR NULL
+    @ManyToOne
+    private Product product;
+
+    //USE FOR MANY TYPE// OR NULL
+    @ManyToOne
+    private ProductTypePrice productTypePrice;
 
     private Double tradedQuantity;
 
 //    private double buyPrice;
 //
-    private double salePrice;
+    private double totalSalePrice;
 
     //TOTAL PROFIT OF PRODUCT
     private double profit = 0;
-
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Product product;
 }

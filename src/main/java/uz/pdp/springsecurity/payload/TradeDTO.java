@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,27 +14,20 @@ import java.util.UUID;
 
 public class TradeDTO {
 
-    private Timestamp firstDate;
-
-    private Timestamp secondDate;
-
     private UUID customerId;
+
     /**
      * savdogar id
      */
     private UUID userId;
 
-    /**
-     * product idlari
-     */
-    private List<ProductTradeDto> productTraderDto;
-
-    private Date payDate;
-
     private UUID branchId;
 
+    private UUID paymentStatusId;
 
     private UUID payMethodId;
+
+    private Date payDate;
 
     /**
      * umumiy summa
@@ -45,12 +37,15 @@ public class TradeDTO {
     /**
      * to'langan summa
      */
-    private Double amountPaid;
+    private Double paidSum;
+
     /**
      * qarz
      */
-    private UUID addressId;
+    private double debtSum = 0d;
 
-    private UUID businessId;
-
+    /**
+     * product idlari
+     */
+    private List<TradeProductDto> productTraderDto;
 }

@@ -1,6 +1,5 @@
 package uz.pdp.springsecurity.service;
 
-import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.BenefitAndLost;
@@ -9,17 +8,11 @@ import uz.pdp.springsecurity.entity.Trade;
 import uz.pdp.springsecurity.entity.TradeProduct;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BenefitAndLostDto;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.OutlayRepository;
-import uz.pdp.springsecurity.repository.PurchaseRepository;
-import uz.pdp.springsecurity.repository.TradeRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,6 +32,9 @@ public class BenefitAndLostService {
     @Autowired
     CurrencyService currencyService;
 
+    @Autowired
+    TradeProductRepository tradeProductRepository;
+
     public ApiResponse findBenefitLost(BenefitAndLostDto benefitAndLostDto) throws ParseException {
 
         List<Trade> allTrade = tradeRepository.findAllByPayDateIsBetweenAndBranch_Id(benefitAndLostDto.getFirstDate(), benefitAndLostDto.getSecondDate(), benefitAndLostDto.getBranchId());
@@ -51,7 +47,7 @@ public class BenefitAndLostService {
         double otherExpenses = 0;
         for (Trade trade : allTrade) {
 
-            for (TradeProduct tradeProduct : trade.getTradeProductList()) {
+            for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
                 totalBuySum += (tradeProduct.getProduct().getBuyPrice() * tradeProduct.getTradedQuantity());
                 totalSaleSum += (tradeProduct.getProduct().getSalePrice() * tradeProduct.getTradedQuantity());
                 otherExpenses += (tradeProduct.getProduct().getTax() * tradeProduct.getTradedQuantity());
@@ -98,7 +94,7 @@ public class BenefitAndLostService {
         double totalSaleSum = 0;
         double otherExpenses = 0;
         for (Trade trade : allTrade) {
-            for (TradeProduct tradeProduct : trade.getTradeProductList()) {
+            for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
                 totalBuySum += (tradeProduct.getProduct().getBuyPrice() * tradeProduct.getTradedQuantity());
                 totalSaleSum += (tradeProduct.getProduct().getSalePrice() * tradeProduct.getTradedQuantity());
                 otherExpenses += (tradeProduct.getProduct().getTax() * tradeProduct.getTradedQuantity());
@@ -148,7 +144,7 @@ public class BenefitAndLostService {
         double totalSaleSum = 0;
         double otherExpenses = 0;
         for (Trade trade : tradeList) {
-            for (TradeProduct tradeProduct : trade.getTradeProductList()) {
+            for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
                 totalBuySum += (tradeProduct.getProduct().getBuyPrice() * tradeProduct.getTradedQuantity());
                 totalSaleSum += (tradeProduct.getProduct().getSalePrice() * tradeProduct.getTradedQuantity());
                 otherExpenses += (tradeProduct.getProduct().getTax() * tradeProduct.getTradedQuantity());

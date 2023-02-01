@@ -16,6 +16,7 @@ import org.springframework.util.FileCopyUtils;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.repository.CurrencyRepository;
 import uz.pdp.springsecurity.repository.CurrentCourceRepository;
+import uz.pdp.springsecurity.repository.TradeProductRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -33,6 +34,9 @@ public class PDFService {
 
     @Autowired
     CurrentCourceRepository currentCourceRepository;
+
+    @Autowired
+    TradeProductRepository tradeProductRepository;
 
     static String path = "src/main/resources/invoice.pdf";
 
@@ -161,7 +165,7 @@ public class PDFService {
 
 
         Double subTotal = 0D;
-        List<TradeProduct> tradeProductList = trade.getTradeProductList();
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTradeId(trade.getId());
         for (TradeProduct tradeProduct : tradeProductList) {
             col1.add(new Paragraph(new Text(tradeProduct.getProduct().getName())));
 
