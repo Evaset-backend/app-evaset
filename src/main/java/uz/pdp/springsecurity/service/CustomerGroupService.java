@@ -66,6 +66,6 @@ public class CustomerGroupService {
         customerGroup.setPercent(customerGroupDto.getPercent());
 
         customerGroupRepository.save(customerGroup);
-        return new ApiResponse("EDITED", false);
+        return new ApiResponse("EDITED", true);
     }
 }
