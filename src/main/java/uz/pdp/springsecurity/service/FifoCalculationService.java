@@ -45,23 +45,36 @@ public class FifoCalculationService {
     }
 
     public TradeProduct trade(Branch branch, TradeProduct tradeProduct) {
-        Product product = tradeProduct.getProduct();
-        List<FifoCalculation> fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+        List<FifoCalculation> fifoList = null;
+        Double salePrice = 0d;
+        if (tradeProduct.getProduct() != null) {
+            Product product = tradeProduct.getProduct();
+            salePrice = product.getSalePrice();
+            fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+        } else {
+            ProductTypePrice productTypePrice = tradeProduct.getProductTypePrice();
+            fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
+            salePrice = productTypePrice.getSalePrice();
+        }
+
         double tradedQuantity = tradeProduct.getTradedQuantity();
         double profit = 0;
         for (FifoCalculation fifo : fifoList) {
-            if (fifo.getRemainAmount()>=tradedQuantity){
-                double amount = fifo.getRemainAmount() - tradedQuantity;
-                fifo.setRemainAmount(amount);
-                profit = tradedQuantity * (product.getSalePrice() - fifo.getBuyPrice());
-                tradedQuantity = 0;
+            if (fifo.getRemainAmount()>tradedQuantity){
+                fifo.setRemainAmount(fifo.getRemainAmount() - tradedQuantity);
+                profit += tradedQuantity * (salePrice - fifo.getBuyPrice());
+                break;
+            } else if (fifo.getRemainAmount() < tradedQuantity) {
+                double amount = fifo.getRemainAmount();
+                tradedQuantity -= amount;
+                profit += amount * (salePrice - fifo.getBuyPrice());
+                fifo.setRemainAmount(0);
+                fifo.setActive(false);
+            }else {
+                profit += tradedQuantity * (salePrice - fifo.getBuyPrice());
+                fifo.setRemainAmount(0);
                 fifo.setActive(false);
                 break;
-            } else {
-                double amount = fifo.getRemainAmount();
-                fifo.setRemainAmount(0);
-                profit += amount * (product.getSalePrice() - fifo.getBuyPrice());
-                tradedQuantity -= amount;
             }
         }
         tradeProduct.setProfit(profit);

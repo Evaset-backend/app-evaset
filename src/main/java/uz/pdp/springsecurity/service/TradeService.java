@@ -63,6 +63,9 @@ public class TradeService {
     @Autowired
     WarehouseService warehouseService;
 
+    @Autowired
+    FifoCalculationService fifoCalculationService;
+
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
         Trade trade = new Trade();
@@ -125,13 +128,17 @@ public class TradeService {
         List<TradeProductDto> productTraderDto = tradeDTO.getProductTraderDto();
         List<TradeProduct> tradeProductList = new ArrayList<>();
 
+        double profit = 0;
         for (TradeProductDto tradeProductDto : productTraderDto) {
             TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
             if (tradeProduct != null) {
                 tradeProduct.setTrade(trade);
-                tradeProductList.add(tradeProduct);
+                TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
+                tradeProductList.add(savedTradeProduct);
+                profit += savedTradeProduct.getProfit();
             }
         }
+        tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
         return new ApiResponse("SAVED!", true);
     }
