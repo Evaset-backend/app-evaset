@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.payload.PurchaseProductDto;
 import uz.pdp.springsecurity.payload.TradeProductDto;
 import uz.pdp.springsecurity.repository.PurchaseProductRepository;
 import uz.pdp.springsecurity.repository.WarehouseRepository;
@@ -53,6 +54,26 @@ public class WarehouseService {
             warehouseList.add(warehouse);
         }
         warehouseRepository.saveAll(warehouseList);
+    }
+
+    public Boolean editPurchaseProductAmount(PurchaseProduct purchaseProduct, Double amount) {
+        Branch branch = purchaseProduct.getPurchase().getBranch();
+        Warehouse warehouse = null;
+        if (purchaseProduct.getProduct() != null) {
+            Product product = purchaseProduct.getProduct();
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
+            if (optionalWarehouse.isEmpty())return false;
+            warehouse = optionalWarehouse.get();
+            warehouse.setAmount(warehouse.getAmount() + amount);
+        } else {
+            ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
+            if (optionalWarehouse.isEmpty())return false;
+            warehouse = optionalWarehouse.get();
+            warehouse.setAmount(warehouse.getAmount() + amount);
+        }
+        warehouseRepository.save(warehouse);
+        return true;
     }
 
     /**
