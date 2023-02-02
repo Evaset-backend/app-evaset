@@ -25,4 +25,6 @@ public class SupplierDto {
     private String companyName;
 
     private UUID businessId;
+
+    private double debt;
 }

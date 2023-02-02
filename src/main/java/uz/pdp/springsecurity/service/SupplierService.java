@@ -29,7 +29,7 @@ public class SupplierService {
     public ApiResponse add(SupplierDto supplierDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(supplierDto.getBusinessId());
         if (optionalBusiness.isEmpty()) {
-            return new ApiResponse("BUSINESS NOT FOUND",false);
+            return new ApiResponse("BUSINESS NOT FOUND", false);
         }
         Supplier supplier = new Supplier(
                 supplierDto.getName(),
@@ -38,50 +38,53 @@ public class SupplierService {
                 optionalBusiness.get()
         );
 
-        if (supplierDto.isJuridical()){
+        if (supplierDto.isJuridical()) {
             supplier.setJuridical(true);
             supplier.setInn(supplierDto.getInn());
             supplier.setCompanyName(supplierDto.getCompanyName());
         }
+        supplier.setDebt(supplierDto.getDebt());
 
-            supplierRepository.save(supplier);
+        supplierRepository.save(supplier);
         return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse edit(UUID id, SupplierDto supplierDto) {
-        if (!supplierRepository.existsById(id)) return new ApiResponse("supplier NOT FOUND",false);
+        if (!supplierRepository.existsById(id)) return new ApiResponse("supplier NOT FOUND", false);
 
         Supplier supplier = supplierRepository.getById(id);
         supplier.setName(supplierDto.getName());
         supplier.setPhoneNumber(supplierDto.getPhoneNumber());
         supplier.setTelegram(supplierDto.getTelegram());
 
-        if (supplierDto.isJuridical()){
+        if (supplierDto.isJuridical()) {
             supplier.setJuridical(true);
             supplier.setInn(supplierDto.getInn());
             supplier.setCompanyName(supplierDto.getCompanyName());
         }
 
+
+        supplier.setDebt(supplierDto.getDebt());
         supplierRepository.save(supplier);
         return new ApiResponse("EDITED", true);
     }
 
     public ApiResponse get(UUID id) {
-        if (!supplierRepository.existsById(id)) return new ApiResponse("SUPPLIER NOT FOUND",false);
-        return new ApiResponse("FOUND",true,supplierRepository.findById(id).get());
+        if (!supplierRepository.existsById(id)) return new ApiResponse("SUPPLIER NOT FOUND", false);
+        return new ApiResponse("FOUND", true, supplierRepository.findById(id).get());
     }
 
     public ApiResponse delete(UUID id) {
-        if (!supplierRepository.existsById(id)) return new ApiResponse("SUPPLIER NOT FOUND",false);
+        if (!supplierRepository.existsById(id)) return new ApiResponse("SUPPLIER NOT FOUND", false);
         supplierRepository.deleteById(id);
-        return new ApiResponse("DELETED",true);
+        return new ApiResponse("DELETED", true);
     }
 
 
     public ApiResponse getAllByBusiness(UUID businessId) {
         List<Supplier> allByBusinessId = supplierRepository.findAllByBusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
-        return new ApiResponse("FOUND",true,allByBusinessId);
+        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse storeRepayment(UUID id, RepaymentDto repaymentDto) {
@@ -100,7 +103,7 @@ public class SupplierService {
                 return new ApiResponse("Brat Qarz null kelyabdi !", false);
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ApiResponse("Exception Xatolik !", false);
         }
     }
