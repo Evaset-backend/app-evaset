@@ -138,6 +138,7 @@ public class TradeService {
                 profit += savedTradeProduct.getProfit();
             }
         }
+        trade.setTotalProfit(profit);
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
         return new ApiResponse("SAVED!", true);
@@ -174,12 +175,13 @@ public class TradeService {
     }
 
     public ApiResponse deleteByTraderId(UUID trader_id) {
+        if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
         tradeRepository.deleteByTrader_Id(trader_id);
         return new ApiResponse("DELETED", true);
     }
 
     public ApiResponse deleteAllByTraderId(UUID trader_id) {
-
+        if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
         tradeRepository.deleteAllByTrader_Id(trader_id);
         return new ApiResponse("DELETED", true);
     }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.TradeDTO;
 import uz.pdp.springsecurity.repository.TradeRepository;
 import uz.pdp.springsecurity.service.TradeService;
 
@@ -30,12 +31,12 @@ public class TradeControllerIml {
      * @param tradeDTO
      * @return ApiResponse(success - > true, message - > ADDED)
      */
-    /*@CheckPermission("ADD_TRADE")
+    @CheckPermission("ADD_TRADE")
     @PostMapping
     public HttpEntity<?> create(@RequestBody TradeDTO tradeDTO) {
         ApiResponse apiResponse = tradeService.create(tradeDTO);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
+    }
 
     /**
      * ID ORQALI SAVDONI TAHRIRLASH
