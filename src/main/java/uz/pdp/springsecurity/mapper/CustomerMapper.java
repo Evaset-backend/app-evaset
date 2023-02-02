@@ -20,6 +20,9 @@ public interface CustomerMapper {
     List<CustomerDto> toDtoList(List<Customer> customers);
 
 
+    @Mapping(target = "customerGroup", ignore = true)
+    @Mapping(target = "business", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "id", ignore = true)

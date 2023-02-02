@@ -30,11 +30,7 @@ public class CustomerGroupService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        CustomerGroup customerGroup = new CustomerGroup(
-                customerGroupDto.getName(),
-                customerGroupDto.getPercent(),
-                customerGroupDto.getBusinessId()
-        );
+        CustomerGroup customerGroup = mapper.toEntity(customerGroupDto);
         customerGroupRepository.save(customerGroup);
         return new ApiResponse("ADDED", true);
     }

@@ -26,5 +26,6 @@ public class CustomerGroup extends AbsEntity {
     @Column(nullable = false)
     private Double percent;
 
-    private UUID businessId;
+    @ManyToOne
+    private Business business;
 }

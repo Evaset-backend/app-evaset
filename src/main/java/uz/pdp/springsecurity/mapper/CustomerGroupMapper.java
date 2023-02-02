@@ -14,4 +14,10 @@ public interface CustomerGroupMapper {
     CustomerGroupDto toDto(CustomerGroup customerGroup);
 
     List<CustomerGroupDto> toDtoList(List<CustomerGroup> customerGroups);
+
+    @Mapping(target = "business", ignore = true)
+    @Mapping(target = "updateAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "business.id", source = "businessId")
+    CustomerGroup toEntity(CustomerGroupDto customerGroupDto);
 }
