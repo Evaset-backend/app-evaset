@@ -29,9 +29,9 @@ public class CustomerGroupController {
 
 //    @CheckPermission("VIEW_CUSTOMER_GROUP")
     @GetMapping("/get")
-    public HttpEntity<List<CustomerGroup>> getAll(){
-        List<CustomerGroup> customerGroups = customerGroupService.getAll();
-        return ResponseEntity.ok(customerGroups);
+    public HttpEntity<?> getAll(){
+        ApiResponse apiResponse = customerGroupService.getAll();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("DELETE_CUSTOMER_GROUP")
