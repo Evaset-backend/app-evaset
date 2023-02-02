@@ -33,15 +33,20 @@ public class CustomerGroupService {
         CustomerGroup customerGroup = new CustomerGroup(
                 customerGroupDto.getName(),
                 customerGroupDto.getPercent(),
-                optionalBusiness.get()
+                customerGroupDto.getBusinessId()
         );
         customerGroupRepository.save(customerGroup);
         return new ApiResponse("ADDED", true);
     }
 
+
+    public List<CustomerGroup> getAll() {
+        return customerGroupRepository.findAll();
+
     public ApiResponse getAll() {
         List<CustomerGroup> customerGroupList = customerGroupRepository.findAll();
         return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
+
     }
 
     public ApiResponse delete(UUID id) {

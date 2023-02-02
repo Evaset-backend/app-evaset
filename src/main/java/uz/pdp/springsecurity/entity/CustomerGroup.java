@@ -11,6 +11,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -25,7 +26,5 @@ public class CustomerGroup extends AbsEntity {
     @Column(nullable = false)
     private Double percent;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Business business;
+    private UUID businessId;
 }

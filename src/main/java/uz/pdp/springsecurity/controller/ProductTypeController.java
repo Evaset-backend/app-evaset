@@ -9,7 +9,6 @@ import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.configuration.ExcelGenerator;
 import uz.pdp.springsecurity.entity.ProductType;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ProductDto;
 import uz.pdp.springsecurity.payload.ProductTypePostDto;
 import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.repository.ProductTypeRepository;
@@ -57,9 +56,6 @@ public class ProductTypeController {
         return ResponseEntity.ok(response);
     }
 
-
-
-
     @CheckPermission("ADD_PRODUCT_TYPE")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody ProductTypePostDto postDto) throws ParseException {
@@ -71,6 +67,13 @@ public class ProductTypeController {
     @GetMapping()
     public HttpEntity<?> getAll() {
         ApiResponse apiResponse = service.getProductType();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_PRODUCT_TYPE_PRODUCT_ID")
+    @GetMapping("/product_type/{id}")
+    public HttpEntity<?> getProductTypeByProductId(@Valid @PathVariable UUID id) {
+        ApiResponse apiResponse = service.getProductTypeByProductId(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
