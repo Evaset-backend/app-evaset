@@ -90,18 +90,19 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
-        if (purchaseDto.getDebtSum() > 0) {
-            supplier.setDebt(supplier.getDebt() + purchaseDto.getTotalSum() - purchaseDto.getPaidSum());
-            supplierRepository.save(supplier);
-        }
-
         purchase.setTotalSum(purchaseDto.getTotalSum());
-        purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
         purchase.setPaidSum(purchaseDto.getPaidSum());
+        purchase.setDebtSum(purchaseDto.getDebtSum());
+        purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
         purchase.setDate(purchaseDto.getDate());
         purchase.setDescription(purchaseDto.getDescription());
 
         purchaseRepository.save(purchase);
+
+        if (purchaseDto.getDebtSum() > 0) {
+            supplier.setDebt(supplier.getDebt() + purchaseDto.getDebtSum());
+            supplierRepository.save(supplier);
+        }
 
 
 //        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(branch.getBusiness().getId());
@@ -178,6 +179,94 @@ public class PurchaseService {
         return new ApiResponse("ADDED", true);
     }
 
+    public ApiResponse edit(UUID id, PurchaseDto purchaseDto) {
+        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
+        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
+
+        Purchase purchase = optionalPurchase.get();
+        ApiResponse apiResponse = editPurchase(purchase, purchaseDto);
+        if (!apiResponse.isSuccess()) return new ApiResponse("ERROR", false);
+        return new ApiResponse("EDITED", true);
+    }
+
+    private ApiResponse editPurchase(Purchase purchase, PurchaseDto purchaseDto) {
+        Optional<Supplier> optionalSupplier = supplierRepository.findById(purchaseDto.getSupplerId());
+        if (optionalSupplier.isEmpty()) return new ApiResponse("SUPPLIER NOT FOUND", false);
+        Supplier supplier = optionalSupplier.get();
+        purchase.setSupplier(supplier);
+
+        Optional<User> optionalUser = userRepository.findById(purchaseDto.getSeller());
+        if (optionalUser.isEmpty()) return new ApiResponse("SELLER NOT FOUND", false);
+        purchase.setSeller(optionalUser.get());
+
+        Optional<ExchangeStatus> optionalPurchaseStatus = exchangeStatusRepository.findById(purchaseDto.getPurchaseStatusId());
+        if (optionalPurchaseStatus.isEmpty()) return new ApiResponse("PURCHASE STATUS NOT FOUND", false);
+        purchase.setPurchaseStatus(optionalPurchaseStatus.get());
+
+        Optional<PaymentStatus> optionalPaymentStatus = paymentStatusRepository.findById(purchaseDto.getPaymentStatusId());
+        if (optionalPaymentStatus.isEmpty()) return new ApiResponse("PAYMENT STATUS NOT FOUND", false);
+        purchase.setPaymentStatus(optionalPaymentStatus.get());
+
+        Optional<Branch> optionalBranch = branchRepository.findById(purchaseDto.getBranchId());
+        if (optionalBranch.isEmpty()) return new ApiResponse("BRANCH NOT FOUND", false);
+        Branch branch = optionalBranch.get();
+        purchase.setBranch(branch);
+
+        purchase.setTotalSum(purchaseDto.getTotalSum());
+        purchase.setPaidSum(purchaseDto.getPaidSum());
+        purchase.setDebtSum(purchaseDto.getDebtSum());
+        purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
+        purchase.setDate(purchaseDto.getDate());
+        purchase.setDescription(purchaseDto.getDescription());
+
+        purchaseRepository.save(purchase);
+
+        /*if (purchaseDto.getDebtSum() > 0) {
+            supplier.setDebt(supplier.getDebt() + purchaseDto.getDebtSum());
+            supplierRepository.save(supplier);
+        }*/
+
+
+//        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(branch.getBusiness().getId());
+//        CurrentCource course = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
+        List<PurchaseProductDto> purchaseProductDtoList = purchaseDto.getPurchaseProductsDto();
+        List<PurchaseProduct> purchaseProductList = new ArrayList<>();
+
+        for (PurchaseProductDto purchaseProductDto : purchaseProductDtoList) {
+            Optional<PurchaseProduct> optionalPurchaseProduct = purchaseProductRepository.findById(purchaseProductDto.getPurchaseProductId());
+            if (optionalPurchaseProduct.isEmpty()) continue;
+            PurchaseProduct purchaseProduct = optionalPurchaseProduct.get();
+            //SINGLE TYPE
+            if (purchaseProductDto.getProductId()!=null) {
+                Product product = purchaseProduct.getProduct();
+                product.setSalePrice(purchaseProductDto.getSalePrice());
+                product.setBuyPrice(purchaseProductDto.getBuyPrice());
+                productRepository.save(product);
+            } else {//MANY TYPE
+                ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
+                productTypePrice.setBuyPrice(purchaseProductDto.getBuyPrice());
+                productTypePrice.setSalePrice(purchaseProductDto.getSalePrice());
+                productTypePriceRepository.save(productTypePrice);
+            }
+            purchaseProduct.setPurchasedQuantity(purchaseProductDto.getPurchasedQuantity());
+            purchaseProduct.setSalePrice(purchaseProductDto.getSalePrice());
+            purchaseProduct.setBuyPrice(purchaseProductDto.getBuyPrice());
+            purchaseProduct.setTotalSum(purchaseDto.getTotalSum());
+
+            purchaseProductList.add(purchaseProduct);
+
+
+            double amount = purchaseProductDto.getPurchasedQuantity() - purchaseProduct.getPurchasedQuantity();
+            if (amount != 0.0){
+                warehouseService.editPurchaseProductAmount(purchaseProduct, amount);
+                fifoCalculationService.editPurchaseProductAmount(purchaseProduct, purchaseProductDto);
+            }
+        }
+        purchaseProductRepository.saveAll(purchaseProductList);
+
+        return new ApiResponse("EDITED", true);
+    }
+
     public ApiResponse getAllByBusiness(UUID businessId) {
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
         return new ApiResponse("FOUND", true, purchaseList);
@@ -197,17 +286,6 @@ public class PurchaseService {
 
         /*Purchase changePrices = changePrices(purchase);
         return new ApiResponse("FOUND", true, changePrices);*/
-    }
-
-    public ApiResponse edit(UUID id, PurchaseDto purchaseDto) {
-        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
-        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        Purchase purchase = optionalPurchase.get();
-        ApiResponse apiResponse = addPurchase(purchase, purchaseDto);
-
-        if (!apiResponse.isSuccess()) return new ApiResponse("ERROR", false);
-        return new ApiResponse("EDITED", true);
     }
 
     public ApiResponse delete(UUID id) {
