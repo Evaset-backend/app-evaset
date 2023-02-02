@@ -30,23 +30,14 @@ public class CustomerGroupService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        CustomerGroup customerGroup = new CustomerGroup(
-                customerGroupDto.getName(),
-                customerGroupDto.getPercent(),
-                customerGroupDto.getBusinessId()
-        );
+        CustomerGroup customerGroup = mapper.toEntity(customerGroupDto);
         customerGroupRepository.save(customerGroup);
         return new ApiResponse("ADDED", true);
     }
 
-
-    public List<CustomerGroup> getAll() {
-        return customerGroupRepository.findAll();
-
     public ApiResponse getAll() {
         List<CustomerGroup> customerGroupList = customerGroupRepository.findAll();
         return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
-
     }
 
     public ApiResponse delete(UUID id) {
