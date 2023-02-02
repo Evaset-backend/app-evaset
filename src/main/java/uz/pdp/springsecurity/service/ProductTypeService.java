@@ -1,17 +1,11 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.ProductType;
-import uz.pdp.springsecurity.entity.ProductTypeValue;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ProductTypeGetDto;
-import uz.pdp.springsecurity.payload.ProductTypePostDto;
-import uz.pdp.springsecurity.payload.ProductTypeValueDto;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.ProductTypeRepository;
-import uz.pdp.springsecurity.repository.ProductTypeValueRepository;
+import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.payload.*;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.*;
 
@@ -24,6 +18,22 @@ public class ProductTypeService {
     private final ProductTypeValueRepository valueRepository;
 
     private final BusinessRepository businessRepository;
+
+    @Autowired
+    WarehouseRepository warehouseRepository;
+
+    @Autowired
+    ProductTypePriceRepository productTypePriceRepository;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    AttachmentRepository attachmentRepository;
+
+
+
+
 
 
     public ApiResponse addProductType(ProductTypePostDto postDto) {
@@ -59,6 +69,33 @@ public class ProductTypeService {
         valueRepository.saveAll(productTypeValues);
 
         return new ApiResponse("successfully_added", true);
+    }
+
+    public ApiResponse getProductTypeByProductId(UUID productId){
+        ProductTypeViewDto productTypeViewDto=new ProductTypeViewDto();
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductId(productId);
+        if (optionalProduct.isEmpty()){
+            return new ApiResponse("NOT FOUND", false);
+        }
+        Product product = optionalProduct.get();
+        productTypeViewDto.setName(product.getName());
+        if (priceList.isEmpty()){
+            return new ApiResponse("PRICE NOT FOUND", false);
+        }
+        for (ProductTypePrice productTypePrice : priceList){
+            if (productTypePrice.getProduct().getId().equals(productId)){
+                productTypeViewDto.setBuyPrice(productTypePrice.getBuyPrice());
+                productTypeViewDto.setSalePrice(productTypePrice.getSalePrice());
+                productTypeViewDto.setBarcode(productTypePrice.getBarcode());
+                Optional<Attachment> optionalAttachment = attachmentRepository.findById(productTypePrice.getId());
+                Attachment attachment = optionalAttachment.get();
+                productTypeViewDto.setPhotoIds(attachment.getId());
+            }
+        }
+        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+        optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
+        return new ApiResponse("FOUND", true);
     }
 
 
