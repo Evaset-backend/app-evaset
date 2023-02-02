@@ -27,4 +27,6 @@ public class SupplierDto {
 
     private UUID businessId;
 
+    private double debt;
+
 }
