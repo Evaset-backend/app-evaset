@@ -3,11 +3,11 @@ package uz.pdp.springsecurity.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +20,10 @@ public class ProductTypePrice extends AbsEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductTypeValue productTypeValue;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Attachment photo;
 
     private String barcode;
 

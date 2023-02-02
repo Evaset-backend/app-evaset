@@ -27,4 +27,6 @@ public class CustomerDto {
     private UUID businessId;
 
     private UUID branchId;
+
+    private double debt;
 }

@@ -1,9 +1,10 @@
 package uz.pdp.springsecurity.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.CustomerGroup;
+import uz.pdp.springsecurity.mapper.CustomerGroupMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CustomerGroupDto;
 import uz.pdp.springsecurity.repository.BusinessRepository;
@@ -14,33 +15,38 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerGroupService {
+    private final CustomerGroupRepository customerGroupRepository;
 
-    @Autowired
-    CustomerGroupRepository customerGroupRepository;
+    private final BusinessRepository businessRepository;
 
-    @Autowired
-    BusinessRepository businessRepository;
+    private final CustomerGroupMapper mapper;
 
     public ApiResponse addCustomerGroup(CustomerGroupDto customerGroupDto) {
 
         Optional<Business> optionalBusiness = businessRepository.findById(customerGroupDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("BRANCH NOT FOUND",false);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
         CustomerGroup customerGroup = new CustomerGroup(
                 customerGroupDto.getName(),
                 customerGroupDto.getPercent(),
-                optionalBusiness.get()
+                customerGroupDto.getBusinessId()
         );
         customerGroupRepository.save(customerGroup);
         return new ApiResponse("ADDED", true);
     }
 
+
     public List<CustomerGroup> getAll() {
-        List<CustomerGroup> customerGroups = customerGroupRepository.findAll();
-        return customerGroups;
+        return customerGroupRepository.findAll();
+
+    public ApiResponse getAll() {
+        List<CustomerGroup> customerGroupList = customerGroupRepository.findAll();
+        return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
+
     }
 
     public ApiResponse delete(UUID id) {
@@ -50,15 +56,22 @@ public class CustomerGroupService {
     }
 
     public ApiResponse getById(UUID id) {
-        if (!customerGroupRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, customerGroupRepository.findById(id).get());
+        Optional<CustomerGroup> optional = customerGroupRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return new ApiResponse("NOT_FOUND", false);
+        }
+
+        CustomerGroup customerGroup = optional.get();
+        return new ApiResponse("FOUND", true, mapper.toDto(customerGroup));
     }
+
 
     public ApiResponse edit(UUID id, CustomerGroupDto customerGroupDto) {
         if (!customerGroupRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Optional<Business> optionalBusiness = businessRepository.findById(customerGroupDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("BRANCH NOT FOUND",false);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
         CustomerGroup customerGroup = customerGroupRepository.getById(id);

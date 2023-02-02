@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SupplierDto {
+
     @NotNull(message = "required line")
     private String name;
     @NotNull(message = "required line")
@@ -25,4 +26,7 @@ public class SupplierDto {
     private String companyName;
 
     private UUID businessId;
+
+    private double debt;
+
 }

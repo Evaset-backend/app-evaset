@@ -33,7 +33,6 @@ public class Customer extends AbsEntity {
     private CustomerGroup customerGroup;
 
 
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
