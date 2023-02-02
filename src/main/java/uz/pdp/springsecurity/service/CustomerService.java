@@ -39,35 +39,36 @@ public class CustomerService {
     private final CustomerMapper mapper;
 
     public ApiResponse add(CustomerDto customerDto) {
+
         Optional<Business> optionalBusiness = businessRepository.findById(customerDto.getBusinessId());
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("BUSINESS NOT FOUND", false);
         }
 
         Optional<Branch> optionalBranch = branchRepository.findById(customerDto.getBranchId());
-
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        Customer customer = new Customer(
-                customerDto.getName(),
-                customerDto.getPhoneNumber(),
-                customerDto.getTelegram(),
-                optionalBusiness.get(),
-                optionalBranch.get()
-        );
-
-        if (customerDto.getCustomerGroupId() != null) {
-            Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-            optionalCustomerGroup.ifPresent(customer::setCustomerGroup);
+        Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
+        if (customerGroupOptional.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
         }
+
+
+        Customer customer = mapper.toEntity(customerDto);
+
         customerRepository.save(customer);
         return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse edit(UUID id, CustomerDto customerDto) {
-        if (!customerRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("NOT FOUND ", false);
+        }
+
         Optional<Business> optionalBusiness = businessRepository.findById(customerDto.getBusinessId());
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("BRANCH NOT FOUND", false);
@@ -78,14 +79,15 @@ public class CustomerService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        Customer customer = customerRepository.getById(id);
-        customer.setName(customerDto.getName());
-        customer.setPhoneNumber(customerDto.getPhoneNumber());
-        customer.setTelegram(customerDto.getTelegram());
-        customer.setBusiness(optionalBusiness.get());
-        customer.setBranch(optionalBranch.get());
+        Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
+        if (optionalCustomerGroup.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        }
 
+        Customer customer = optionalCustomer.get();
+        mapper.update(customerDto, customer);
         customerRepository.save(customer);
+
         return new ApiResponse("EDITED", true);
     }
 
