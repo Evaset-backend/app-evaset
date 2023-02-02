@@ -38,7 +38,6 @@ public class CustomerGroupService {
     public ApiResponse getAll() {
         List<CustomerGroup> customerGroupList = customerGroupRepository.findAll();
         return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
-
     }
 
     public ApiResponse delete(UUID id) {
