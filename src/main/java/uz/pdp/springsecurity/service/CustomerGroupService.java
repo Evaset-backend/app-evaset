@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.CustomerGroup;
@@ -18,12 +17,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CustomerGroupService {
+    private final CustomerGroupRepository customerGroupRepository;
 
-    @Autowired
-    CustomerGroupRepository customerGroupRepository;
-
-    @Autowired
-    BusinessRepository businessRepository;
+    private final BusinessRepository businessRepository;
 
     private final CustomerGroupMapper mapper;
 
@@ -55,9 +51,16 @@ public class CustomerGroupService {
     }
 
     public ApiResponse getById(UUID id) {
-        if (!customerGroupRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, customerGroupRepository.findById(id).get());
+        Optional<CustomerGroup> optional = customerGroupRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return new ApiResponse("NOT_FOUND", false);
+        }
+
+        CustomerGroup customerGroup = optional.get();
+        return new ApiResponse("FOUND", true, mapper.toDto(customerGroup));
     }
+
 
     public ApiResponse edit(UUID id, CustomerGroupDto customerGroupDto) {
         if (!customerGroupRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
