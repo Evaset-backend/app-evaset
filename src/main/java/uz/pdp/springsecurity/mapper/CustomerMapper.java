@@ -23,7 +23,7 @@ public interface CustomerMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "customerGroup", source = "customerGroupId")
+    @Mapping(target = "customerGroup.id", source = "customerGroupId")
     @Mapping(target = "business.id", source = "businessId")
     @Mapping(target = "branch.id", source = "branchId")
     Customer toEntity(CustomerDto customerDto);
