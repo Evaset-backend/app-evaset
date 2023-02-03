@@ -19,6 +19,7 @@ public class ProductViewDto {
     private List<Branch> branch;
     private double buyPrice;
     private double salePrice;
+    private String barcode;
     private double amount;
     private String brandName;
     private double minQuantity;
