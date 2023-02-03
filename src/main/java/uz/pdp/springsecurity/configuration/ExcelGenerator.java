@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import uz.pdp.springsecurity.entity.Product;
 import uz.pdp.springsecurity.entity.ProductType;
 
 import javax.servlet.ServletOutputStream;
@@ -16,9 +17,11 @@ import java.util.UUID;
 
 public class ExcelGenerator {
 
-    private List<ProductType> productTypeList;
+    private final List<ProductType> productTypeList;
 
-    private XSSFWorkbook workbook;
+    private  List<Product> productList;
+
+    private final XSSFWorkbook workbook;
 
     private XSSFSheet sheet;
 
@@ -28,16 +31,17 @@ public class ExcelGenerator {
     }
 
     private void writeHeader() {
-        sheet = workbook.createSheet("Product Type");
+        sheet = workbook.createSheet("Product");
         Row row = sheet.createRow(0);
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        createCell(row, 0, "ID", style);
-        createCell(row, 1, "Product Type Name", style);
-        createCell(row, 2, "Business Id", style);
+        createCell(row, 1, "ID", style);
+        createCell(row, 2, "Product Type Name", style);
+        createCell(row, 3, "Business Id", style);
+        createCell(row, 4, "Business Id", style);
     }
 
     private void createCell(Row row, int columnCount, Object valueOfCell, CellStyle style) {
