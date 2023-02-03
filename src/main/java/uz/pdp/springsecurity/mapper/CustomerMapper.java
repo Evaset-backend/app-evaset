@@ -32,5 +32,6 @@ public interface CustomerMapper {
     Customer toEntity(CustomerDto customerDto);
 
     @InheritInverseConfiguration
+    @Mapping(target = "id", ignore = true)
     void update(CustomerDto customerDto, @MappingTarget Customer customer);
 }
