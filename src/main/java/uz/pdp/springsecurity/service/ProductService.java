@@ -104,6 +104,9 @@ public class ProductService {
         product.setPhoto(attachmentList);
         product.setTax(productDto.getTax());
         product.setBarcode(productDto.getBarcode());
+        product.setExpireDate(productDto.getExpireDate());
+        product.setMinQuantity(productDto.getQuantity());
+        product.setDueDate(productDto.getDueDate());
 
         product.setActive(true);
 
