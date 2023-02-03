@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerDto {
+    private UUID id;
 
     @NotNull(message = "required line")
     private String name;
