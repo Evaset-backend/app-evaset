@@ -506,6 +506,7 @@ public class ProductService {
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
 
+
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranch_BusinessIdAndProductId(businessId, product.getId());

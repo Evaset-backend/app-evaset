@@ -25,6 +25,8 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     void deleteByTrader_Id(UUID trader_id);
 
+    boolean existsByTraderId(UUID traderId);
+
     void deleteAllByTrader_Id(UUID trader_id);
 
     List<Trade> findAllByPayDateIsBetweenAndBranch_Id(Date payDate, Date payDate2, UUID branch_id);
