@@ -1,6 +1,6 @@
 package uz.pdp.springsecurity.entity;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +11,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Type;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
