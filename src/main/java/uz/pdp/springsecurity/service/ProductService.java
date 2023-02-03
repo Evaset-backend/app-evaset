@@ -499,6 +499,7 @@ public class ProductService {
                 productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
                 productViewDto.setBrandName(product.getBrand().getName());
+                productViewDto.setBarcode(product.getBarcode());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());

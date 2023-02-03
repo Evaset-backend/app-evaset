@@ -72,30 +72,33 @@ public class ProductTypeService {
     }
 
     public ApiResponse getProductTypeByProductId(UUID productId){
-        ProductTypeViewDto productTypeViewDto=new ProductTypeViewDto();
+        List<ProductTypeViewDto> productTypeViewDtoList=new ArrayList<>();
         Optional<Product> optionalProduct = productRepository.findById(productId);
         List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductId(productId);
         if (optionalProduct.isEmpty()){
             return new ApiResponse("NOT FOUND", false);
         }
         Product product = optionalProduct.get();
-        productTypeViewDto.setName(product.getName());
+
         if (priceList.isEmpty()){
             return new ApiResponse("PRICE NOT FOUND", false);
         }
         for (ProductTypePrice productTypePrice : priceList){
+            ProductTypeViewDto productTypeViewDto=new ProductTypeViewDto();
             if (productTypePrice.getProduct().getId().equals(productId)){
+                productTypeViewDto.setName(product.getName());
                 productTypeViewDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypeViewDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypeViewDto.setBarcode(productTypePrice.getBarcode());
                 Optional<Attachment> optionalAttachment = attachmentRepository.findById(productTypePrice.getId());
-                Attachment attachment = optionalAttachment.get();
-                productTypeViewDto.setPhotoIds(attachment.getId());
+                optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoIds(attachment.getId()));
             }
+            productTypeViewDtoList.add(productTypeViewDto);
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
         }
-        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
-        optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
-        return new ApiResponse("FOUND", true);
+
+        return new ApiResponse("FOUND", true,productTypeViewDtoList);
     }
 
 
