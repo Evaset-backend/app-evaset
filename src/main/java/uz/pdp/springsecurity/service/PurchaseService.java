@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.repository.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -116,14 +117,18 @@ public class PurchaseService {
             //SINGLE TYPE
             if (purchaseProductDto.getProductId()!=null) {
                 UUID productId = purchaseProductDto.getProductId();
-                Product product = productRepository.findById(productId).get();
+                Optional<Product> optional = productRepository.findById(productId);
+                if (optional.isEmpty())continue;
+                Product product = optional.get();
                 product.setSalePrice(purchaseProductDto.getSalePrice());
                 product.setBuyPrice(purchaseProductDto.getBuyPrice());
                 productRepository.save(product);
                 purchaseProduct.setProduct(product);
             } else {//MANY TYPE
                 UUID productTypePriceId = purchaseProductDto.getProductTypePriceId();
-                ProductTypePrice productTypePrice = productTypePriceRepository.findById(productTypePriceId).get();
+                Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productTypePriceId);
+                if (optional.isEmpty())continue;
+                ProductTypePrice productTypePrice = optional.get();
                 productTypePrice.setBuyPrice(purchaseProductDto.getBuyPrice());
                 productTypePrice.setSalePrice(purchaseProductDto.getSalePrice());
                 productTypePriceRepository.save(productTypePrice);
@@ -184,6 +189,14 @@ public class PurchaseService {
         if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         Purchase purchase = optionalPurchase.get();
+        if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+        Timestamp createdAt = purchase.getCreatedAt();
+        long difference = System.currentTimeMillis() - createdAt.getTime();
+        long oneDay = 1000 * 60 * 60 * 24;
+        if (difference > oneDay){
+            purchase.setEditable(false);
+            return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+        }
         ApiResponse apiResponse = editPurchase(purchase, purchaseDto);
         if (!apiResponse.isSuccess()) return new ApiResponse("ERROR", false);
         return new ApiResponse("EDITED", true);
