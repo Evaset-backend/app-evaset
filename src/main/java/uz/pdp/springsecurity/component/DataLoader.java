@@ -223,7 +223,9 @@ public class DataLoader implements CommandLineRunner {
                             GET_BY_PRODUCT_TYPE,
                             UPDATE_PRODUCT_TYPE,
                             DELETE_PRODUCT_TYPE,
-                            GET_PRODUCT_TYPE_PRODUCT_ID
+                            GET_PRODUCT_TYPE_PRODUCT_ID,
+
+                            GET_EXCEL
 
                     ),
                     business

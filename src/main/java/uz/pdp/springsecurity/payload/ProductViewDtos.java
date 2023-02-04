@@ -12,18 +12,16 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductViewDto {
+public class ProductViewDtos {
 
-    private UUID productId;
     private String productName;
-    private List<Branch> branch;
+    private String branch;
     private double buyPrice;
     private double salePrice;
     private String measurementId;
     private String barcode;
-    private UUID photoIds;
     private double amount;
     private String brandName;
     private double minQuantity;
-    private Date expiredDate;
+    private String expiredDate;
 }
