@@ -185,6 +185,13 @@ public class ProductController {
     }
 
     @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-by-branch-for-purchase-trade/{branch_id}")
+    public HttpEntity<?> getByBranchForSearch(@PathVariable UUID branch_id) {
+        ApiResponse apiResponse = productService.getByBranchForSearch(branch_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-business/{business_id}")
     public HttpEntity<?> getByBusiness(@PathVariable UUID business_id) {
         ApiResponse apiResponse = productService.getByBusiness(business_id);
