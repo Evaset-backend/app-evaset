@@ -117,8 +117,10 @@ public class ProductService {
             return addProductTypeSingleDto(productDto, product);
         } else if (productDto.getType().equals(Type.MANY.name())) {
             return addProductTypeManyDto(productDto, product, isUpdate);
-        } else {
+        } else if (productDto.getType().equals(Type.COMBO.name())) {
             return addProductTypeComboDto(productDto, product, isUpdate);
+        } else {
+            return new ApiResponse("no such type exists", false);
         }
 
     }
@@ -169,7 +171,7 @@ public class ProductService {
         saveProduct.setSalePrice(productDto.getSalePrice());
         comboRepository.saveAll(productTypeComboList);
         productRepository.save(saveProduct);
-        return new ApiResponse("successfully saved",true);
+        return new ApiResponse("successfully saved", true);
     }
 
     private ApiResponse addProductTypeSingleDto(ProductDto productDto, Product product) {
@@ -280,8 +282,10 @@ public class ProductService {
             return addProductTypeSingleDto(productDto, product);
         } else if (productDto.getType().equals(Type.MANY.name())) {
             return addProductTypeManyDto(productDto, product, isUpdate);
-        } else {
+        } else if (productDto.getType().equals(Type.COMBO.name())) {
             return addProductTypeComboDto(productDto, product, isUpdate);
+        } else {
+            return new ApiResponse("no such type exists", false);
         }
 
     }
@@ -469,12 +473,12 @@ public class ProductService {
     }
 
     public ApiResponse getByBranch(UUID branch_id) {
-        ProductViewDto productViewDto=new ProductViewDto();
+        ProductViewDto productViewDto = new ProductViewDto();
 
         List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
-        if (productList.isEmpty()){
-            return new ApiResponse("NOT FOUND",false);
-        }else {
+        if (productList.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        } else {
             for (Product product : productList) {
                 productViewDto.setProductName(product.getName());
                 productViewDto.setBrandName(product.getBrand().getName());
@@ -488,16 +492,16 @@ public class ProductService {
                     productViewDto.setAmount(warehouse.getAmount());
                 }
             }
-            return new ApiResponse("FOUND",true,productViewDto);
+            return new ApiResponse("FOUND", true, productViewDto);
         }
     }
 
     public ApiResponse getByBusiness(UUID businessId) {
-        List<ProductViewDto> productViewDtoList=new ArrayList<>();
+        List<ProductViewDto> productViewDtoList = new ArrayList<>();
         List<Product> productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
-        if (productList.isEmpty()){
-            return new ApiResponse("NOT FOUND",false);
-        }else {
+        if (productList.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        } else {
             for (Product product : productList) {
                 ProductViewDto productViewDto = new ProductViewDto();
                 productViewDto.setProductId(product.getId());
