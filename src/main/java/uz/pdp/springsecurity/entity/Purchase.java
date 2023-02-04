@@ -46,6 +46,8 @@ public class Purchase extends AbsEntity {
 
     private double debtSum;
 
+    private boolean editable;
+
 //    @OneToMany
 //    @OnDelete(action = OnDeleteAction.CASCADE)
 //    @JoinColumn
