@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Measurement;
 import uz.pdp.springsecurity.entity.Product;
 import uz.pdp.springsecurity.entity.Warehouse;
@@ -42,7 +43,10 @@ public class ExcelService {
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
-                productViewDto.setBranch(product.getBranch().toString());
+                List<Branch> branchList = product.getBranch();
+                for (Branch branch : branchList) {
+                    productViewDto.setBranch(branch.getName());
+                }
                 productViewDto.setExpiredDate(product.getExpireDate().toString());
 
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
