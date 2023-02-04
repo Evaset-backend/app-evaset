@@ -56,7 +56,6 @@ public class Product extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Measurement measurement;
 
-
     @ManyToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Attachment> photo;

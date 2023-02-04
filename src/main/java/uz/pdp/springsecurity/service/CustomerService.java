@@ -55,7 +55,6 @@ public class CustomerService {
             return new ApiResponse("NOT FOUND", false);
         }
 
-
         Customer customer = mapper.toEntity(customerDto);
 
         customerRepository.save(customer);

@@ -103,6 +103,7 @@ public class ProductService {
         product.setMeasurement(optionalMeasurement.get());
         product.setPhoto(attachmentList);
         product.setTax(productDto.getTax());
+        product.setExpireDate(productDto.getExpireDate());
         product.setBarcode(productDto.getBarcode());
         product.setExpireDate(productDto.getExpireDate());
         product.setMinQuantity(productDto.getQuantity());
@@ -509,6 +510,13 @@ public class ProductService {
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
 
+                List<UUID> ids = new ArrayList<>();
+                List<Attachment> photo = product.getPhoto();
+                List<Attachment> attachmentList = attachmentRepository.findAllById(ids);
+                for (Attachment attachment : attachmentList) {
+                    Optional<Attachment> optionalAttachment = attachmentRepository.findById(attachment.getId());
+                    optionalAttachment.ifPresent(attachment1 -> productViewDto.setPhotoIds(attachment.getId()));
+                }
 
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
@@ -519,7 +527,6 @@ public class ProductService {
             return new ApiResponse("FOUND", true, productViewDtoList);
         }
     }
-
 
 
     public ApiResponse deleteProducts(List<UUID> ids) {
@@ -534,4 +541,6 @@ public class ProductService {
         }
         return new ApiResponse("DELETED", true);
     }
+
+
 }

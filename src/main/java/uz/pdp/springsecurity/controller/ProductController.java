@@ -6,14 +6,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.annotations.CurrentUser;
+import uz.pdp.springsecurity.configuration.ExcelGenerator;
+import uz.pdp.springsecurity.entity.Product;
+import uz.pdp.springsecurity.entity.ProductType;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductBarcodeDto;
 import uz.pdp.springsecurity.payload.ProductDto;
+import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.service.ProductService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +32,9 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    ProductRepository productRepository;
 
     /**
      * YANGI PRODUCT QO'SHISH
@@ -178,6 +190,4 @@ public class ProductController {
         ApiResponse apiResponse = productService.getByBusiness(business_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
-}
+   }
