@@ -495,6 +495,64 @@ public class ProductService {
         }
     }
 
+    public ApiResponse getByBranchForSearch(UUID branch_id) {
+
+        List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
+        if (productList.isEmpty()){
+            return new ApiResponse("NOT FOUND",false);
+        }else {
+            for (Product product : productList) {
+                if (product.getType().equals(Type.SINGLE)){
+                    ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
+                    getForPurchaseDto.setProductId(product.getId());
+                    getForPurchaseDto.setType(Type.SINGLE.name());
+                    getForPurchaseDto.setName(product.getName());
+                    getForPurchaseDto.setBarcode(product.getBarcode());
+                    getForPurchaseDto.setBrandName(product.getBrand().getName());
+                    getForPurchaseDto.setBuyPrice(product.getBuyPrice());
+                    getForPurchaseDto.setSalePrice(product.getSalePrice());
+                    getForPurchaseDto.setMinQuantity(product.getMinQuantity());
+                    getForPurchaseDto.setExpiredDate(product.getExpireDate());
+                    getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
+                    if (optionalWarehouse.isEmpty()) {
+                        getForPurchaseDto.setAmount(0d);
+                    }else {
+                        getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
+                    }
+                    getForPurchaseDtoList.add(getForPurchaseDto);
+                }else if (product.getType().equals(Type.MANY)){
+                    List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
+                    for (ProductTypePrice productTypePrice : productTypePriceList) {
+                        ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
+                        getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
+                        getForPurchaseDto.setType(Type.MANY.name());
+                        getForPurchaseDto.setName(product.getName()+"( "+productTypePrice.getProductTypeValue().getProductType()+"-"+productTypePrice.getProductTypeValue().getName()+" )");
+                        getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
+                        getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
+                        getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
+                        getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
+                        getForPurchaseDto.setBrandName(product.getBrand().getName());
+                        getForPurchaseDto.setMinQuantity(product.getMinQuantity());
+                        getForPurchaseDto.setExpiredDate(product.getExpireDate());
+                        getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
+                        if (optionalWarehouse.isEmpty()) {
+                            getForPurchaseDto.setAmount(0d);
+                        }else {
+                            getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
+                        }
+                        getForPurchaseDtoList.add(getForPurchaseDto);
+                    }
+                }
+
+
+            }
+            return new ApiResponse("FOUND",true,getForPurchaseDtoList);
+        }
+    }
+
     public ApiResponse getByBusiness(UUID businessId) {
         List<ProductViewDto> productViewDtoList = new ArrayList<>();
         List<Product> productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
