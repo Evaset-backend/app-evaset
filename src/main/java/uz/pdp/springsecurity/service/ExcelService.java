@@ -51,6 +51,7 @@ public class ExcelService {
                 optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
                 productViewDtoList.add(productViewDto);
             }
+
             return productViewDtoList;
         }
     }
