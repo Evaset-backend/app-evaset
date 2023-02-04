@@ -106,7 +106,7 @@ public class ProductService {
         product.setExpireDate(productDto.getExpireDate());
         product.setBarcode(productDto.getBarcode());
         product.setExpireDate(productDto.getExpireDate());
-        product.setMinQuantity(productDto.getQuantity());
+        product.setMinQuantity(productDto.getMinQuantity());
         product.setDueDate(productDto.getDueDate());
 
         product.setActive(true);
@@ -122,7 +122,6 @@ public class ProductService {
         } else {
             return new ApiResponse("no such type exists", false);
         }
-
     }
 
     private ApiResponse addProductTypeComboDto(ProductDto productDto, Product product, boolean isUpdate) {
