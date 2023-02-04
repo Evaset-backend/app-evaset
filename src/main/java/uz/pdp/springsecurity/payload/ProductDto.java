@@ -17,7 +17,7 @@ public class ProductDto {
     private String name;
 
     @NotNull(message = "required line")
-    private Double quantity;
+    private Double minQuantity;
 
     @NotNull(message = "required line")
     private String barcode;
