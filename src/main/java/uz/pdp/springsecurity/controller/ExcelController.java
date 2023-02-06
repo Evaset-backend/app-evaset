@@ -2,11 +2,11 @@ package uz.pdp.springsecurity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.service.ResponseMessage;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.configuration.ExcelGenerator;
 import uz.pdp.springsecurity.entity.Product;
@@ -14,6 +14,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductViewDto;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 import uz.pdp.springsecurity.repository.ProductRepository;
+import uz.pdp.springsecurity.service.ExcelHelper;
 import uz.pdp.springsecurity.service.ExcelService;
 import uz.pdp.springsecurity.service.ProductService;
 
@@ -46,12 +47,30 @@ public class ExcelController {
         String currentDateTime = dateFormatter.format(new Date());
 
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=PRODUCT" + currentDateTime + ".xlsx";
+        String headerValue = "attachment; filename= PRODUCT "+ ".xlsx";
         response.setHeader(headerKey, headerValue);
         List<ProductViewDtos> productViewDtos = excelService.getByBusiness(uuid);
         ExcelGenerator generator = new ExcelGenerator(productViewDtos);
         generator.generateExcelFile(response);
 
         return ResponseEntity.ok(response);
+    }
+
+    @CheckPermission("POST_EXCEL")
+    @PostMapping("/upload/{id}")
+    public HttpEntity<?> uploadFile(@PathVariable UUID id,@RequestBody MultipartFile file) {
+        String message = "";
+        if (ExcelHelper.hasExcelFormat(file)) {
+            try {
+                excelService.save(file,id);
+                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                return ResponseEntity.status(HttpStatus.OK).body(message);
+            } catch (Exception e) {
+                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+            }
+        }
+        message = "Please upload an excel file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((message));
     }
 }

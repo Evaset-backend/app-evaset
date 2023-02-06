@@ -15,9 +15,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Optional<Product> findByBarcodeAndBranchIdAndActive(String barcode, UUID branch_id, boolean active);
 
-    Optional<Product> findByIdAndBranchIdAndActiveTrue(UUID id, UUID branch_id);
+    Optional<Product> findByNameAndBranchIdAndActiveTrue(String name,UUID branchId);
 
     void deleteByIdAndBranchId(UUID id, UUID branch_id);
+
+    Optional<Product> findByIdAndBranchIdAndActiveTrue(UUID id, UUID branchId);
 
     Optional<Product> findAllByBarcodeAndBranchIdAndActiveTrue(String barcode, UUID branch_id);
 

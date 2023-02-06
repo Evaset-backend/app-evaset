@@ -34,7 +34,7 @@ public class ExcelGenerator {
 
     private void writeHeader() {
         sheet = workbook.createSheet("Product");
-        Row row = sheet.createRow(1);
+        Row row = sheet.createRow(0);
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setBold(true);

@@ -113,6 +113,7 @@ public enum Manager {
     DELETE_PRODUCT_TYPE,
     GET_PRODUCT_TYPE_PRODUCT_ID,
 
-    GET_EXCEL
+    GET_EXCEL,
+    POST_EXCEL
 
 }
