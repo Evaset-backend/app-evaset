@@ -1,8 +1,11 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.ExchangeProductBranchMapper;
+import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ExchangeProductBranchDTO;
 import uz.pdp.springsecurity.payload.ExchangeProductDTO;
@@ -12,6 +15,7 @@ import java.sql.Date;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ExchangeProductBranchService {
 
     @Autowired
@@ -32,6 +36,70 @@ public class ExchangeProductBranchService {
     @Autowired
     ExchangeProductRepository exchangeProductRepository;
 
+    private final ExchangeProductBranchMapper mapper;
+
+    private final ExchangeProductMapper exchangeProductMapper;
+
+
+    public ApiResponse create(ExchangeProductBranchDTO exchangeProductBranchDTO) {
+
+        UUID businessId = exchangeProductBranchDTO.getBusinessId();
+        UUID shippedBranchId = exchangeProductBranchDTO.getShippedBranchId();
+        UUID receivedBranchId = exchangeProductBranchDTO.getReceivedBranchId();
+        UUID exchangeStatusId = exchangeProductBranchDTO.getExchangeStatusId();
+
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        Optional<Branch> optionalShippedBranch = branchRepository.findById(shippedBranchId);
+        Optional<Branch> optionalReceivedBranch = branchRepository.findById(receivedBranchId);
+        Optional<ExchangeStatus> optionalExchangeStatus = exchangeStatusRepository.findById(exchangeStatusId);
+
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("not found business", false);
+        }
+
+        if (optionalShippedBranch.isEmpty()) {
+            return new ApiResponse("not found shipped Branch", false);
+        }
+
+        if (optionalReceivedBranch.isEmpty()) {
+            return new ApiResponse("not found received Branch", false);
+        }
+
+        if (optionalExchangeStatus.isEmpty()) {
+            return new ApiResponse("not found exchange status", false);
+        }
+
+
+        ExchangeProductBranch exchangeProductBranch = mapper.toEntity(exchangeProductBranchDTO);
+
+        List<ExchangeProduct> exchangeProducts = new ArrayList<>();
+        List<ExchangeProductDTO> exchangeProductDTOS = exchangeProductBranchDTO.getExchangeProductDTOS();
+
+        for (ExchangeProductDTO exchangeProductDTO : exchangeProductDTOS) {
+
+            ExchangeProduct exchangeProduct = new ExchangeProduct();
+            UUID productExchangeId = exchangeProductDTO.getProductExchangeId();
+
+            Optional<Product> optionalProduct = productRepository.findById(productExchangeId);
+            if (optionalProduct.isEmpty()) {
+                return new ApiResponse("not found product", false);
+            }
+
+            exchangeProduct.setProduct(optionalProduct.get());
+            exchangeProduct.setExchangeProductQuantity(exchangeProductDTO.getExchangeProductQuantity());
+
+            exchangeProducts.add(exchangeProduct);
+        }
+
+        //todo fifo uchun kod yozilishi
+
+        exchangeProductBranch.setExchangeProduct(exchangeProducts);
+        exchangeProductBranchRepository.save(exchangeProductBranch);
+
+        return new ApiResponse("successfully saved exchange product branch", true);
+    }
+
+
 //    public ApiResponse create(ExchangeProductBranchDTO exchangeProductBranchDTO) {
 //        ExchangeProductBranch exchangeProductBranch = new ExchangeProductBranch();
 //        return add(exchangeProductBranch, exchangeProductBranchDTO);
@@ -42,10 +110,10 @@ public class ExchangeProductBranchService {
 //        Optional<ExchangeProductBranch> optionalExchange = exchangeProductBranchRepository.findById(id);
 //        if (optionalExchange.isEmpty()) return new ApiResponse("NOT FOUND", false);
 //        ExchangeProductBranch exchange = optionalExchange.get();
+
 //        return add(exchange, exchangeProductBranchDTO);
+
 //    }
-
-
 //    public ApiResponse add(ExchangeProductBranch exchangeProductBranch, ExchangeProductBranchDTO exchangeProductBranchDTO) {
 //        if ((exchangeProductBranchDTO.getShippedBranchId() == exchangeProductBranchDTO.getReceivedBranchId())) {
 //            return new ApiResponse("SELECT ANOTHER BRANCH TO SEND", false);
@@ -155,12 +223,22 @@ public class ExchangeProductBranchService {
 //
 //        exchangeProductBranchRepository.save(exchangeProductBranch);
 //
+
 //        return new ApiResponse("SENT", true);
+
 //    }
 
     public ApiResponse getOne(UUID id) {
-        if (exchangeProductBranchRepository.findById(id).isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, exchangeProductBranchRepository.getById(id));
+        Optional<ExchangeProductBranch> optional = exchangeProductBranchRepository.findById(id);
+        if (optional.isEmpty()) {
+            return new ApiResponse("not found exchange product branch ", false);
+        }
+        ExchangeProductBranch exchangeProductBranch = optional.get();
+        List<ExchangeProductDTO> exchangeProductDTOList = exchangeProductMapper.toDtoList(exchangeProductBranch.getExchangeProduct());
+        ExchangeProductBranchDTO exchangeProductBranchDTO = mapper.toDto(exchangeProductBranch);
+        exchangeProductBranchDTO.setExchangeProductDTOS(exchangeProductDTOList);
+
+        return new ApiResponse(exchangeProductBranchDTO);
     }
 
     public ApiResponse deleteOne(UUID id) {
@@ -177,6 +255,7 @@ public class ExchangeProductBranchService {
     public ApiResponse getByStatusId(UUID exchangeStatusId, UUID branch_id) {
         List<ExchangeProductBranch> allByExchangeStatus_id = exchangeProductBranchRepository.findAllByExchangeStatus_IdAndBusiness_Id(exchangeStatusId, branch_id);
         if (allByExchangeStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
+
         return new ApiResponse("FOUND", true, allByExchangeStatus_id);
     }
 

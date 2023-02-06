@@ -283,6 +283,7 @@ public class PurchaseService {
     public ApiResponse getAllByBusiness(UUID businessId) {
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
         return new ApiResponse("FOUND", true, purchaseList);
+
         /*if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         List<Purchase> purchaseList = new ArrayList<>();
         for (Purchase purchase : allByBusinessId) {
