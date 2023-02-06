@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
+import uz.pdp.springsecurity.payload.PurchaseProductDto;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -47,7 +48,4 @@ public class Purchase extends AbsEntity {
     private double debtSum;
 
     private boolean editable = true;
-
-    @Transient// for get method;
-    private List<PurchaseProduct> purchaseProductList;
 }

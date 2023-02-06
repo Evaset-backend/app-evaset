@@ -225,11 +225,11 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
-        /*double debtSum = purchase.getDebtSum();
+        double debtSum = purchase.getDebtSum();
         if (purchaseDto.getDebtSum() > 0 && debtSum != purchaseDto.getDebtSum()) {
             supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
             supplierRepository.save(supplier);
-        }*/
+        }
 
         purchase.setTotalSum(purchaseDto.getTotalSum());
         purchase.setPaidSum(purchaseDto.getPaidSum());
@@ -298,8 +298,7 @@ public class PurchaseService {
     public ApiResponse get(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-        purchase.setPurchaseProductList(purchaseProductList);
+//        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
         return new ApiResponse("FOUND", true, purchase);
 
         /*Purchase changePrices = changePrices(purchase);
@@ -394,7 +393,7 @@ public class PurchaseService {
         for (Purchase purchase : purchaseList) {
             allPayment += purchase.getTotalSum();
         }
-        return new ApiResponse(true, allPayment);
+        return new ApiResponse("FOUND", true, allPayment);
     }
 
     public ApiResponse getPaymentByBranch(UUID branchId) {
@@ -404,7 +403,7 @@ public class PurchaseService {
         for (Purchase purchase : purchaseList) {
             allPayment += purchase.getTotalSum();
         }
-        return new ApiResponse(true, allPayment);
+        return new ApiResponse("FOUND", true, allPayment);
     }
 
     /*public ApiResponse getByTotalSum(double totalSum) {
