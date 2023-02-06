@@ -25,12 +25,12 @@ public class ExchangeProductBranchController {
      * @param exchangeProductBranchDTO
      * @return ApiResponse(success - > true message - > ADDED)
      */
-//    @CheckPermission("ADD_EXCHANGE")
-//    @PostMapping
-//    public HttpEntity<?> create(@RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
-//        ApiResponse apiResponse = exchangeProductBranchService.create(exchangeProductBranchDTO);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
+    @CheckPermission("ADD_EXCHANGE")
+    @PostMapping
+    public HttpEntity<?> create(@RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
+        ApiResponse apiResponse = exchangeProductBranchService.create(exchangeProductBranchDTO);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     /**
      * O'TKAZMALARNI IDSI ORQALI TAXRIRLASH

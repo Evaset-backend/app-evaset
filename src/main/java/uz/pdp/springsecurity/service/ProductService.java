@@ -528,7 +528,7 @@ public class ProductService {
                         ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                         getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
                         getForPurchaseDto.setType(Type.MANY.name());
-                        getForPurchaseDto.setName(product.getName()+"( "+productTypePrice.getProductTypeValue().getProductType()+"-"+productTypePrice.getProductTypeValue().getName()+" )");
+                        getForPurchaseDto.setName(product.getName()+"( "+productTypePrice.getProductTypeValue().getProductType().getName()+"-"+productTypePrice.getProductTypeValue().getName()+" )");
                         getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
                         getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
                         getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());

@@ -150,12 +150,90 @@ public class TradeService {
             return new ApiResponse("NOT FOUND TRADE", false);
         }
         Trade trade = optionalTrade.get();
-        ApiResponse apiResponse = addTrade(trade, tradeDTO);
+        if (!trade.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+        Timestamp createdAt = trade.getCreatedAt();
+        long difference = System.currentTimeMillis() - createdAt.getTime();
+        long oneDay = 1000 * 60 * 60 * 24;
+        if (difference > oneDay){
+            trade.setEditable(false);
+            return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+        }
+        ApiResponse apiResponse = editTrade(trade, tradeDTO);
 
         if (!apiResponse.isSuccess()) {
             return new ApiResponse("ERROR", false);
         }
         return new ApiResponse("UPDATED", true);
+    }
+
+    public ApiResponse editTrade(Trade trade, TradeDTO tradeDTO) {
+
+        /**
+         * SET LATER
+         */
+        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("CUSTOMER NOT FOUND", false);
+        }
+        Customer customer = optionalCustomer.get();
+        trade.setCustomer(customer);
+
+        Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
+        if (optionalUser.isEmpty()) {
+            return new ApiResponse("TRADER NOT FOUND", false);
+        }
+        trade.setTrader(optionalUser.get());
+
+        Optional<Branch> optionalBranch = branchRepository.findById(tradeDTO.getBranchId());
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("BRANCH NOT FOUND", false);
+        }
+        Branch branch = optionalBranch.get();
+        trade.setBranch(branch);
+
+        Optional<PaymentStatus> optionalPaymentStatus = paymentStatusRepository.findById(tradeDTO.getPaymentStatusId());
+        if(optionalPaymentStatus.isEmpty()){
+            return new ApiResponse("PAYMENTSTATUS NOT FOUND", false);
+        }
+        trade.setPaymentStatus(optionalPaymentStatus.get());
+
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(tradeDTO.getPayMethodId());
+        if (optionalPaymentMethod.isEmpty()) {
+            return new ApiResponse("PAYMAENTMETHOD NOT FOUND", false);
+        }
+        trade.setPayMethod(optionalPaymentMethod.get());
+
+        double loanSum = tradeDTO.getDebtSum();
+        if (loanSum > 0) {
+            customer.setDebt(customer.getDebt() + loanSum);
+        }
+
+        trade.setPayDate(tradeDTO.getPayDate());
+        trade.setTotalSum(tradeDTO.getTotalSum());
+        trade.setPaidSum(tradeDTO.getPaidSum());
+        trade.setDebtSum(loanSum);
+        tradeRepository.save(trade);
+
+        /**
+         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
+         */
+        List<TradeProductDto> productTraderDto = tradeDTO.getProductTraderDto();
+        List<TradeProduct> tradeProductList = new ArrayList<>();
+
+        double profit = 0;
+        for (TradeProductDto tradeProductDto : productTraderDto) {
+            TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
+            if (tradeProduct != null) {
+                tradeProduct.setTrade(trade);
+                TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
+                tradeProductList.add(savedTradeProduct);
+                profit += savedTradeProduct.getProfit();
+            }
+        }
+        trade.setTotalProfit(profit);
+        tradeRepository.save(trade);
+        tradeProductRepository.saveAll(tradeProductList);
+        return new ApiResponse("SAVED!", true);
     }
 
     public ApiResponse getOne(UUID id) {
