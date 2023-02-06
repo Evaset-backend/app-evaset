@@ -225,6 +225,12 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
+        /*double debtSum = purchase.getDebtSum();
+        if (purchaseDto.getDebtSum() > 0 && debtSum != purchaseDto.getDebtSum()) {
+            supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
+            supplierRepository.save(supplier);
+        }*/
+
         purchase.setTotalSum(purchaseDto.getTotalSum());
         purchase.setPaidSum(purchaseDto.getPaidSum());
         purchase.setDebtSum(purchaseDto.getDebtSum());
@@ -233,12 +239,6 @@ public class PurchaseService {
         purchase.setDescription(purchaseDto.getDescription());
 
         purchaseRepository.save(purchase);
-
-        /*if (purchaseDto.getDebtSum() > 0) {
-            supplier.setDebt(supplier.getDebt() + purchaseDto.getDebtSum());
-            supplierRepository.save(supplier);
-        }*/
-
 
 //        Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(branch.getBusiness().getId());
 //        CurrentCource course = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
@@ -283,6 +283,7 @@ public class PurchaseService {
     public ApiResponse getAllByBusiness(UUID businessId) {
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
         if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+
         return new ApiResponse("FOUND", true, purchaseList);
 
         /*if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
@@ -384,6 +385,26 @@ public class PurchaseService {
         PDFService pdfService = new PDFService();
         pdfService.createPdfPurchase(optionalPurchase.get(), response);
         return new ApiResponse("CREATED", true);
+    }
+
+    public ApiResponse getPaymentByBusiness(UUID businessId) {
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
+        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        double allPayment = 0;
+        for (Purchase purchase : purchaseList) {
+            allPayment += purchase.getTotalSum();
+        }
+        return new ApiResponse(true, allPayment);
+    }
+
+    public ApiResponse getPaymentByBranch(UUID branchId) {
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
+        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        double allPayment = 0;
+        for (Purchase purchase : purchaseList) {
+            allPayment += purchase.getTotalSum();
+        }
+        return new ApiResponse(true, allPayment);
     }
 
     /*public ApiResponse getByTotalSum(double totalSum) {

@@ -158,7 +158,7 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
-        ApiResponse apiResponse = addTrade(trade, tradeDTO);
+        ApiResponse apiResponse = editTrade(trade, tradeDTO);
 
         if (!apiResponse.isSuccess()) {
             return new ApiResponse("ERROR", false);
