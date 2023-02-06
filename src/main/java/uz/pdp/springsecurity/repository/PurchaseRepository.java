@@ -14,7 +14,9 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
     List<Purchase> findAllByBranch_Id(UUID branch_id);
     List<Purchase> findAllByDate(Date date);
     List<Purchase> findAllBySupplierId(UUID dealer_id);
-    List<Purchase> findAllByBranch_BusinessId(UUID businessId);
+
+        List<Purchase> findAllByBranch_BusinessId(UUID businessId);
+//    List<Purchase> findAllByBranchBusinessId(UUID businessId);
 
     List<Purchase> findAllByTotalSum(double totalSum);
 
