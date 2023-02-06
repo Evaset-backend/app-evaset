@@ -51,6 +51,8 @@ public class Trade extends AbsEntity {
 
     private Double totalProfit = 0.0;
 
+    private boolean editable = true;
+
     @ManyToOne
     private Address address;
 }

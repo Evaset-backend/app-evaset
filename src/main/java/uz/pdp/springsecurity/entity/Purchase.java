@@ -46,10 +46,8 @@ public class Purchase extends AbsEntity {
 
     private double debtSum;
 
-    private boolean editable;
+    private boolean editable = true;
 
-//    @OneToMany
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    @JoinColumn
-//    private List<PurchaseProduct> purchaseProductList;
+    @Transient// for get method;
+    private List<PurchaseProduct> purchaseProductList;
 }

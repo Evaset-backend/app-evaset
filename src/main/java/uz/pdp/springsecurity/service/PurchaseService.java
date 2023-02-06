@@ -296,6 +296,8 @@ public class PurchaseService {
     public ApiResponse get(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
+        purchase.setPurchaseProductList(purchaseProductList);
         return new ApiResponse("FOUND", true, purchase);
 
         /*Purchase changePrices = changePrices(purchase);
