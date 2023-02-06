@@ -22,6 +22,4 @@ public class ExchangeProduct  extends AbsEntity {
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
-
-
 }
