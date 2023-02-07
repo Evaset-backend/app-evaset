@@ -69,7 +69,7 @@ public class PurchaseController {
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
-        ApiResponse apiResponse = purchaseService.get(id);
+        ApiResponse apiResponse = purchaseService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
