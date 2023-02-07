@@ -3,10 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.PurchaseDto;
-import uz.pdp.springsecurity.payload.PurchaseProductDto;
-import uz.pdp.springsecurity.payload.Statistic;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -298,8 +295,12 @@ public class PurchaseService {
     public ApiResponse get(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
-//        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-        return new ApiResponse("FOUND", true, purchase);
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
+        if (!purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();
+        purchaseGetOneDto.setPurchase(purchase);
+        purchaseGetOneDto.setPurchaseProductList(purchaseProductList);
+        return new ApiResponse("FOUND", true, purchaseGetOneDto);
 
         /*Purchase changePrices = changePrices(purchase);
         return new ApiResponse("FOUND", true, changePrices);*/
