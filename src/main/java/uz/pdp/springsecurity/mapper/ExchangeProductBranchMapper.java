@@ -1,8 +1,9 @@
 package uz.pdp.springsecurity.mapper;
 
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import uz.pdp.springsecurity.entity.ExchangeProduct;
+import org.mapstruct.MappingTarget;
 import uz.pdp.springsecurity.entity.ExchangeProductBranch;
 import uz.pdp.springsecurity.payload.ExchangeProductBranchDTO;
 
@@ -35,4 +36,12 @@ public interface ExchangeProductBranchMapper {
     ExchangeProductBranchDTO toDto(ExchangeProductBranch branch);
 
     List<ExchangeProductBranchDTO> toDtoList(List<ExchangeProductBranch> branchList);
+
+    @InheritInverseConfiguration
+    @Mapping(target = "exchangeProduct", ignore = true)
+    @Mapping(target = "shippedBranch.id", source = "shippedBranchId")
+    @Mapping(target = "receivedBranch.id", source = "receivedBranchId")
+    @Mapping(target = "exchangeStatus.id", source = "exchangeStatusId")
+    @Mapping(target = "business.id", source = "businessId")
+    void update(ExchangeProductBranchDTO exchangeProductBranchDTO, @MappingTarget ExchangeProductBranch exchangeProductBranch);
 }
