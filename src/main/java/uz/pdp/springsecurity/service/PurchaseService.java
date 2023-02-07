@@ -386,26 +386,6 @@ public class PurchaseService {
         return new ApiResponse("CREATED", true);
     }
 
-    public ApiResponse getPaymentByBusiness(UUID businessId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
-        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allPayment = 0;
-        for (Purchase purchase : purchaseList) {
-            allPayment += purchase.getTotalSum();
-        }
-        return new ApiResponse("FOUND", true, allPayment);
-    }
-
-    public ApiResponse getPaymentByBranch(UUID branchId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
-        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allPayment = 0;
-        for (Purchase purchase : purchaseList) {
-            allPayment += purchase.getTotalSum();
-        }
-        return new ApiResponse("FOUND", true, allPayment);
-    }
-
     /*public ApiResponse getByTotalSum(double totalSum) {
         List<Purchase> allByTotalSum = purchaseRepository.findAllByTotalSum(totalSum);
         if (allByTotalSum.isEmpty()) return new ApiResponse("NOT FOUND", false);

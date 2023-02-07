@@ -164,20 +164,6 @@ public class PurchaseController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-purchase-payment-by-business/{businessId}")
-    public HttpEntity<?> getPaymentByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = purchaseService.getPaymentByBusiness(businessId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-purchase-payment-by-branch/{branchId}")
-    public HttpEntity<?> getPaymentByBranch(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = purchaseService.getPaymentByBranch(branchId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
     /**
      * JAMI SUMMA ORQALI BARCHA XARIDLARNI OLIB CHIQISH
      *
