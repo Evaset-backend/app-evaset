@@ -249,31 +249,31 @@ public class ExchangeProductBranchService {
 
     public ApiResponse getByDate(Date exchangeDate, UUID business_id) {
         List<ExchangeProductBranch> allByExchangeDate = exchangeProductBranchRepository.findAllByExchangeDateAndBusiness_Id(exchangeDate, business_id);
-        return new ApiResponse("FOUND", true, allByExchangeDate);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByExchangeDate));
     }
 
     public ApiResponse getByStatusId(UUID exchangeStatusId, UUID branch_id) {
         List<ExchangeProductBranch> allByExchangeStatus_id = exchangeProductBranchRepository.findAllByExchangeStatus_IdAndBusiness_Id(exchangeStatusId, branch_id);
         if (allByExchangeStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
-        return new ApiResponse("FOUND", true, allByExchangeStatus_id);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByExchangeStatus_id));
     }
 
     public ApiResponse getByBusinessId(UUID businessId) {
         List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByBusiness_Id(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByBusinessId);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByBusinessId));
     }
 
     public ApiResponse getByShippedBranchId(UUID shippedBranch_id) {
         List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByShippedBranch_Id(shippedBranch_id);
         if (allByShippedBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByShippedBranch_id);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByShippedBranch_id));
     }
 
     public ApiResponse getByReceivedBranchId(UUID receivedBranch_id) {
         List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByReceivedBranch_Id(receivedBranch_id);
         if (allByShippedBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByShippedBranch_id);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByShippedBranch_id));
     }
 }
