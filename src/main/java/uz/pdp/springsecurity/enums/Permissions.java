@@ -137,5 +137,7 @@ public enum Permissions {
     DELETE_PRODUCT_TYPE,
 
     GET_EXCEL,
-    POST_EXCEL
+    POST_EXCEL,
+
+    VIEW_INFO
 }

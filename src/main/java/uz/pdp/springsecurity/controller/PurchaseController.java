@@ -69,7 +69,7 @@ public class PurchaseController {
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
-        ApiResponse apiResponse = purchaseService.get(id);
+        ApiResponse apiResponse = purchaseService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -161,20 +161,6 @@ public class PurchaseController {
     @GetMapping("/get-pdf/{id}")
     public HttpEntity<?> getPdf(@PathVariable UUID id, HttpServletResponse response) throws IOException {
         ApiResponse apiResponse = purchaseService.getPdfFile(id, response);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-purchase-payment-by-business/{businessId}")
-    public HttpEntity<?> getPaymentByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = purchaseService.getPaymentByBusiness(businessId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-purchase-payment-by-branch/{branchId}")
-    public HttpEntity<?> getPaymentByBranch(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = purchaseService.getPaymentByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

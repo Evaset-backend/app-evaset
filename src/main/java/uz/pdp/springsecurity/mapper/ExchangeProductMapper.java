@@ -13,4 +13,12 @@ public interface ExchangeProductMapper {
     ExchangeProductDTO toDto(ExchangeProduct exchangeProduct);
 
     List<ExchangeProductDTO> toDtoList(List<ExchangeProduct> exchangeProducts);
+
+    @Mapping(target = "updateAt", ignore = true)
+    @Mapping(target = "product", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "product.id", source = "productExchangeId")
+    ExchangeProduct toEntity(ExchangeProductDTO exchangeProductDTO);
+
 }

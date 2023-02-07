@@ -19,6 +19,7 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor
 @Data
 public class PurchaseProduct extends AbsEntity {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Purchase purchase;

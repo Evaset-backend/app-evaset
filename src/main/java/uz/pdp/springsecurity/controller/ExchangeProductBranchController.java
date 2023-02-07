@@ -40,12 +40,12 @@ public class ExchangeProductBranchController {
      * @return ApiResponse(success - > true message - > EDITED)
      */
 
-//    @CheckPermission("EDIT_EXCHANGE")
-//    @PutMapping("/{id}")
-//    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
-//        ApiResponse apiResponse = exchangeProductBranchService.edit(id, exchangeProductBranchDTO);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
+    @CheckPermission("EDIT_EXCHANGE")
+    @PutMapping("/{id}")
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
+        ApiResponse apiResponse = exchangeProductBranchService.edit(id, exchangeProductBranchDTO);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     /**
      * BITTA O'TKAZMANI OLIB CHIQISH ID ORQALI

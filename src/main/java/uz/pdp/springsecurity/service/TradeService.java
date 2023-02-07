@@ -203,15 +203,15 @@ public class TradeService {
         }
         trade.setPayMethod(optionalPaymentMethod.get());
 
-        double loanSum = tradeDTO.getDebtSum();
-        if (loanSum > 0) {
-            customer.setDebt(customer.getDebt() + loanSum);
+        double debtSum = trade.getDebtSum();
+        if (tradeDTO.getDebtSum() > 0 && debtSum != tradeDTO.getDebtSum()) {
+            customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
         trade.setPayDate(tradeDTO.getPayDate());
         trade.setTotalSum(tradeDTO.getTotalSum());
         trade.setPaidSum(tradeDTO.getPaidSum());
-        trade.setDebtSum(loanSum);
+        trade.setDebtSum(tradeDTO.getDebtSum());
         tradeRepository.save(trade);
 
         /**
@@ -222,6 +222,7 @@ public class TradeService {
 
         double profit = 0;
         for (TradeProductDto tradeProductDto : productTraderDto) {
+
             TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
             if (tradeProduct != null) {
                 tradeProduct.setTrade(trade);
