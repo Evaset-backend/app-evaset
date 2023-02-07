@@ -47,7 +47,7 @@ public class ExcelController {
         String currentDateTime = dateFormatter.format(new Date());
 
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename= PRODUCT "+ ".xlsx";
+        String headerValue = "attachment; filename = PRODUCT "+ ".xlsx";
         response.setHeader(headerKey, headerValue);
         List<ProductViewDtos> productViewDtos = excelService.getByBusiness(uuid);
         ExcelGenerator generator = new ExcelGenerator(productViewDtos);
@@ -58,7 +58,7 @@ public class ExcelController {
 
     @CheckPermission("POST_EXCEL")
     @PostMapping("/upload/{id}")
-    public HttpEntity<?> uploadFile(@PathVariable UUID id,@RequestBody MultipartFile file) {
+    public HttpEntity<?> uploadFile(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
