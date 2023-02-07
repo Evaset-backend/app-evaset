@@ -227,7 +227,6 @@ public class DataLoader implements CommandLineRunner {
 
                             GET_EXCEL,
                             POST_EXCEL
-
                     ),
                     business
             ));
