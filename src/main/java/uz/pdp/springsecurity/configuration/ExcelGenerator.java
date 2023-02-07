@@ -2,15 +2,10 @@ package uz.pdp.springsecurity.configuration;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Product;
-import uz.pdp.springsecurity.entity.ProductType;
-import uz.pdp.springsecurity.payload.ProductViewDto;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 
 import javax.servlet.ServletOutputStream;
@@ -21,7 +16,7 @@ import java.util.UUID;
 
 public class ExcelGenerator {
 
-    private  List<ProductViewDtos> productViewDtosList;
+    private final List<ProductViewDtos> productViewDtosList;
 
     private final XSSFWorkbook workbook;
 

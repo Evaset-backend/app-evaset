@@ -229,7 +229,6 @@ public class ProductService {
         return new ApiResponse("NOT FOUND PRODUCT TYPE VALUE", false);
     }
 
-
     public ApiResponse editProduct(UUID id, ProductDto productDto) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isEmpty()) {
@@ -344,6 +343,8 @@ public class ProductService {
                 productTypePriceGetDto.setProfitPercent(productTypePrice.getProfitPercent());
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
+                productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
+
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
