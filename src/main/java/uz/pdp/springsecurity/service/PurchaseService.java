@@ -292,11 +292,11 @@ public class PurchaseService {
         return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
-    public ApiResponse get(UUID id) {
+    public ApiResponse getOne(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-        if (!purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();
         purchaseGetOneDto.setPurchase(purchase);
         purchaseGetOneDto.setPurchaseProductList(purchaseProductList);
