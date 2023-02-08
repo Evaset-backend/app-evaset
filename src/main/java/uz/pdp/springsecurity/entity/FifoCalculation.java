@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -40,6 +41,7 @@ public class FifoCalculation extends AbsEntity {
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Purchase purchase;
 
     public FifoCalculation(Branch branch, double purchasedAmount, double remainAmount, double buyPrice, Date date, Purchase purchase) {
