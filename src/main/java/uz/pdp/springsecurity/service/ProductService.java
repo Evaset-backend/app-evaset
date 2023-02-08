@@ -199,6 +199,7 @@ public class ProductService {
                     if (typePriceOptional.isEmpty()) {
                         return new ApiResponse("not found product type many id", false);
                     }
+
                     ProductTypePrice productTypePrice = typePriceOptional.get();
                     productTypePrice.setProduct(saveProduct);
                     productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
@@ -219,6 +220,12 @@ public class ProductService {
                 }
             }
         }
+
+        if (productTypePriceList.size() > 0) {
+            productTypePriceRepository.saveAll(productTypePriceList);
+            return new ApiResponse("successfully saved", true);
+        }
+        return new ApiResponse("NOT FOUND PRODUCT TYPE VALUE", false);
 
         productTypePriceRepository.saveAll(productTypePriceList);
         return new ApiResponse("successfully saved", true);

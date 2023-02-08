@@ -18,10 +18,10 @@ public class ProductViewDtos {
     private String branch;
     private double buyPrice;
     private double salePrice;
-    private String measurementId;
-    private String barcode;
     private double amount;
     private String brandName;
     private double minQuantity;
-    private String expiredDate;
+    private Date expiredDate;
+    private int barcode;
+    private String measurementId;
 }

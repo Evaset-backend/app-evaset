@@ -34,6 +34,8 @@ public class ExcelService {
     @Autowired
     BranchRepository branchRepository;
 
+
+
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
         List<ProductViewDtos> productViewDtoList = new ArrayList<>();
         List<Product> productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
@@ -44,7 +46,7 @@ public class ExcelService {
                 ProductViewDtos productViewDto = new ProductViewDtos();
                 productViewDto.setProductName(product.getName());
                 productViewDto.setBrandName(product.getBrand().getName());
-                productViewDto.setBarcode(product.getBarcode());
+                productViewDto.setBarcode(Integer.parseInt(product.getBarcode()));
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
@@ -52,7 +54,7 @@ public class ExcelService {
                 for (Branch branch : branchList) {
                     productViewDto.setBranch(branch.getName());
                 }
-                productViewDto.setExpiredDate(product.getExpireDate().toString());
+                productViewDto.setExpiredDate(product.getExpireDate());
 
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
@@ -67,21 +69,25 @@ public class ExcelService {
 
     public ApiResponse save(MultipartFile file, UUID branchId) {
 
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        branchRepository.findById(branchId);
+        if (branch.isPresent()){
+            branch.get();
+
+        }
+                UUID productId = UUID.randomUUID();
         try {
             List<ProductViewDtos> productViewDtosList = ExcelHelper.excelToTutorials(file.getInputStream());
             assert productViewDtosList != null;
             for (ProductViewDtos productViewDtos : productViewDtosList) {
-                String name = productViewDtos.getProductName();
-                Optional<Product> optionalProduct = productRepository.findByNameAndBranchIdAndActiveTrue(name, branchId);
-                if (optionalProduct.isPresent()) {
-                    Product product = optionalProduct.get();
-                    UUID productId = product.getId();
-                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(productId);
-                    if (optionalWarehouse.isPresent()) {
-                        Warehouse warehouse = optionalWarehouse.get();
-                        warehouse.setAmount(productViewDtos.getAmount() + warehouse.getAmount());
-                    }
-                }
+                Product product=new Product();
+                product.setId(productId);
+                product.setName(productViewDtos.getProductName());
+                product.setExpireDate(productViewDtos.getExpiredDate());
+                product.setBarcode(String.valueOf(productViewDtos.getBarcode()));
+                product.setDueDate(productViewDtos.getExpiredDate());
+
+
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
