@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Measurement;
-import uz.pdp.springsecurity.entity.Product;
-import uz.pdp.springsecurity.entity.Warehouse;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 import uz.pdp.springsecurity.repository.BranchRepository;
@@ -69,25 +66,41 @@ public class ExcelService {
 
     public ApiResponse save(MultipartFile file, UUID branchId) {
 
-        Optional<Branch> branch = branchRepository.findById(branchId);
-        branchRepository.findById(branchId);
-        if (branch.isPresent()){
-            branch.get();
+        Business business = new Business();
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isPresent()){
+            Branch branch = optionalBranch.get();
+            business = branch.getBusiness();
 
         }
                 UUID productId = UUID.randomUUID();
         try {
             List<ProductViewDtos> productViewDtosList = ExcelHelper.excelToTutorials(file.getInputStream());
-            assert productViewDtosList != null;
+            List<Product> productList=new ArrayList<>();
             for (ProductViewDtos productViewDtos : productViewDtosList) {
                 Product product=new Product();
                 product.setId(productId);
+                product.setBusiness(business);
                 product.setName(productViewDtos.getProductName());
                 product.setExpireDate(productViewDtos.getExpiredDate());
                 product.setBarcode(String.valueOf(productViewDtos.getBarcode()));
                 product.setDueDate(productViewDtos.getExpiredDate());
+                product.setBuyPrice(productViewDtos.getBuyPrice());
+                product.setSalePrice(productViewDtos.getSalePrice());
+                product.setMinQuantity(productViewDtos.getMinQuantity());
+                product.setTax(10);
 
+                product.setCategory(null);
+                product.setMeasurement(null);
+                product.setBrand(null);
+                product.setType(null);
+                product.setPhoto(null);
+                productList.add(product);
 
+                if (productViewDtosList.size()>0){
+                    productRepository.saveAll(productList);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
