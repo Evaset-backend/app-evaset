@@ -3,10 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.PurchaseDto;
-import uz.pdp.springsecurity.payload.PurchaseProductDto;
-import uz.pdp.springsecurity.payload.Statistic;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -225,11 +222,11 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
-        /*double debtSum = purchase.getDebtSum();
+        double debtSum = purchase.getDebtSum();
         if (purchaseDto.getDebtSum() > 0 && debtSum != purchaseDto.getDebtSum()) {
             supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
             supplierRepository.save(supplier);
-        }*/
+        }
 
         purchase.setTotalSum(purchaseDto.getTotalSum());
         purchase.setPaidSum(purchaseDto.getPaidSum());
@@ -295,12 +292,15 @@ public class PurchaseService {
         return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
-    public ApiResponse get(UUID id) {
+    public ApiResponse getOne(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-        purchase.setPurchaseProductList(purchaseProductList);
-        return new ApiResponse("FOUND", true, purchase);
+        if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();
+        purchaseGetOneDto.setPurchase(purchase);
+        purchaseGetOneDto.setPurchaseProductList(purchaseProductList);
+        return new ApiResponse("FOUND", true, purchaseGetOneDto);
 
         /*Purchase changePrices = changePrices(purchase);
         return new ApiResponse("FOUND", true, changePrices);*/
@@ -385,26 +385,6 @@ public class PurchaseService {
         PDFService pdfService = new PDFService();
         pdfService.createPdfPurchase(optionalPurchase.get(), response);
         return new ApiResponse("CREATED", true);
-    }
-
-    public ApiResponse getPaymentByBusiness(UUID businessId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
-        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allPayment = 0;
-        for (Purchase purchase : purchaseList) {
-            allPayment += purchase.getTotalSum();
-        }
-        return new ApiResponse(true, allPayment);
-    }
-
-    public ApiResponse getPaymentByBranch(UUID branchId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
-        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allPayment = 0;
-        for (Purchase purchase : purchaseList) {
-            allPayment += purchase.getTotalSum();
-        }
-        return new ApiResponse(true, allPayment);
     }
 
     /*public ApiResponse getByTotalSum(double totalSum) {

@@ -9,6 +9,8 @@ import java.util.UUID;
 public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
     Optional<Warehouse> findByBranchIdAndProductId(UUID branchId, UUID productId);
 
+    Optional<Warehouse> findByBranchId(UUID branch_id);
+
     Optional<Warehouse> findByBranchIdAndProductTypePriceId(UUID branchId, UUID productTypePriceId);
 
     Optional<Warehouse> findByBranch_BusinessIdAndProductId(UUID branchId, UUID businessId);

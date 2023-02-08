@@ -10,7 +10,6 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -47,7 +46,4 @@ public class Purchase extends AbsEntity {
     private double debtSum;
 
     private boolean editable = true;
-
-    @Transient// for get method;
-    private List<PurchaseProduct> purchaseProductList;
 }

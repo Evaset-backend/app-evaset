@@ -226,7 +226,10 @@ public class DataLoader implements CommandLineRunner {
                             GET_PRODUCT_TYPE_PRODUCT_ID,
 
                             GET_EXCEL,
-                            POST_EXCEL
+
+                            POST_EXCEL,
+
+                            VIEW_INFO
                     ),
                     business
             ));
