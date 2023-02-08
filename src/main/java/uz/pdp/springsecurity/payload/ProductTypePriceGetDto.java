@@ -12,6 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProductTypePriceGetDto {
 
+    private UUID productTypePriceId;
+
     private UUID productTypeValueNameId;
 
     private String productTypeName;

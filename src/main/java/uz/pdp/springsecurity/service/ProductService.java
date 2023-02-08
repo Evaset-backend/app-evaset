@@ -55,6 +55,7 @@ public class ProductService {
 
     private final ProductTypeComboRepository comboRepository;
     private final RoleRepository roleRepository;
+    private final ProductTypeRepository productTypeRepository;
 
 
     public ApiResponse addProduct(@Valid ProductDto productDto) throws ParseException {
@@ -139,9 +140,7 @@ public class ProductService {
                 return new ApiResponse("not found content product", false);
             }
             if (isUpdate) {
-                List<ProductTypeComboDto> typeComboDtoList = productDto.getProductTypeComboDtoList();
-                for (ProductTypeComboDto typeComboDto : typeComboDtoList) {
-                    Optional<ProductTypeCombo> comboOptional = comboRepository.findById(typeComboDto.getComboId());
+                    Optional<ProductTypeCombo> comboOptional = comboRepository.findById(productTypeComboDto.getComboId());
                     if (comboOptional.isEmpty()) {
                         return new ApiResponse("not found combo product", false);
                     }
@@ -153,7 +152,7 @@ public class ProductService {
                     productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
 //                    productTypeCombo.setMeasurement(saveProduct.getMeasurement());
                     productTypeComboList.add(productTypeCombo);
-                }
+
             } else {
                 ProductTypeCombo productTypeCombo = new ProductTypeCombo();
                 productTypeCombo.setMainProduct(saveProduct);
@@ -227,6 +226,10 @@ public class ProductService {
             return new ApiResponse("successfully saved", true);
         }
         return new ApiResponse("NOT FOUND PRODUCT TYPE VALUE", false);
+
+        productTypePriceRepository.saveAll(productTypePriceList);
+        return new ApiResponse("successfully saved", true);
+
     }
 
     public ApiResponse editProduct(UUID id, ProductDto productDto) {
@@ -337,6 +340,7 @@ public class ProductService {
             for (ProductTypePrice productTypePrice : allByProductId) {
                 ProductTypePriceGetDto productTypePriceGetDto = new ProductTypePriceGetDto();
 
+                productTypePriceGetDto.setProductTypePriceId(productTypePrice.getId());
                 productTypePriceGetDto.setProductTypeName(productTypePrice.getProductTypeValue().getProductType().getName());
                 productTypePriceGetDto.setProductTypeValueName(productTypePrice.getProductTypeValue().getName());
                 productTypePriceGetDto.setBarcode(productTypePrice.getBarcode());
@@ -344,7 +348,6 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
-
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
@@ -357,6 +360,7 @@ public class ProductService {
             List<ProductTypeCombo> allComboProduct = comboRepository.findAllByMainProductId(product.getId());
             for (ProductTypeCombo combo : allComboProduct) {
                 ProductTypeComboGetDto comboGetDto = new ProductTypeComboGetDto();
+                comboGetDto.setComboId(combo.getId());
                 comboGetDto.setContentProduct(combo.getContentProduct());
                 comboGetDto.setAmount(combo.getAmount());
                 comboGetDto.setBuyPrice(combo.getBuyPrice());
