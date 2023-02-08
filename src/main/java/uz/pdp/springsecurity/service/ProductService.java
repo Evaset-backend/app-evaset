@@ -221,7 +221,7 @@ public class ProductService {
             }
         }
 
-        if (productTypePriceList.size() > 0) {
+        if (productTypePriceList.size() >= 0) {
             productTypePriceRepository.saveAll(productTypePriceList);
             return new ApiResponse("successfully saved", true);
         }
