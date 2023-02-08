@@ -31,6 +31,7 @@ public class WarehouseService {
     private ProductTypeRepository productTypeRepository;
     @Autowired
     private ExchangeProductBranchRepository exchangeProductBranchRepository;
+    private final FifoCalculationService fifoCalculationService;
 
     public void addPurchase(Purchase purchase) {
         Branch branch = purchase.getBranch();
@@ -199,8 +200,9 @@ public class WarehouseService {
             }
         }
         List<ExchangeProduct> exchangeProducts = exchangeProductRepository.saveAll(exchangeProductList);
-        exchangeProductBranch.setExchangeProduct(exchangeProducts);
+        exchangeProductBranch.setExchangeProductList(exchangeProducts);
         exchangeProductBranchRepository.save(exchangeProductBranch);
+        fifoCalculationService.createExchange(exchangeProductBranch);
         return new ApiResponse("successfully saved");
     }
 }
