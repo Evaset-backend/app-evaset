@@ -140,9 +140,7 @@ public class ProductService {
                 return new ApiResponse("not found content product", false);
             }
             if (isUpdate) {
-                List<ProductTypeComboDto> typeComboDtoList = productDto.getProductTypeComboDtoList();
-                for (ProductTypeComboDto typeComboDto : typeComboDtoList) {
-                    Optional<ProductTypeCombo> comboOptional = comboRepository.findById(typeComboDto.getComboId());
+                    Optional<ProductTypeCombo> comboOptional = comboRepository.findById(productTypeComboDto.getComboId());
                     if (comboOptional.isEmpty()) {
                         return new ApiResponse("not found combo product", false);
                     }
@@ -154,7 +152,7 @@ public class ProductService {
                     productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
 //                    productTypeCombo.setMeasurement(saveProduct.getMeasurement());
                     productTypeComboList.add(productTypeCombo);
-                }
+
             } else {
                 ProductTypeCombo productTypeCombo = new ProductTypeCombo();
                 productTypeCombo.setMainProduct(saveProduct);
