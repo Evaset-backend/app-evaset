@@ -292,6 +292,11 @@ public class PurchaseService {
         return new ApiResponse("FOUND", true, purchaseList);*/
     }
 
+    /**
+     * check get one
+     * @param id
+     * @return
+     */
     public ApiResponse getOne(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
