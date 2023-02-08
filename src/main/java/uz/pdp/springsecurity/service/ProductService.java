@@ -55,6 +55,7 @@ public class ProductService {
 
     private final ProductTypeComboRepository comboRepository;
     private final RoleRepository roleRepository;
+    private final ProductTypeRepository productTypeRepository;
 
 
     public ApiResponse addProduct(@Valid ProductDto productDto) throws ParseException {

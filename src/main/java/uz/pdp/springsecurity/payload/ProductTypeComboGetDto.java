@@ -10,11 +10,13 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductTypeComboGetDto {
+    private UUID comboId;
 
     private Product contentProduct;
 
