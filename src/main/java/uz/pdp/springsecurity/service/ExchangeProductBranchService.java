@@ -132,7 +132,7 @@ public class ExchangeProductBranchService {
             return new ApiResponse("not found exchange product branch ", false);
         }
         ExchangeProductBranch exchangeProductBranch = optional.get();
-        List<ExchangeProductDTO> exchangeProductDTOList = exchangeProductMapper.toDtoList(exchangeProductBranch.getExchangeProduct());
+        List<ExchangeProductDTO> exchangeProductDTOList = exchangeProductMapper.toDtoList(exchangeProductBranch.getExchangeProductList());
         ExchangeProductBranchDTO exchangeProductBranchDTO = mapper.toDto(exchangeProductBranch);
         exchangeProductBranchDTO.setExchangeProductDTOS(exchangeProductDTOList);
 
