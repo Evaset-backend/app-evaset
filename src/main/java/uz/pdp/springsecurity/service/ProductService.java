@@ -333,6 +333,7 @@ public class ProductService {
             for (ProductTypePrice productTypePrice : allByProductId) {
                 ProductTypePriceGetDto productTypePriceGetDto = new ProductTypePriceGetDto();
 
+                productTypePriceGetDto.setProductTypePriceId(productTypePrice.getId());
                 productTypePriceGetDto.setProductTypeName(productTypePrice.getProductTypeValue().getProductType().getName());
                 productTypePriceGetDto.setProductTypeValueName(productTypePrice.getProductTypeValue().getName());
                 productTypePriceGetDto.setBarcode(productTypePrice.getBarcode());
@@ -340,7 +341,6 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
-
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }

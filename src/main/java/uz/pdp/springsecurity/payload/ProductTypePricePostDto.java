@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductTypePricePostDto{
+
     private UUID productTypePriceId;
 
     private UUID productTypeValueId;
