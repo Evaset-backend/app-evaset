@@ -55,6 +55,7 @@ public class ProductService {
 
     private final ProductTypeComboRepository comboRepository;
     private final RoleRepository roleRepository;
+    private final ProductTypeRepository productTypeRepository;
 
 
     public ApiResponse addProduct(@Valid ProductDto productDto) throws ParseException {
@@ -354,6 +355,7 @@ public class ProductService {
             List<ProductTypeCombo> allComboProduct = comboRepository.findAllByMainProductId(product.getId());
             for (ProductTypeCombo combo : allComboProduct) {
                 ProductTypeComboGetDto comboGetDto = new ProductTypeComboGetDto();
+                comboGetDto.setComboId(combo.getId());
                 comboGetDto.setContentProduct(combo.getContentProduct());
                 comboGetDto.setAmount(combo.getAmount());
                 comboGetDto.setBuyPrice(combo.getBuyPrice());
