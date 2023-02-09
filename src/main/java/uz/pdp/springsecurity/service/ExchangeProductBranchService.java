@@ -83,7 +83,7 @@ public class ExchangeProductBranchService {
         return warehouseService.createOrUpdateExchangeProductBranch(exchangeProductBranchDTO, exchangeProductBranch, false);
     }
 
-    public ApiResponse edit(UUID id, ExchangeProductBranchDTO exchangeProductBranchDTO) {
+    /*public ApiResponse edit(UUID id, ExchangeProductBranchDTO exchangeProductBranchDTO) {
 
         UUID businessId = exchangeProductBranchDTO.getBusinessId();
         UUID shippedBranchId = exchangeProductBranchDTO.getShippedBranchId();
@@ -123,7 +123,7 @@ public class ExchangeProductBranchService {
         mapper.update(exchangeProductBranchDTO, optionalExchangeProductBranch.get());
         return warehouseService
                 .createOrUpdateExchangeProductBranch(exchangeProductBranchDTO, optionalExchangeProductBranch.get(), true);
-    }
+    }*/
 
 
     public ApiResponse getOne(UUID id) {
