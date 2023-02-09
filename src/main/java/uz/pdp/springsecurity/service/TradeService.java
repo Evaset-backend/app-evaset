@@ -218,18 +218,29 @@ public class TradeService {
         /**
          * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
          */
-        List<TradeProductDto> productTraderDto = tradeDTO.getProductTraderDto();
+        List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
         List<TradeProduct> tradeProductList = new ArrayList<>();
 
         double profit = 0;
-        for (TradeProductDto tradeProductDto : productTraderDto) {
-
-            TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
-            if (tradeProduct != null) {
-                tradeProduct.setTrade(trade);
-                TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
-                tradeProductList.add(savedTradeProduct);
-                profit += savedTradeProduct.getProfit();
+        for (TradeProductDto tradeProductDto : tradeProductDtoList) {
+            if (tradeProductDto.getTradeProductId() != null){
+                Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
+                if (optionalTradeProduct.isEmpty()) continue;
+                TradeProduct tradeProduct = optionalTradeProduct.get();
+                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
+                double difference = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
+                warehouseService.editTrade(branch, tradeProduct, tradeProductDto);
+                /**
+                 * todo fifo
+                 */
+            }else {
+                TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
+                if (tradeProduct != null) {
+                    tradeProduct.setTrade(trade);
+                    TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
+                    tradeProductList.add(savedTradeProduct);
+                    profit += savedTradeProduct.getProfit();
+                }
             }
         }
         trade.setTotalProfit(profit);
@@ -254,7 +265,7 @@ public class TradeService {
         Optional<Trade> byId = tradeRepository.findById(id);
         if (byId.isEmpty()) return new ApiResponse("NOT FOUND",false);
         tradeRepository.deleteById(id);
-        return new ApiResponse("DELATED", true);
+        return new ApiResponse("DELETED", true);
     }
 
     public ApiResponse deleteByTraderId(UUID trader_id) {
