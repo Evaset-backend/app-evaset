@@ -130,7 +130,7 @@ public class WarehouseService {
          */
         for (ExchangeProductDTO exchangeProductDTO : branchDTO.getExchangeProductDTOS()) {
             ExchangeProduct exchangeProduct = new ExchangeProduct();
-            exchangeProduct.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
+            exchangeProduct.setExchangeProductQuantity(exchangeProductDTO.getExchangeProductQuantity());
             if (exchangeProductDTO.getProductExchangeId() != null) {
                 Optional<Product> optionalProduct = productRepository.findById(exchangeProductDTO.getProductExchangeId());
                 optionalProduct.ifPresent(exchangeProduct::setProduct);
