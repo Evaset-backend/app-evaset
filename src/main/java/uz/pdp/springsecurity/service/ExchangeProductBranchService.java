@@ -56,15 +56,15 @@ public class ExchangeProductBranchService {
         Optional<Branch> optionalShippedBranch = branchRepository.findById(shippedBranchId);
         Optional<Branch> optionalReceivedBranch = branchRepository.findById(receivedBranchId);
         Optional<ExchangeStatus> optionalExchangeStatus = exchangeStatusRepository.findById(exchangeStatusId);
-        Optional<Warehouse> optionalWarehouseShippedBranch = warehouseRepository.findByBranchId(shippedBranchId);
-        Optional<Warehouse> optionalWarehouseReceivedBranch = warehouseRepository.findByBranchId(receivedBranchId);
+//        Optional<Warehouse> optionalWarehouseShippedBranch = warehouseRepository.findByBranchId(shippedBranchId);
+//        Optional<Warehouse> optionalWarehouseReceivedBranch = warehouseRepository.findByBranchId(receivedBranchId);
 
-        if (optionalWarehouseShippedBranch.isEmpty()) {
-            return new ApiResponse("not found shippedBranch warehouse");
-        }
-        if (optionalWarehouseReceivedBranch.isEmpty()) {
-            return new ApiResponse("not found receivedBranch warehouse");
-        }
+//        if (optionalWarehouseShippedBranch.isEmpty()) {
+//            return new ApiResponse("not found shippedBranch warehouse");
+//        }
+//        if (optionalWarehouseReceivedBranch.isEmpty()) {
+//            return new ApiResponse("not found receivedBranch warehouse");
+//        }
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("not found business", false);
         }

@@ -158,7 +158,9 @@ public class WarehouseService {
                         warehouse.setAmount(warehouse.getAmount() - exchangeProduct.getExchangeProductQuantity());
                         warehouseRepository.save(warehouse);
                     }
-                    return new ApiResponse("Omborda mahsulot yetarli emas!");
+                    else {
+                        return new ApiResponse("Omborda mahsulot yetarli emas!");
+                    }
                 }
                 if (optionalReceivedBranchWarehouse.isPresent()) {
                     Warehouse warehouse = optionalReceivedBranchWarehouse.get();
@@ -183,7 +185,9 @@ public class WarehouseService {
                         warehouse.setAmount(warehouse.getAmount() - exchangeProduct.getExchangeProductQuantity());
                         warehouseRepository.save(warehouse);
                     }
-                    return new ApiResponse("Omborda mahsulot yetarli emas!");
+                    else {
+                        return new ApiResponse("Omborda mahsulot yetarli emas!");
+                    }
                 }
                 if (optionalReceivedBranchWarehouse.isPresent()) {
                     Warehouse warehouse = optionalReceivedBranchWarehouse.get();
@@ -203,6 +207,6 @@ public class WarehouseService {
         exchangeProductBranch.setExchangeProductList(exchangeProducts);
         exchangeProductBranchRepository.save(exchangeProductBranch);
         fifoCalculationService.createExchange(exchangeProductBranch);
-        return new ApiResponse("successfully saved");
+        return new ApiResponse("successfully saved",true);
     }
 }
