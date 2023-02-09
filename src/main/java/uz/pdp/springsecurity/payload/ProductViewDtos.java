@@ -22,6 +22,6 @@ public class ProductViewDtos {
     private String brandName;
     private double minQuantity;
     private Date expiredDate;
-    private int barcode;
+    private String barcode;
     private String measurementId;
 }

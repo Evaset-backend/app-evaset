@@ -76,7 +76,7 @@ public class ExcelHelper {
                             productViewDtos.setExpiredDate(currentCell.getDateCellValue());
                             break;
                         case 8:
-                            productViewDtos.setBarcode((int) currentCell.getNumericCellValue());
+                            productViewDtos.setBarcode(currentCell.getStringCellValue());
                             break;
                         case 9:
                             productViewDtos.setMeasurementId(currentCell.getStringCellValue());

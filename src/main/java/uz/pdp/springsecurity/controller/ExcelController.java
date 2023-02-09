@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.configuration.ExcelGenerator;
 import uz.pdp.springsecurity.entity.ResponseMessage;
+import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.service.ExcelHelper;
@@ -54,14 +55,16 @@ public class ExcelController {
     }
 
     @CheckPermission("POST_EXCEL")
-    @PostMapping("/upload/{id}")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,@PathVariable UUID id) {
+    @PostMapping("/upload")
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam MultipartFile file,
+                                                      @RequestParam UUID categoryId,
+                                                      @RequestParam UUID measurementId,
+                                                      @RequestParam UUID branchId) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                excelService.save(file,id);
-                message = "Uploaded the file successfully: " + file.getOriginalFilename();
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+                ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId);
+                ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
             } catch (Exception e) {
                 message = "Could not upload the file: " + file.getOriginalFilename() + "!";
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
