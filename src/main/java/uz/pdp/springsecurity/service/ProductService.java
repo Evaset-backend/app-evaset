@@ -198,6 +198,7 @@ public class ProductService {
                     if (typePriceOptional.isEmpty()) {
                         return new ApiResponse("not found product type many id", false);
                     }
+
                     ProductTypePrice productTypePrice = typePriceOptional.get();
                     productTypePrice.setProduct(saveProduct);
                     productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
@@ -534,6 +535,7 @@ public class ProductService {
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
                         if (optionalWarehouse.isEmpty()) {
                             getForPurchaseDto.setAmount(0d);

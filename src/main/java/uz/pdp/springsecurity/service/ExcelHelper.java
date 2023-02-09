@@ -1,30 +1,21 @@
 package uz.pdp.springsecurity.service;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.springsecurity.payload.ProductViewDto;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 
-import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 public class ExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String[] HEADERs = {"Id", "Title", "Description", "Published"};
-    public static String SHEET = "maxxx";
+    public static String SHEET = "product";
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
@@ -37,42 +28,70 @@ public class ExcelHelper {
     public static List<ProductViewDtos> excelToTutorials(InputStream is) {
 
         try {
-            POIFSFileSystem fs = new POIFSFileSystem(is);
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
-            HSSFSheet sheet = wb.getSheetAt(0);
-            HSSFRow row;
-            HSSFCell cell;
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheet(SHEET);
+            Iterator<Row> rows = sheet.iterator();
+            List<ProductViewDtos> productViewDtosList = new ArrayList<ProductViewDtos>();
 
-            int rows; // No of rows
-            rows = sheet.getPhysicalNumberOfRows();
+            int rowNumber = 0;
+            while (rows.hasNext()) {
+                Row currentRow = rows.next();
 
-            int cols = 0; // No of columns
-            int tmp = 0;
-
-            // This trick ensures that we get the data properly even if it doesn't start from first few rows
-            for (int i = 0; i < 10 || i < rows; i++) {
-                row = sheet.getRow(i);
-                if (row != null) {
-                    tmp = sheet.getRow(i).getPhysicalNumberOfCells();
-                    if (tmp > cols) cols = tmp;
+                if (rowNumber == 0) {
+                    rowNumber++;
+                    continue;
                 }
-            }
 
-            for (int r = 0; r < rows; r++) {
-                row = sheet.getRow(r);
-                if (row != null) {
-                    for (int c = 0; c < cols; c++) {
-                        cell = row.getCell((short) c);
-                        if (cell != null) {
-                            // Your code here
-                        }
+                Iterator<Cell> cellsInRow = currentRow.iterator();
+
+                ProductViewDtos productViewDtos = new ProductViewDtos();
+
+                int cellIdx = 0;
+                while (cellsInRow.hasNext()) {
+                    Cell currentCell = cellsInRow.next();
+                    switch (cellIdx) {
+
+                        case 0:
+                            productViewDtos.setProductName(currentCell.getStringCellValue());
+                            break;
+                        case 1:
+                            productViewDtos.setBranch(currentCell.getStringCellValue());
+                            break;
+                        case 2:
+                            productViewDtos.setBuyPrice(currentCell.getNumericCellValue());
+                            break;
+                        case 3:
+                            productViewDtos.setSalePrice(currentCell.getNumericCellValue());
+                            break;
+                        case 4:
+                            productViewDtos.setAmount(currentCell.getNumericCellValue());
+                            break;
+                        case 5:
+                            productViewDtos.setBrandName(currentCell.getStringCellValue());
+                            break;
+                        case 6:
+                            productViewDtos.setMinQuantity(currentCell.getNumericCellValue());
+                            break;
+                        case 7:
+                            productViewDtos.setExpiredDate(currentCell.getDateCellValue());
+                            break;
+                        case 8:
+                            productViewDtos.setBarcode((int) currentCell.getNumericCellValue());
+                            break;
+                        case 9:
+                            productViewDtos.setMeasurementId(currentCell.getStringCellValue());
+                            break;
+                        default:
+                            break;
                     }
+                    cellIdx++;
                 }
+                productViewDtosList.add(productViewDtos);
+                workbook.close();
             }
+            return productViewDtosList;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
         }
-
-        return null;
     }
 }

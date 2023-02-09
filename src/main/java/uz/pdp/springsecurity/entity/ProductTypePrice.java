@@ -32,5 +32,4 @@ public class ProductTypePrice extends AbsEntity {
     private double salePrice;
 
     private double profitPercent;
-//    private double amount;
 }
