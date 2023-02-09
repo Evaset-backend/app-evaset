@@ -14,8 +14,8 @@ public class  AuthService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+//    @Autowired
+//    PasswordEncoder passwordEncoder;
 
     @Autowired
     RoleRepository roleRepository;
