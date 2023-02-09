@@ -221,12 +221,6 @@ public class ProductService {
             }
         }
 
-        if (productTypePriceList.size() > 0) {
-            productTypePriceRepository.saveAll(productTypePriceList);
-            return new ApiResponse("successfully saved", true);
-        }
-        return new ApiResponse("NOT FOUND PRODUCT TYPE VALUE", false);
-
         productTypePriceRepository.saveAll(productTypePriceList);
         return new ApiResponse("successfully saved", true);
 
@@ -542,6 +536,7 @@ public class ProductService {
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
                         if (optionalWarehouse.isEmpty()) {
                             getForPurchaseDto.setAmount(0d);
