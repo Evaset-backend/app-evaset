@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TradeDTO;
+import uz.pdp.springsecurity.payload.TradeGetOneDto;
 import uz.pdp.springsecurity.payload.TradeProductDto;
 import uz.pdp.springsecurity.repository.*;
 
@@ -239,11 +240,14 @@ public class TradeService {
 
     public ApiResponse getOne(UUID id) {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);
-        if (optionalTrade.isEmpty()){
-            return new ApiResponse("NOT FOUND", false);
-        }
-        Trade trade = generateTradeByActiveCourse(optionalTrade.get());
-        return  new ApiResponse(true, trade);
+        if (optionalTrade.isEmpty())return new ApiResponse("NOT FOUND", false);
+        Trade trade = optionalTrade.get();
+        List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
+        if (allByTradeId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        TradeGetOneDto tradeGetOneDto = new TradeGetOneDto();
+        tradeGetOneDto.setTrade(trade);
+        tradeGetOneDto.setTradeProductList(allByTradeId);
+        return  new ApiResponse(true, tradeGetOneDto);
     }
 
     public ApiResponse deleteTrade(UUID id) {
@@ -268,78 +272,61 @@ public class TradeService {
     public ApiResponse getAllByTraderId(UUID trader_id) {
         List<Trade> allByTrader_id = tradeRepository.findAllByTrader_Id(trader_id);
         if (allByTrader_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByTrader_id) {
-            Trade generateTradeByActiveCourse = generateTradeByActiveCourse(trade);
-            tradeList.add(generateTradeByActiveCourse);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByTrader_id);
     }
 
     public ApiResponse getAllByBranchId(UUID branch_id) {
         List<Trade> allByBranch_id = tradeRepository.findAllByBranch_Id(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByBranch_id) {
-            Trade generateTradeByActiveCourse = generateTradeByActiveCourse(trade);
-            tradeList.add(generateTradeByActiveCourse);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByBranch_id);
     }
 
     public ApiResponse getByCustomerId(UUID customer_id) {
         List<Trade> allByCustomer_id = tradeRepository.findAllByCustomer_Id(customer_id);
         if (allByCustomer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByCustomer_id) {
-            Trade generateTradeByActiveCourse = generateTradeByActiveCourse(trade);
-            tradeList.add(generateTradeByActiveCourse);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByCustomer_id);
     }
 
     public ApiResponse getByPayDate(Timestamp payDate) throws ParseException {
         List<Trade> allByPayDate = tradeRepository.findTradeByOneDate(payDate);
         if (allByPayDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByPayDate) {
-            Trade trade1 = generateTradeByActiveCourse(trade);
-            tradeList.add(trade1);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByPayDate);
     }
 
     public ApiResponse getByPayStatus(UUID paymentStatus_id) {
         List<Trade> allByPaymentStatus_id = tradeRepository.findAllByPaymentStatus_Id(paymentStatus_id);
         if (allByPaymentStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByPaymentStatus_id) {
-            Trade generateTradeByActiveCourse = generateTradeByActiveCourse(trade);
-            tradeList.add(generateTradeByActiveCourse);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByPaymentStatus_id);
     }
 
     public ApiResponse getByPayMethod(UUID payMethod_id) {
         List<Trade> allByPaymentMethod_id = tradeRepository.findAllByPayMethod_Id(payMethod_id);
         if (allByPaymentMethod_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByPaymentMethod_id) {
-            Trade trade1 = generateTradeByActiveCourse(trade);
-            tradeList.add(trade1);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+
+        return new ApiResponse("FOUND", true, allByPaymentMethod_id);
     }
 
     public ApiResponse getByAddress(UUID address_id) {
         List<Trade> allByAddress_id = tradeRepository.findAllByAddress_Id(address_id);
         if (allByAddress_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByAddress_id) {
+
+        return new ApiResponse("FOUND", true, allByAddress_id);
+    }
+
+    public ApiResponse getAllByBusinessId(UUID businessId) {
+        List<Trade> allByBusinessId = tradeRepository.findAllByBusinessId(businessId);
+        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
+        /*List<Trade> tradeList = new ArrayList<>();
+        for (Trade trade : allByBusinessId) {
             Trade trade1 = generateTradeByActiveCourse(trade);
             tradeList.add(trade1);
-        }
-        return new ApiResponse("FOUND", true, tradeList);
+        }*/
+        return new ApiResponse("FOUND",true,allByBusinessId);
     }
 
     public ApiResponse createPdf(UUID id, HttpServletResponse response) throws IOException {
@@ -352,34 +339,23 @@ public class TradeService {
         return new ApiResponse("CREATED", true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Trade> allByBusinessId = tradeRepository.findAllByBusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
-        List<Trade> tradeList = new ArrayList<>();
-        for (Trade trade : allByBusinessId) {
-            Trade trade1 = generateTradeByActiveCourse(trade);
-            tradeList.add(trade1);
-        }
-        return new ApiResponse("FOUND",true,tradeList);
-    }
-
-    private Trade generateTradeByActiveCourse(Trade trade){
-        UUID busnessId = trade.getBranch().getBusiness().getId();
-        double avans = currencyService.getValueByActiveCourse(trade.getPaidSum(), busnessId);
-        trade.setPaidSum(avans);
-        double totalSum = currencyService.getValueByActiveCourse(trade.getTotalSum(), busnessId);
-        trade.setTotalSum(totalSum);
-//        sac
-
-
-        for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
-            double salePrice = currencyService.getValueByActiveCourse(tradeProduct.getTotalSalePrice(), busnessId);
-            tradeProduct.setTotalSalePrice(salePrice);
-            Product product = tradeProduct.getProduct();
-            product.setSalePrice(salePrice);
-            double buyPrice = currencyService.getValueByActiveCourse(product.getBuyPrice(), busnessId);
-            product.setBuyPrice(buyPrice);
-        }
-        return trade;
-    }
+//    private Trade generateTradeByActiveCourse(Trade trade){
+//        UUID busnessId = trade.getBranch().getBusiness().getId();
+//        double avans = currencyService.getValueByActiveCourse(trade.getPaidSum(), busnessId);
+//        trade.setPaidSum(avans);
+//        double totalSum = currencyService.getValueByActiveCourse(trade.getTotalSum(), busnessId);
+//        trade.setTotalSum(totalSum);
+////        sac
+//
+//
+//        for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(trade.getId())) {
+//            double salePrice = currencyService.getValueByActiveCourse(tradeProduct.getTotalSalePrice(), busnessId);
+//            tradeProduct.setTotalSalePrice(salePrice);
+//            Product product = tradeProduct.getProduct();
+//            product.setSalePrice(salePrice);
+//            double buyPrice = currencyService.getValueByActiveCourse(product.getBuyPrice(), busnessId);
+//            product.setBuyPrice(buyPrice);
+//        }
+//        return trade;
+//    }
 }
