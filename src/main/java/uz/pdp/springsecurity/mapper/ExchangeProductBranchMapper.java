@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ExchangeProductBranchMapper {
 
-    @Mapping(target = "exchangeProduct", ignore = true)
+    @Mapping(target = "exchangeProductList", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "shippedBranch", ignore = true)
     @Mapping(target = "receivedBranch", ignore = true)
@@ -38,7 +38,7 @@ public interface ExchangeProductBranchMapper {
     List<ExchangeProductBranchDTO> toDtoList(List<ExchangeProductBranch> branchList);
 
     @InheritInverseConfiguration
-    @Mapping(target = "exchangeProduct", ignore = true)
+    @Mapping(target = "exchangeProductList", ignore = true)
     @Mapping(target = "shippedBranch.id", source = "shippedBranchId")
     @Mapping(target = "receivedBranch.id", source = "receivedBranchId")
     @Mapping(target = "exchangeStatus.id", source = "exchangeStatusId")
