@@ -44,4 +44,6 @@ public class ProductGetForPurchaseDto {
     private Date expiredDate;
 
     private double minQuantity;
+
+    private UUID photoId;
 }

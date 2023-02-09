@@ -542,6 +542,7 @@ public class ProductService {
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
                         if (optionalWarehouse.isEmpty()) {
                             getForPurchaseDto.setAmount(0d);
