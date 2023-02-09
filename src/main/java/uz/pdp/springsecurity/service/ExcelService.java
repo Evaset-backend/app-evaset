@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.Type;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.MeasurementRepository;
-import uz.pdp.springsecurity.repository.ProductRepository;
-import uz.pdp.springsecurity.repository.WarehouseRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +29,9 @@ public class ExcelService {
     @Autowired
     BranchRepository branchRepository;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
 
 
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
@@ -43,7 +44,7 @@ public class ExcelService {
                 ProductViewDtos productViewDto = new ProductViewDtos();
                 productViewDto.setProductName(product.getName());
                 productViewDto.setBrandName(product.getBrand().getName());
-                productViewDto.setBarcode(Integer.parseInt(product.getBarcode()));
+                productViewDto.setBarcode(productViewDto.getBarcode());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
@@ -64,18 +65,31 @@ public class ExcelService {
         }
     }
 
-    public ApiResponse save(MultipartFile file, UUID branchId) {
+    public ApiResponse save(MultipartFile file, UUID branchId,UUID measurementId,UUID categoryId) {
 
-        Business business = new Business();
+        Business business = null;
 
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isPresent()){
+        Optional<Category> optionalCategory = categoryRepository.findById(branchId);
+//        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+        Optional<Branch> optionalBranch = branchRepository.findById(categoryId);
+        Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
+
+
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("NOT FOUND BRANCH");
+        }
+        if (optionalCategory.isEmpty()){
+            return new ApiResponse("NOT FOUND CATEGORY");
+        }
+        if (optionalMeasurement.isEmpty()){
+            return new ApiResponse("NOT FOUND MEASUREMENT");
+        }
+
+        try {
             Branch branch = optionalBranch.get();
             business = branch.getBusiness();
+            UUID productId = UUID.randomUUID();
 
-        }
-                UUID productId = UUID.randomUUID();
-        try {
             List<ProductViewDtos> productViewDtosList = ExcelHelper.excelToTutorials(file.getInputStream());
             List<Product> productList=new ArrayList<>();
             for (ProductViewDtos productViewDtos : productViewDtosList) {
@@ -91,16 +105,16 @@ public class ExcelService {
                 product.setMinQuantity(productViewDtos.getMinQuantity());
                 product.setTax(10);
 
-                product.setCategory(null);
-                product.setMeasurement(null);
+                product.setCategory(optionalCategory.get());
+                product.setMeasurement(optionalMeasurement.get());
                 product.setBrand(null);
-                product.setType(null);
+                product.setType(Type.SINGLE);
                 product.setPhoto(null);
                 productList.add(product);
-
-                if (productViewDtosList.size()>0){
-                    productRepository.saveAll(productList);
-                }
+            }
+            if (productViewDtosList.size()>0){
+                productRepository.saveAll(productList);
+                return new ApiResponse("Successfully Added ",true);
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
