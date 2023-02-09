@@ -120,6 +120,27 @@ public class WarehouseService {
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
         return tradeProduct;
     }
+    public TradeProduct editTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
+        Double quantity = tradeProduct.getTradedQuantity();
+        if (tradeProductDto.getProductId() != null) {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
+            if (optionalWarehouse.isEmpty()) return null;
+            Warehouse warehouse = optionalWarehouse.get();
+            if (warehouse.getAmount() + quantity < tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() + quantity - tradeProductDto.getTradedQuantity());
+            warehouseRepository.save(warehouse);
+        } else {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
+            if (optionalWarehouse.isEmpty()) return null;
+            Warehouse warehouse = optionalWarehouse.get();
+            if (warehouse.getAmount() + quantity < tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() + quantity - tradeProductDto.getTradedQuantity());
+            warehouseRepository.save(warehouse);
+        }
+        tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
+        tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
+        return tradeProduct;
+    }
 
     public ApiResponse createOrUpdateExchangeProductBranch(ExchangeProductBranchDTO branchDTO, ExchangeProductBranch exchangeProductBranch, boolean update) {
 
