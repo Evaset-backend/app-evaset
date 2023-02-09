@@ -94,7 +94,7 @@ public class AttachmentController {
      * @param response
      * @throws IOException
      */
-//    @CheckPermission("DOWNLOAD_MEDIA")
+    @CheckPermission("DOWNLOAD_MEDIA")
     @GetMapping("/download/{id}")
     public void download(@PathVariable UUID id, HttpServletResponse response) throws IOException {
         Optional<Attachment> byId = attachmentRepository.findById(id);
