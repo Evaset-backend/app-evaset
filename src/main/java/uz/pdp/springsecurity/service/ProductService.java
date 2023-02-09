@@ -139,20 +139,19 @@ public class ProductService {
             if (optionalProduct.isEmpty()) {
                 return new ApiResponse("not found content product", false);
             }
-            if (isUpdate) {
-                    Optional<ProductTypeCombo> comboOptional = comboRepository.findById(productTypeComboDto.getComboId());
-                    if (comboOptional.isEmpty()) {
-                        return new ApiResponse("not found combo product", false);
-                    }
-                    ProductTypeCombo productTypeCombo = comboOptional.get();
-                    productTypeCombo.setMainProduct(saveProduct);
-                    productTypeCombo.setContentProduct(optionalProduct.get());
-                    productTypeCombo.setAmount(productTypeComboDto.getAmount());
-                    productTypeCombo.setBuyPrice(productTypeComboDto.getBuyPrice());
-                    productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
+            if (isUpdate && productTypeComboDto.getComboId() != null) {
+                Optional<ProductTypeCombo> comboOptional = comboRepository.findById(productTypeComboDto.getComboId());
+                if (comboOptional.isEmpty()) {
+                    return new ApiResponse("not found combo product", false);
+                }
+                ProductTypeCombo productTypeCombo = comboOptional.get();
+                productTypeCombo.setMainProduct(saveProduct);
+                productTypeCombo.setContentProduct(optionalProduct.get());
+                productTypeCombo.setAmount(productTypeComboDto.getAmount());
+                productTypeCombo.setBuyPrice(productTypeComboDto.getBuyPrice());
+                productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
 //                    productTypeCombo.setMeasurement(saveProduct.getMeasurement());
-                    productTypeComboList.add(productTypeCombo);
-
+                productTypeComboList.add(productTypeCombo);
             } else {
                 ProductTypeCombo productTypeCombo = new ProductTypeCombo();
                 productTypeCombo.setMainProduct(saveProduct);
@@ -497,11 +496,11 @@ public class ProductService {
 
         List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
         List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
-        if (productList.isEmpty()){
-            return new ApiResponse("NOT FOUND",false);
-        }else {
+        if (productList.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        } else {
             for (Product product : productList) {
-                if (product.getType().equals(Type.SINGLE)){
+                if (product.getType().equals(Type.SINGLE)) {
                     ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                     getForPurchaseDto.setProductId(product.getId());
                     getForPurchaseDto.setType(Type.SINGLE.name());
@@ -516,17 +515,17 @@ public class ProductService {
                     Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
                     if (optionalWarehouse.isEmpty()) {
                         getForPurchaseDto.setAmount(0d);
-                    }else {
+                    } else {
                         getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
                     }
                     getForPurchaseDtoList.add(getForPurchaseDto);
-                }else if (product.getType().equals(Type.MANY)){
+                } else if (product.getType().equals(Type.MANY)) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
                     for (ProductTypePrice productTypePrice : productTypePriceList) {
                         ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                         getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
                         getForPurchaseDto.setType(Type.MANY.name());
-                        getForPurchaseDto.setName(product.getName()+"( "+productTypePrice.getProductTypeValue().getProductType().getName()+"-"+productTypePrice.getProductTypeValue().getName()+" )");
+                        getForPurchaseDto.setName(product.getName() + "( " + productTypePrice.getProductTypeValue().getProductType().getName() + "-" + productTypePrice.getProductTypeValue().getName() + " )");
                         getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
                         getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
                         getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
@@ -538,7 +537,7 @@ public class ProductService {
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
                         if (optionalWarehouse.isEmpty()) {
                             getForPurchaseDto.setAmount(0d);
-                        }else {
+                        } else {
                             getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
                         }
                         getForPurchaseDtoList.add(getForPurchaseDto);
@@ -547,7 +546,7 @@ public class ProductService {
 
 
             }
-            return new ApiResponse("FOUND",true,getForPurchaseDtoList);
+            return new ApiResponse("FOUND", true, getForPurchaseDtoList);
         }
     }
 
