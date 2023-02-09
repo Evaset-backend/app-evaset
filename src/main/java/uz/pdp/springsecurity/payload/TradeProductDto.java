@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TradeProductDto {
+    private UUID tradeProductId;
 
     //USE FOR SINGLE TYPE// OR NULL
     private UUID productId;
@@ -23,7 +24,5 @@ public class TradeProductDto {
 
     private double totalSalePrice;
 
-//    @NotNull(message = "required line")
-//    private double buyPrice;
-//
+
 }
