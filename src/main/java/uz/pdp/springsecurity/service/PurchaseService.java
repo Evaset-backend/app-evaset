@@ -314,7 +314,7 @@ public class PurchaseService {
     public ApiResponse delete(UUID id) {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         purchaseRepository.deleteById(id);
-        return new ApiResponse("DELETED", false);
+        return new ApiResponse("DELETED", true);
     }
 
     public ApiResponse getByDealerId(UUID dealer_id) {
