@@ -59,11 +59,12 @@ public class ExcelController {
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam MultipartFile file,
                                                       @RequestParam UUID categoryId,
                                                       @RequestParam UUID measurementId,
-                                                      @RequestParam UUID branchId) {
+                                                      @RequestParam UUID branchId,
+                                                      @RequestParam UUID brandId) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId);
+                ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId,brandId);
                 ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
             } catch (Exception e) {
                 message = "Could not upload the file: " + file.getOriginalFilename() + "!";
