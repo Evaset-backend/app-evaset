@@ -535,7 +535,7 @@ public class ProductService {
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                        if (productTypePrice.getPhoto().getId()!=null){
+                        if (productTypePrice.getPhoto()!=null){
                             getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         }
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
