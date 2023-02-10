@@ -43,9 +43,16 @@ public class CategoryService {
 
     public ApiResponse edit(UUID id, CategoryDto categoryDto) {
         if (!categoryRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        Category reCategory = new Category();
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
+        if (optionalCategory.isPresent()) {
+            reCategory = optionalCategory.get();
+        }
 
         Category category = categoryRepository.getById(id);
         category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+        category.setParentCategory(reCategory);
 
         categoryRepository.save(category);
         return new ApiResponse("EDITED", true);
