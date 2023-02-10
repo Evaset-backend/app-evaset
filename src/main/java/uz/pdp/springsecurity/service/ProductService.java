@@ -71,28 +71,32 @@ public class ProductService {
         UUID categoryId = productDto.getCategoryId();
         UUID brandId = productDto.getBrandId();
         UUID measurementId = productDto.getMeasurementId();
-        List<UUID> photoIds = productDto.getPhotoIds();
         List<UUID> branchId = productDto.getBranchId();
+
 
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
         Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
         Optional<Brand> optionalBrand = brandRepository.findById(brandId);
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
         List<Branch> allBranch = branchRepository.findAllById(branchId);
-        List<Attachment> attachmentList = attachmentRepository.findAllById(photoIds);
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(productDto.getPhotoId());
 
 
-        if (optionalBusiness.isEmpty())
+        if (optionalBusiness.isEmpty()) {
             return new ApiResponse("not found business", false);
+        }
 
-        if (optionalCategory.isEmpty())
+        if (optionalCategory.isEmpty()) {
             return new ApiResponse("not found category", false);
+        }
 
-        if (optionalBrand.isEmpty())
+        if (optionalBrand.isEmpty()) {
             return new ApiResponse("not found brand", false);
+        }
 
-        if (optionalMeasurement.isEmpty())
+        if (optionalMeasurement.isEmpty()) {
             return new ApiResponse("not found measurement", false);
+        }
 
 
         Product product = new Product();
@@ -102,10 +106,11 @@ public class ProductService {
         product.setCategory(optionalCategory.get());
         product.setBrand(optionalBrand.get());
         product.setMeasurement(optionalMeasurement.get());
-        product.setPhoto(attachmentList);
+
         product.setTax(productDto.getTax());
         product.setExpireDate(productDto.getExpireDate());
         product.setBarcode(productDto.getBarcode());
+        optionalAttachment.ifPresent(product::setPhoto);
         product.setExpireDate(productDto.getExpireDate());
         product.setMinQuantity(productDto.getMinQuantity());
         product.setDueDate(productDto.getDueDate());
@@ -235,7 +240,6 @@ public class ProductService {
         UUID categoryId = productDto.getCategoryId();
         UUID brandId = productDto.getBrandId();
         UUID measurementId = productDto.getMeasurementId();
-        List<UUID> photoIds = productDto.getPhotoIds();
         List<UUID> branchId = productDto.getBranchId();
 
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
@@ -243,7 +247,7 @@ public class ProductService {
         Optional<Brand> optionalBrand = brandRepository.findById(brandId);
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
         List<Branch> allBranch = branchRepository.findAllById(branchId);
-        List<Attachment> attachmentList = attachmentRepository.findAllById(photoIds);
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(productDto.getPhotoId());
 
 
         if (optionalBusiness.isEmpty())
@@ -266,7 +270,7 @@ public class ProductService {
         product.setCategory(optionalCategory.get());
         product.setBrand(optionalBrand.get());
         product.setMeasurement(optionalMeasurement.get());
-        product.setPhoto(attachmentList);
+        optionalAttachment.ifPresent(product::setPhoto);
         product.setBarcode(productDto.getBarcode());
         product.setActive(true);
 
@@ -341,6 +345,7 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
+                productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
@@ -561,15 +566,8 @@ public class ProductService {
                 productViewDto.setMinQuantity(product.getMinQuantity());
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
-
-                List<UUID> ids = new ArrayList<>();
-                List<Attachment> photo = product.getPhoto();
-                List<Attachment> attachmentList = attachmentRepository.findAllById(ids);
-                for (Attachment attachment : attachmentList) {
-                    Optional<Attachment> optionalAttachment = attachmentRepository.findById(attachment.getId());
-                    optionalAttachment.ifPresent(attachment1 -> productViewDto.setPhotoIds(attachment.getId()));
-                }
-
+                Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
+                attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranch_BusinessIdAndProductId(businessId, product.getId());

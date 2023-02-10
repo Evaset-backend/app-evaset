@@ -21,8 +21,7 @@ public class ProductTypePrice extends AbsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductTypeValue productTypeValue;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(cascade = CascadeType.ALL)
     private Attachment photo;
 
     private String barcode;

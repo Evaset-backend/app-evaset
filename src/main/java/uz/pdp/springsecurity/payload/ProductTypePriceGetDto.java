@@ -16,6 +16,8 @@ public class ProductTypePriceGetDto {
 
     private UUID productTypeValueNameId;
 
+    private UUID photoId;
+
     private String productTypeName;
 
     private String productTypeValueName;

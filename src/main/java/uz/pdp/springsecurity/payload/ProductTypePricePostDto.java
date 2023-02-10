@@ -22,6 +22,8 @@ public class ProductTypePricePostDto{
 
     private UUID productTypeValueId;
 
+    private UUID photoId;
+
     @NotNull(message = "required line")
     private String barcode;
 

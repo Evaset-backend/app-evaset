@@ -40,7 +40,7 @@ public class Product extends AbsEntity {
 
     private double minQuantity;
 
-//    @Column(unique = true, nullable = false)
+    //    @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)
     private Type type;
 
@@ -56,9 +56,8 @@ public class Product extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Measurement measurement;
 
-    @ManyToMany
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Attachment> photo;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Attachment photo;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
