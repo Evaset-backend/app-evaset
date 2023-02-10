@@ -23,22 +23,30 @@ public class CategoryService {
     BusinessRepository businessRepository;
 
     public ApiResponse add(CategoryDto categoryDto) {
-        Optional<Business> optionalBusiness = businessRepository.findById(categoryDto.getBusinessId());
-        if (optionalBusiness.isEmpty()) {
-            return new ApiResponse("BUSINESS NOT FOUND", false);
+        UUID businessId = categoryDto.getBusinessId();
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()){
+            return new ApiResponse("Business Not Found");
         }
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
+
         Category category = new Category();
-        if (optionalCategory.isPresent()){
-            category = optionalCategory.get();
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+        category.setBusiness(optionalBusiness.get());
+
+        if (categoryDto.getParentCategory() != null) {
+            Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
+
+            if (optionalCategory.isPresent()) {
+                Category parentCategory = optionalCategory.get();
+                category.setParentCategory(parentCategory);
+            }
+
         }
-        Category category1 = new Category();
-        category1.setName(categoryDto.getName());
-        category1.setDescription(categoryDto.getDescription());
-        category1.setParentCategory(category);
-        category1.setBusiness(optionalBusiness.get());
-        categoryRepository.save(category1);
-        return new ApiResponse("ADDED", true, category1);
+        categoryRepository.save(category);
+
+        return new ApiResponse("Added",true,category);
+
     }
 
     public ApiResponse edit(UUID id, CategoryDto categoryDto) {
@@ -117,7 +125,6 @@ public class CategoryService {
         dto.setDescription(category.getDescription());
         dto.setBusinessId(category.getBusiness().getId());
         dto.setParentCategory(category.getParentCategory().getId());
-        dto.setParentCategoryName(category.getParentCategory().getName());
         return dto;
     }
 
