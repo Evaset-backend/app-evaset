@@ -18,9 +18,10 @@ public class CategoryDto {
     private UUID parentCategory;
     private String parentCategoryName;
 
-    public CategoryDto(String name, UUID businessId, String description) {
+    public CategoryDto(String name, UUID businessId, String description,UUID parentCategory) {
         this.name = name;
         this.businessId = businessId;
         this.description = description;
+        this.parentCategory=parentCategory;
     }
 }

@@ -27,16 +27,18 @@ public class CategoryService {
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("BUSINESS NOT FOUND", false);
         }
-
-        Category category = new Category(
-                categoryDto.getName(),
-                optionalBusiness.get(),
-                categoryDto.getDescription()
-
-        );
-
-        category = categoryRepository.save(category);
-        return new ApiResponse("ADDED", true, category);
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
+        Category category = new Category();
+        if (optionalCategory.isPresent()){
+            category = optionalCategory.get();
+        }
+        Category category1 = new Category();
+        category1.setName(categoryDto.getName());
+        category1.setDescription(categoryDto.getDescription());
+        category1.setParentCategory(category);
+        category1.setBusiness(optionalBusiness.get());
+        categoryRepository.save(category1);
+        return new ApiResponse("ADDED", true, category1);
     }
 
     public ApiResponse edit(UUID id, CategoryDto categoryDto) {

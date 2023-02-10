@@ -33,11 +33,6 @@ public class Category extends AbsEntity {
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
-    public Category(UUID id, Timestamp createdAt, Timestamp updateAt, String name, Business business) {
-        super(id, createdAt, updateAt);
-        this.name = name;
-        this.business = business;
-    }
 
     public Category(UUID id, Timestamp createdAt, Timestamp updateAt, String name, Business business, Category category) {
         super(id, createdAt, updateAt);
@@ -66,4 +61,18 @@ public class Category extends AbsEntity {
         this.business=business;
     }
 
+    public Category(String name, Business business, String description, Category parentCategory) {
+        this.name=name;
+        this.description=description;
+        this.business=business;
+        this.parentCategory=parentCategory;
+    }
+
+    public Category(String name, String description, UUID parentCategory, Business name1, Category category) {
+        this.name=name;
+        this.description=description;
+        this.business=business;
+
+
+    }
 }
