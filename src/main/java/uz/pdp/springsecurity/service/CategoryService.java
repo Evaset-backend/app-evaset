@@ -34,11 +34,14 @@ public class CategoryService {
         category.setDescription(categoryDto.getDescription());
         category.setBusiness(optionalBusiness.get());
 
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
+        if (categoryDto.getParentCategory() != null) {
+            Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getParentCategory());
 
-        if (optionalCategory.isPresent()){
-            Category parentCategory = optionalCategory.get();
-            category.setParentCategory(parentCategory);
+            if (optionalCategory.isPresent()) {
+                Category parentCategory = optionalCategory.get();
+                category.setParentCategory(parentCategory);
+            }
+
         }
         categoryRepository.save(category);
 
