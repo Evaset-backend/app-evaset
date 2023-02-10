@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.PurchaseDto;
 import uz.pdp.springsecurity.payload.PurchaseProductDto;
 import uz.pdp.springsecurity.repository.FifoCalculationRepository;
 import uz.pdp.springsecurity.repository.PurchaseProductRepository;
-import uz.pdp.springsecurity.repository.TradeProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class FifoCalculationService {
     @Autowired
     private PurchaseProductRepository purchaseProductRepository;
 
-    public ApiResponse addProduct(Purchase purchase) {
+    public ApiResponse addPurchase(Purchase purchase) {
         Branch branch = purchase.getBranch();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
 
@@ -70,38 +68,38 @@ public class FifoCalculationService {
 
     public TradeProduct trade(Branch branch, TradeProduct tradeProduct) {
         List<FifoCalculation> fifoList = null;
-        Double salePrice = 0d;
+//        Double salePrice = 0d;
         if (tradeProduct.getProduct() != null) {
             Product product = tradeProduct.getProduct();
-            salePrice = product.getSalePrice();
             fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+//            salePrice = product.getSalePrice();
         } else {
             ProductTypePrice productTypePrice = tradeProduct.getProductTypePrice();
             fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
-            salePrice = productTypePrice.getSalePrice();
+//            salePrice = productTypePrice.getSalePrice();
         }
 
         double quantity = tradeProduct.getTradedQuantity();
-        double profit = 0;
+        double totalBuyPrice = 0;
         for (FifoCalculation fifo : fifoList) {
             if (fifo.getRemainAmount()>quantity){
                 fifo.setRemainAmount(fifo.getRemainAmount() - quantity);
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                totalBuyPrice += quantity * fifo.getBuyPrice();
                 break;
             } else if (fifo.getRemainAmount() < quantity) {
                 double amount = fifo.getRemainAmount();
                 quantity -= amount;
-                profit += amount * (salePrice - fifo.getBuyPrice());
+                totalBuyPrice += amount * fifo.getBuyPrice();
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
             }else {
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                totalBuyPrice += quantity * fifo.getBuyPrice();
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
                 break;
             }
         }
-        tradeProduct.setProfit(profit);
+        tradeProduct.setProfit(tradeProduct.getTotalSalePrice() - totalBuyPrice);
         fifoRepository.saveAll(fifoList);
         return tradeProduct;
     }
@@ -158,4 +156,6 @@ public class FifoCalculationService {
         }
         fifoRepository.saveAll(fifoCalculationList);
     }
+
+
 }

@@ -177,7 +177,7 @@ public class PurchaseService {
         warehouseService.addPurchase(purchase);
 
         //TO SAVE AMOUNTS OF PRODUCTS TO FIFO_CALCULATION
-        fifoCalculationService.addProduct(purchase);
+        fifoCalculationService.addPurchase(purchase);
         return new ApiResponse("ADDED", true);
     }
 

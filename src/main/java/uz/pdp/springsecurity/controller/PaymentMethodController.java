@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/paymethod")
-public class PayMethodController {
+public class PaymentMethodController {
     @Autowired
     PayMethodService payMethodService;
 
