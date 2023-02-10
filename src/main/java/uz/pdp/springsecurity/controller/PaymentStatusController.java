@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/paystatus")
-public class PayStatusController {
+public class PaymentStatusController {
     @Autowired
     PayStatusService payStatusService;
 

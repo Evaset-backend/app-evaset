@@ -14,8 +14,6 @@ import java.util.UUID;
 
 public class TradeDTO {
 
-    private UUID tradeId;
-
     private UUID customerId;
 
     /**
