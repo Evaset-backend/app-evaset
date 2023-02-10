@@ -91,7 +91,7 @@ public class ProductTypeService {
                 productTypeViewDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypeViewDto.setBarcode(productTypePrice.getBarcode());
                 Optional<Attachment> optionalAttachment = attachmentRepository.findById(productTypePrice.getId());
-                optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoIds(attachment.getId()));
+                optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoId(attachment.getId()));
             }
             productTypeViewDtoList.add(productTypeViewDto);
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());

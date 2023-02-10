@@ -345,7 +345,6 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
-                productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
@@ -512,14 +511,18 @@ public class ProductService {
                     getForPurchaseDto.setType(Type.SINGLE.name());
                     getForPurchaseDto.setName(product.getName());
                     getForPurchaseDto.setBarcode(product.getBarcode());
+                    getForPurchaseDto.setBrandName(product.getBrand().getName());
                     getForPurchaseDto.setBuyPrice(product.getBuyPrice());
                     getForPurchaseDto.setSalePrice(product.getSalePrice());
                     getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                     getForPurchaseDto.setExpiredDate(product.getExpireDate());
-                    if (product.getMeasurement() != null)getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                    if (product.getBrand() != null)getForPurchaseDto.setBrandName(product.getBrand().getName());
+                    getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
                     Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
-                    getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
+                    if (optionalWarehouse.isEmpty()) {
+                        getForPurchaseDto.setAmount(0d);
+                    } else {
+                        getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
+                    }
                     getForPurchaseDtoList.add(getForPurchaseDto);
                 } else if (product.getType().equals(Type.MANY)) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
@@ -534,6 +537,10 @@ public class ProductService {
                         getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
+                        getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        if (productTypePrice.getPhoto() != null) {
+                            getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
+                        }
                         if (product.getMeasurement() != null)getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
                         if (product.getBrand() != null)getForPurchaseDto.setBrandName(product.getBrand().getName());
                         if (productTypePrice.getPhoto() != null) getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
