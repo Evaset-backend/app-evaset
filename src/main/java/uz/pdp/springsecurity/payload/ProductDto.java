@@ -29,7 +29,7 @@ public class ProductDto {
     @NotNull(message = "required line")
     private UUID measurementId;
 
-    private List<UUID> photoIds;
+    private UUID photoId;
 
     @NotNull(message = "required line")
     private double buyPrice;
