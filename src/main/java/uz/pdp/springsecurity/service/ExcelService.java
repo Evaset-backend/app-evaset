@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import uz.pdp.springsecurity.payload.ProductViewDtos;
 import uz.pdp.springsecurity.repository.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,9 @@ public class ExcelService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    BrandRepository brandRepository;
 
 
 
@@ -65,14 +70,15 @@ public class ExcelService {
         }
     }
 
-    public ApiResponse save(MultipartFile file, UUID branchId,UUID measurementId,UUID categoryId) {
+    @SneakyThrows
+    public ApiResponse save(MultipartFile file, UUID branchId, UUID measurementId, UUID categoryId,UUID brandId) {
 
         Business business = null;
 
         Optional<Category> optionalCategory = categoryRepository.findById(branchId);
-//        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
         Optional<Branch> optionalBranch = branchRepository.findById(categoryId);
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
+        Optional<Brand> optionalBrand = brandRepository.findById(brandId);
 
 
         if (optionalBranch.isEmpty()){
@@ -84,6 +90,9 @@ public class ExcelService {
         if (optionalMeasurement.isEmpty()){
             return new ApiResponse("NOT FOUND MEASUREMENT");
         }
+        if (optionalBrand.isEmpty()){
+            return new ApiResponse("NOT FOUND BRAND");
+        }
 
         try {
             Branch branch = optionalBranch.get();
@@ -94,12 +103,12 @@ public class ExcelService {
             List<Product> productList=new ArrayList<>();
             for (ProductViewDtos productViewDtos : productViewDtosList) {
                 Product product=new Product();
-                product.setId(productId);
                 product.setBusiness(business);
                 product.setName(productViewDtos.getProductName());
                 product.setExpireDate(productViewDtos.getExpiredDate());
                 product.setBarcode(String.valueOf(productViewDtos.getBarcode()));
-                product.setDueDate(productViewDtos.getExpiredDate());
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                product.setDueDate(formatter.parse(formatter.format(productViewDtos.getExpiredDate())));
                 product.setBuyPrice(productViewDtos.getBuyPrice());
                 product.setSalePrice(productViewDtos.getSalePrice());
                 product.setMinQuantity(productViewDtos.getMinQuantity());
@@ -107,7 +116,7 @@ public class ExcelService {
 
                 product.setCategory(optionalCategory.get());
                 product.setMeasurement(optionalMeasurement.get());
-                product.setBrand(null);
+                product.setBrand(optionalBrand.get());
                 product.setType(Type.SINGLE);
                 product.setPhoto(null);
                 productList.add(product);
