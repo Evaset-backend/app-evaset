@@ -30,15 +30,9 @@ public class Category extends AbsEntity {
     private Business business;
 
     @ManyToOne
-    @JoinColumn(name = "parent_category_id")
+    @JoinColumn(name = "parent_category")
     private Category parentCategory;
 
-
-    public Category(UUID id, Timestamp createdAt, Timestamp updateAt, String name, Business business, Category category) {
-        super(id, createdAt, updateAt);
-        this.name = name;
-        this.business = business;
-    }
 
     public Category(String name) {
         this.name = name;

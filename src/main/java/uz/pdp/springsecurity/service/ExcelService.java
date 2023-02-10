@@ -95,9 +95,9 @@ public class ExcelService {
         }
 
         try {
-            Branch branch = optionalBranch.get();
-            business = branch.getBusiness();
-            UUID productId = UUID.randomUUID();
+            business = optionalBranch.get().getBusiness();
+            List<Branch> branchList = new ArrayList<>();
+            branchList.add(optionalBranch.get());
 
             List<ProductViewDtos> productViewDtosList = ExcelHelper.excelToTutorials(file.getInputStream());
             List<Product> productList=new ArrayList<>();
@@ -112,6 +112,7 @@ public class ExcelService {
                 product.setBuyPrice(productViewDtos.getBuyPrice());
                 product.setSalePrice(productViewDtos.getSalePrice());
                 product.setMinQuantity(productViewDtos.getMinQuantity());
+                product.setBranch(branchList);
                 product.setTax(10);
 
                 product.setCategory(optionalCategory.get());

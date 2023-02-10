@@ -345,7 +345,6 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
-                productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
 
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
@@ -536,19 +535,17 @@ public class ProductService {
                         getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
                         getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
                         getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
-                        getForPurchaseDto.setBrandName(product.getBrand().getName());
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
                         if (productTypePrice.getPhoto() != null) {
                             getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         }
+                        if (product.getMeasurement() != null)getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        if (product.getBrand() != null)getForPurchaseDto.setBrandName(product.getBrand().getName());
+                        if (productTypePrice.getPhoto() != null) getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
                         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
-                        if (optionalWarehouse.isEmpty()) {
-                            getForPurchaseDto.setAmount(0d);
-                        } else {
-                            getForPurchaseDto.setAmount(optionalWarehouse.get().getAmount());
-                        }
+                        getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                         getForPurchaseDtoList.add(getForPurchaseDto);
                     }
                 }
