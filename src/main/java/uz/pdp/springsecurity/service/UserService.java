@@ -16,6 +16,7 @@ import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 
+import javax.validation.Valid;
 import java.util.*;
 
 @Service
@@ -148,8 +149,13 @@ public class UserService {
         return new ApiResponse("DELETED", true);
     }
 
-    public ApiResponse editMyProfile(ProfileDto profileDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ApiResponse editMyProfile(User user, ProfileDto profileDto) {
+        UUID id = user.getId();
+        Optional<User> optionalUser = userRepository.findById(id);
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (optionalUser.isEmpty())
+            return new ApiResponse("NOT FOUND USER");
+
         if (userRepository.existsByUsernameAndIdNot(profileDto.getUsername(), user.getId()))
             return new ApiResponse("USERNAME ALREADY EXISTS", false);
 
