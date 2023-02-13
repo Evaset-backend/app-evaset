@@ -20,6 +20,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@OnDelete(action = OnDeleteAction.CASCADE)
 public class Category extends AbsEntity {
     private String name;
 
@@ -31,6 +32,7 @@ public class Category extends AbsEntity {
 
     @ManyToOne
     @JoinColumn(name = "parent_category")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Category parentCategory;
 
 
