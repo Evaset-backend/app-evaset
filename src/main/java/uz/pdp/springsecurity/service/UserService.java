@@ -152,12 +152,13 @@ public class UserService {
     public ApiResponse editMyProfile(User user, ProfileDto profileDto) {
         UUID id = user.getId();
         Optional<User> optionalUser = userRepository.findById(id);
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (optionalUser.isEmpty())
             return new ApiResponse("NOT FOUND USER");
 
-        if (userRepository.existsByUsernameAndIdNot(profileDto.getUsername(), user.getId()))
+        Optional<User> userOptional = userRepository.findByUsernameAndIdNot(profileDto.getUsername(), id);
+        if (userOptional.isPresent()){
             return new ApiResponse("USERNAME ALREADY EXISTS", false);
+        }
 
         if (!profileDto.getPassword().equals(profileDto.getPrePassword()))
             return new ApiResponse("PASSWORDS ARE NOT COMPATIBLE", false);
