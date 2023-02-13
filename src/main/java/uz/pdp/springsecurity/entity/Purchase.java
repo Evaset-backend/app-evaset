@@ -43,7 +43,7 @@ public class Purchase extends AbsEntity {
 
     private double paidSum;
 
-    private double debtSum;
+    private double debtSum = 0;
 
     private boolean editable = true;
 }

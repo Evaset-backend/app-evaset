@@ -13,7 +13,5 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
 
     List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
 
-    Optional<FifoCalculation> findByPurchaseIdAndProductId(UUID purchaseId, UUID productId);
-
-    Optional<FifoCalculation> findByPurchaseIdAndProductTypePriceId(UUID purchaseId, UUID productTypePriceId);
+    Optional<FifoCalculation> findByPurchaseProductId(UUID purchaseProductId);
 }

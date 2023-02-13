@@ -42,15 +42,15 @@ public class FifoCalculation extends AbsEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Purchase purchase;
+    private PurchaseProduct purchaseProduct;
 
-    public FifoCalculation(Branch branch, double purchasedAmount, double remainAmount, double buyPrice, Date date, Purchase purchase) {
+    public FifoCalculation(Branch branch, double purchasedAmount, double remainAmount, double buyPrice, Date date, PurchaseProduct purchaseProduct) {
         this.branch = branch;
         this.purchasedAmount = purchasedAmount;
         this.remainAmount = remainAmount;
         this.buyPrice = buyPrice;
         this.date = date;
-        this.purchase = purchase;
+        this.purchaseProduct = purchaseProduct;
     }
 
 
