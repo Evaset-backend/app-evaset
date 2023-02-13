@@ -33,62 +33,49 @@ public class WarehouseService {
     private ExchangeProductBranchRepository exchangeProductBranchRepository;
     private final FifoCalculationService fifoCalculationService;
 
-    public void addPurchase(Purchase purchase) {
+    /*public void addPurchase(Purchase purchase) {
         Branch branch = purchase.getBranch();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
         List<Warehouse> warehouseList = new ArrayList<>();
 
         for (PurchaseProduct purchaseProduct : purchaseProductList) {
-            Warehouse warehouse = null;
-            if (purchaseProduct.getProduct() != null) {
-                Product product = purchaseProduct.getProduct();
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
-                if (optionalWarehouse.isPresent()) {
-                    warehouse = optionalWarehouse.get();
-                    warehouse.setAmount(warehouse.getAmount() + purchaseProduct.getPurchasedQuantity());
-                } else {
-                    warehouse = new Warehouse();
-                    warehouse.setBranch(branch);
-                    warehouse.setProduct(product);
-                    warehouse.setAmount(purchaseProduct.getPurchasedQuantity());
-                }
-            } else {
-                ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
-                if (optionalWarehouse.isPresent()) {
-                    warehouse = optionalWarehouse.get();
-                    warehouse.setAmount(warehouse.getAmount() + purchaseProduct.getPurchasedQuantity());
-                } else {
-                    warehouse = new Warehouse();
-                    warehouse.setBranch(branch);
-                    warehouse.setProductTypePrice(productTypePrice);
-                    warehouse.setAmount(purchaseProduct.getPurchasedQuantity());
-                }
-            }
+            Warehouse warehouse = createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
             warehouseList.add(warehouse);
         }
         warehouseRepository.saveAll(warehouseList);
-    }
+    }*/
 
-    public Boolean editPurchaseProductAmount(PurchaseProduct purchaseProduct, Double amount) {
+    public void createOrEditWareHouse(PurchaseProduct purchaseProduct, double amount) {
         Branch branch = purchaseProduct.getPurchase().getBranch();
         Warehouse warehouse = null;
         if (purchaseProduct.getProduct() != null) {
             Product product = purchaseProduct.getProduct();
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
-            if (optionalWarehouse.isEmpty()) return false;
-            warehouse = optionalWarehouse.get();
-            warehouse.setAmount(warehouse.getAmount() + amount);
+            if (optionalWarehouse.isPresent()) {
+                warehouse = optionalWarehouse.get();
+                warehouse.setAmount(warehouse.getAmount() + amount);
+            } else {
+                warehouse = new Warehouse();
+                warehouse.setBranch(branch);
+                warehouse.setProduct(product);
+                warehouse.setAmount(amount);
+            }
         } else {
             ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
-            if (optionalWarehouse.isEmpty()) return false;
-            warehouse = optionalWarehouse.get();
-            warehouse.setAmount(warehouse.getAmount() + amount);
+            if (optionalWarehouse.isPresent()) {
+                warehouse = optionalWarehouse.get();
+                warehouse.setAmount(warehouse.getAmount() + amount);
+            } else {
+                warehouse = new Warehouse();
+                warehouse.setBranch(branch);
+                warehouse.setProductTypePrice(productTypePrice);
+                warehouse.setAmount(amount);
+            }
         }
         warehouseRepository.save(warehouse);
-        return true;
     }
+
 
     /**
      * RETURN TRADEPRODUCT BY TRADEPRODUCTDTO AFTER CHECK AMOUNT

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.PurchaseProductDto;
 import uz.pdp.springsecurity.repository.FifoCalculationRepository;
 import uz.pdp.springsecurity.repository.PurchaseProductRepository;
 
@@ -19,51 +18,32 @@ public class FifoCalculationService {
     @Autowired
     private PurchaseProductRepository purchaseProductRepository;
 
-    public ApiResponse addPurchase(Purchase purchase) {
-        Branch branch = purchase.getBranch();
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-
-        List<FifoCalculation> fifoCalculationList = new ArrayList<>();
-
-        for (PurchaseProduct purchaseProduct : purchaseProductList) {
-            FifoCalculation fifoCalculation = new FifoCalculation(
-                    branch,
-                    purchaseProduct.getPurchasedQuantity(),
-                    purchaseProduct.getPurchasedQuantity(),
-                    purchaseProduct.getBuyPrice(),
-                    purchase.getDate(),
-                    purchase
-            );
-            if (purchaseProduct.getProduct()!=null){
-                fifoCalculation.setProduct(purchaseProduct.getProduct());
-            }else {
-                fifoCalculation.setProductTypePrice(purchaseProduct.getProductTypePrice());
-            }
-
-            fifoCalculationList.add(fifoCalculation);
+    public void createCalculation(PurchaseProduct purchaseProduct) {
+        FifoCalculation fifoCalculation = new FifoCalculation(
+                purchaseProduct.getPurchase().getBranch(),
+                purchaseProduct.getPurchasedQuantity(),
+                purchaseProduct.getPurchasedQuantity(),
+                purchaseProduct.getBuyPrice(),
+                purchaseProduct.getPurchase().getDate(),
+                purchaseProduct
+        );
+        if (purchaseProduct.getProduct()!=null){
+            fifoCalculation.setProduct(purchaseProduct.getProduct());
+        }else {
+            fifoCalculation.setProductTypePrice(purchaseProduct.getProductTypePrice());
         }
-        fifoRepository.saveAll(fifoCalculationList);
-        return new ApiResponse(true);
+        fifoRepository.save(fifoCalculation);
     }
 
-    public boolean editPurchaseProductAmount(PurchaseProduct purchaseProduct, PurchaseProductDto purchaseProductDto) {
-        Purchase purchase = purchaseProduct.getPurchase();
-        FifoCalculation fifoCalculation = null;
-        if (purchaseProduct.getProduct() != null) {
-            Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseIdAndProductId(purchase.getId(), purchaseProduct.getProduct().getId());
-            if (optionalFifoCalculation.isEmpty()) return false;
-            fifoCalculation = optionalFifoCalculation.get();
-        }else {
-            Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseIdAndProductTypePriceId(purchase.getId(), purchaseProduct.getProductTypePrice().getId());
-            if (optionalFifoCalculation.isEmpty()) return false;
-            fifoCalculation = optionalFifoCalculation.get();
-        }
+    public void editFifoCalculation(PurchaseProduct purchaseProduct, Double amount) {
+        Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseProductId(purchaseProduct.getId());
+        if (optionalFifoCalculation.isEmpty()) return;
+        FifoCalculation fifoCalculation = optionalFifoCalculation.get();
         fifoCalculation.setBuyPrice(purchaseProduct.getBuyPrice());
         fifoCalculation.setPurchasedAmount(purchaseProduct.getPurchasedQuantity());
-        double amount = purchaseProductDto.getPurchasedQuantity() - purchaseProduct.getPurchasedQuantity();
         fifoCalculation.setRemainAmount(fifoCalculation.getRemainAmount() + amount);
+        if (fifoCalculation.getRemainAmount() <= 0d)fifoCalculation.setActive(false);
         fifoRepository.save(fifoCalculation);
-        return true;
     }
 
     public TradeProduct trade(Branch branch, TradeProduct tradeProduct) {
