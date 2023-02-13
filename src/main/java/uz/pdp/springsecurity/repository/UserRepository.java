@@ -13,11 +13,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByUsername(String username);
 
+    Optional<User> findByUsernameAndIdNot(String username, UUID id);
+
     Optional<User> findByUsername(String username);
 
     boolean existsByUsernameAndIdNot(String userName, UUID id);
 
     List<User> findAllByRole_Id(UUID role_id);
+
 
     List<User> findAllByBusiness_Id(UUID business_id);
 

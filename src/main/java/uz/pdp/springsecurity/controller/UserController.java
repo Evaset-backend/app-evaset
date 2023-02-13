@@ -77,13 +77,12 @@ public class UserController {
 
     /**
      * OZINI PROFILINI TAXRIRLASH
-     *
-     * @param user
-     * @param profileDto
+     * @CurrentUser user
+     * @RequesBody profileDto
      * @return ApiResponse(success - > true, message - > UPDATED)
      */
     @CheckPermission("EDIT_MY_PROFILE")
-    @PutMapping
+    @PutMapping()
     public ResponseEntity<?> editMyProfile(@CurrentUser User user, @Valid @RequestBody ProfileDto profileDto) {
         ApiResponse apiResponse = userService.editMyProfile(user, profileDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResponse);
@@ -91,8 +90,7 @@ public class UserController {
 
     /**
      * ROLE_ID ORQALI USERNI OLIB CHIQISH
-     *
-     * @param role_id
+     * @Id role_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
 
@@ -106,7 +104,7 @@ public class UserController {
     /**
      * BUSINESS_ID ORQALI USERLARNI OLIB CHIQISH
      *
-     * @param business_id
+     * @Id business_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
     @CheckPermission("VIEW_USER_ADMIN")
