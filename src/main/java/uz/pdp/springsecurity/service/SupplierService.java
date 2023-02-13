@@ -98,13 +98,12 @@ public class SupplierService {
                 supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
                 supplierRepository.save(supplier);
                 return new ApiResponse("Repayment Store !", true);
-
             } else {
-                return new ApiResponse("Brat Qarz null kelyabdi !", false);
+                return new ApiResponse("Repayment Not Found !", false);
             }
 
         } catch (Exception e) {
-            return new ApiResponse("Exception Xatolik !", false);
+            return new ApiResponse("Repayment failed !", false);
         }
     }
 }
