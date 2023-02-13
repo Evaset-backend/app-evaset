@@ -125,7 +125,10 @@ public class CategoryService {
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
         dto.setBusinessId(category.getBusiness().getId());
-        dto.setParentCategory(category.getParentCategory().getId());
+        if (category.getParentCategory().getId()!=null) {
+            dto.setParentCategory(category.getParentCategory().getId());
+        }
+        dto.setParentCategory(null);
         return dto;
     }
 
@@ -139,5 +142,15 @@ public class CategoryService {
             dtos.add(generateCategoryDtoFromCategory(category));
         }
         return new ApiResponse("All child category",true, dtos);
+    }
+
+    public ApiResponse getAllParentCategory(UUID id) {
+
+        List<Category> categoriesByParentCategoryId = categoryRepository.findAllByBusiness_IdAndAndParentCategoryNull(id);
+        if (categoriesByParentCategoryId.isEmpty()){
+            return new ApiResponse(false,"Not Found");
+        }
+        List<Category> categoryList = categoriesByParentCategoryId;
+        return new ApiResponse("All Parent Categories ",true, categoryList);
     }
 }
