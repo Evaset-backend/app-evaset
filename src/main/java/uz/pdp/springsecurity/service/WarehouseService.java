@@ -84,45 +84,24 @@ public class WarehouseService {
      * @param tradeProductDto
      * @return
      */
-    public TradeProduct trade(Branch branch, TradeProductDto tradeProductDto) {
-        TradeProduct tradeProduct = new TradeProduct();
+    public TradeProduct createOrEditTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
+        double amount = tradeProduct.getTradedQuantity();
         if (tradeProductDto.getProductId() != null) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() < tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() - tradeProductDto.getTradedQuantity());
+            if (warehouse.getAmount() + amount < tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() + amount - tradeProductDto.getTradedQuantity());
             warehouseRepository.save(warehouse);
             tradeProduct.setProduct(warehouse.getProduct());
         } else {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() < tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() - tradeProductDto.getTradedQuantity());
+            if (warehouse.getAmount() + amount< tradeProductDto.getTradedQuantity()) return null;
+            warehouse.setAmount(warehouse.getAmount() + amount - tradeProductDto.getTradedQuantity());
             warehouseRepository.save(warehouse);
             tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
-        }
-        tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
-        tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
-        return tradeProduct;
-    }
-    public TradeProduct editTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
-        Double quantity = tradeProduct.getTradedQuantity();
-        if (tradeProductDto.getProductId() != null) {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
-            if (optionalWarehouse.isEmpty()) return null;
-            Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() + quantity < tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() + quantity - tradeProductDto.getTradedQuantity());
-            warehouseRepository.save(warehouse);
-        } else {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
-            if (optionalWarehouse.isEmpty()) return null;
-            Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() + quantity < tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() + quantity - tradeProductDto.getTradedQuantity());
-            warehouseRepository.save(warehouse);
         }
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());

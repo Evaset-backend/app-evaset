@@ -20,9 +20,9 @@ public class TradeProductDto {
     private UUID productTypePriceId;
 
     @NotNull(message = "required line")
-    private Double tradedQuantity;
+    private double tradedQuantity;
 
     private double totalSalePrice;
 
-
+    private boolean delete = false;
 }

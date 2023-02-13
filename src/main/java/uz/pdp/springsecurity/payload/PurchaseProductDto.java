@@ -31,5 +31,5 @@ public class PurchaseProductDto {
 
     private double totalSum;
 
-    private boolean delete;
+    private boolean delete = false;
 }
