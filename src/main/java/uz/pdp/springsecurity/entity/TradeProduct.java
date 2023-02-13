@@ -32,7 +32,7 @@ public class TradeProduct extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductTypePrice productTypePrice;
 
-    private Double tradedQuantity;
+    private double tradedQuantity;
 
 //    private double buyPrice;
 //

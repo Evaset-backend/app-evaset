@@ -105,7 +105,7 @@ public class PurchaseService {
         purchase.setBranch(branch);
 
         double debtSum = purchase.getDebtSum();
-        if (purchaseDto.getDebtSum() > 0) {
+        if (purchaseDto.getDebtSum() > 0 || debtSum != purchase.getDebtSum()) {
             supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
             supplierRepository.save(supplier);
         }

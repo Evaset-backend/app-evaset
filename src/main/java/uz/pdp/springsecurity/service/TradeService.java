@@ -70,79 +70,7 @@ public class TradeService {
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
         Trade trade = new Trade();
-
-
-        return addTrade(trade, tradeDTO);
-    }
-
-    public ApiResponse addTrade(Trade trade, TradeDTO tradeDTO) {
-
-        /**
-         * SET LATER
-         */
-        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-        if (optionalCustomer.isEmpty()) {
-            return new ApiResponse("CUSTOMER NOT FOUND", false);
-        }
-        Customer customer = optionalCustomer.get();
-        trade.setCustomer(customer);
-
-        Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
-        if (optionalUser.isEmpty()) {
-            return new ApiResponse("TRADER NOT FOUND", false);
-        }
-        trade.setTrader(optionalUser.get());
-
-        Optional<Branch> optionalBranch = branchRepository.findById(tradeDTO.getBranchId());
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("BRANCH NOT FOUND", false);
-        }
-        Branch branch = optionalBranch.get();
-        trade.setBranch(branch);
-
-        Optional<PaymentStatus> optionalPaymentStatus = paymentStatusRepository.findById(tradeDTO.getPaymentStatusId());
-        if(optionalPaymentStatus.isEmpty()){
-            return new ApiResponse("PAYMENTSTATUS NOT FOUND", false);
-        }
-        trade.setPaymentStatus(optionalPaymentStatus.get());
-
-        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(tradeDTO.getPayMethodId());
-        if (optionalPaymentMethod.isEmpty()) {
-            return new ApiResponse("PAYMAENTMETHOD NOT FOUND", false);
-        }
-        trade.setPayMethod(optionalPaymentMethod.get());
-
-        double loanSum = tradeDTO.getDebtSum();
-        if (loanSum > 0) {
-            customer.setDebt(customer.getDebt() + loanSum);
-        }
-
-        trade.setPayDate(tradeDTO.getPayDate());
-        trade.setTotalSum(tradeDTO.getTotalSum());
-        trade.setPaidSum(tradeDTO.getPaidSum());
-        trade.setDebtSum(loanSum);
-        tradeRepository.save(trade);
-
-        /**
-         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
-         */
-        List<TradeProductDto> productTraderDto = tradeDTO.getProductTraderDto();
-        List<TradeProduct> tradeProductList = new ArrayList<>();
-
-        double profit = 0;
-        for (TradeProductDto tradeProductDto : productTraderDto) {
-            TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
-            if (tradeProduct != null) {
-                tradeProduct.setTrade(trade);
-                TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
-                tradeProductList.add(savedTradeProduct);
-                profit += savedTradeProduct.getProfit();
-            }
-        }
-        trade.setTotalProfit(profit);
-        tradeRepository.save(trade);
-        tradeProductRepository.saveAll(tradeProductList);
-        return new ApiResponse("SAVED!", true);
+        return createOrEditTrade(trade, tradeDTO);
     }
 
     public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
@@ -159,7 +87,7 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
-        ApiResponse apiResponse = editTrade(trade, tradeDTO);
+        ApiResponse apiResponse = createOrEditTrade(trade, tradeDTO);
 
         if (!apiResponse.isSuccess()) {
             return new ApiResponse("ERROR", false);
@@ -167,7 +95,7 @@ public class TradeService {
         return new ApiResponse("UPDATED", true);
     }
 
-    public ApiResponse editTrade(Trade trade, TradeDTO tradeDTO) {
+    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
 
         /**
          * SET LATER
@@ -205,7 +133,7 @@ public class TradeService {
         trade.setPayMethod(optionalPaymentMethod.get());
 
         double debtSum = trade.getDebtSum();
-        if (tradeDTO.getDebtSum() > 0 && debtSum != tradeDTO.getDebtSum()) {
+        if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
@@ -222,25 +150,39 @@ public class TradeService {
         List<TradeProduct> tradeProductList = new ArrayList<>();
 
         double profit = 0;
+
         for (TradeProductDto tradeProductDto : tradeProductDtoList) {
-            if (tradeProductDto.getTradeProductId() != null){
-                Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
-                if (optionalTradeProduct.isEmpty()) continue;
-                TradeProduct tradeProduct = optionalTradeProduct.get();
-                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
-                double difference = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
-                warehouseService.editTrade(branch, tradeProduct, tradeProductDto);
-                /**
-                 * todo fifo
-                 */
-            }else {
-                TradeProduct tradeProduct = warehouseService.trade(branch, tradeProductDto);
+            if (tradeProductDto.isDelete()) {
+                if(tradeProductRepository.existsById(tradeProductDto.getProductId())){
+                    TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
+                    tradeProductDto.setTradedQuantity(0);//  to make 0 sold quantity
+                    warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
+                    /**
+                     * todo fifo
+                     */
+                }
+
+            } else if (tradeProductDto.getTradeProductId() == null) {
+                TradeProduct tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
                 if (tradeProduct != null) {
                     tradeProduct.setTrade(trade);
                     TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
                     tradeProductList.add(savedTradeProduct);
                     profit += savedTradeProduct.getProfit();
                 }
+            }else {
+                Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
+                if (optionalTradeProduct.isEmpty()) continue;
+                TradeProduct tradeProduct = optionalTradeProduct.get();
+                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
+                double difference = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
+                TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
+                if (savedTradeProduct != null){
+
+                }
+                /**
+                 * todo fifo
+                 */
             }
         }
         trade.setTotalProfit(profit);

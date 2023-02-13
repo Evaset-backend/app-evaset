@@ -50,7 +50,7 @@ public class Trade extends AbsEntity {
 
     private Double paidSum;
 
-    private Double debtSum;
+    private double debtSum = 0;
 
     private Double totalProfit = 0.0;
 
