@@ -10,6 +10,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class CategoryDto {
+
+    private UUID id;
     @NotNull(message = "required line")
     private String name;
     private UUID businessId;
