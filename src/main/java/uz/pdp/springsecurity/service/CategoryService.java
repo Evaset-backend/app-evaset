@@ -81,8 +81,8 @@ public class CategoryService {
 
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-//        List<Category> allByBusinessId = categoryRepository.findAllByBusiness_Id(businessId);
-        List<Category> allByBusinessId = categoryRepository.findByBusinessIdAndParentCategoryNull(businessId);
+//        List<Category> allByBusinessId = categoryRepository.findByBusinessIdAndParentCategoryNull(businessId);
+        List<Category> allByBusinessId  = categoryRepository.findAllByBusiness_Id(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
         return new ApiResponse("FOUND",true,allByBusinessId);
     }
