@@ -121,6 +121,7 @@ public class CategoryService {
 
     public CategoryDto generateCategoryDtoFromCategory(Category category){
         CategoryDto dto = new CategoryDto();
+        dto.setId(category.getId());
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
         dto.setBusinessId(category.getBusiness().getId());
