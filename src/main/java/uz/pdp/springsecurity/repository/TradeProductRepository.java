@@ -10,6 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID> {
-List<TradeProduct> findAllByProduct_Id(UUID product_id);
-List<TradeProduct> findAllByTradeId(UUID tradeId);
+  List<TradeProduct> findAllByProduct_Id(UUID product_id);
+  List<TradeProduct> findAllByTradeId(UUID tradeId);
+
+  List<TradeProduct> findAllByProduct_BusinessId(UUID product_business_id);
 }
+
