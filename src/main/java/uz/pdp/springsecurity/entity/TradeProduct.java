@@ -35,7 +35,6 @@ public class TradeProduct extends AbsEntity {
     private Double tradedQuantity;
 
 //    private double buyPrice;
-//
     private double totalSalePrice;
 
     //TOTAL PROFIT OF PRODUCT
