@@ -6,13 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.PurchaseDto;
-import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.service.ReportsService;
 
 import java.util.UUID;
 
-@RestController("/api/reports")
+@RestController
+@RequestMapping("/api/reports")
 public class ReportsController {
 
     @Autowired
@@ -26,11 +25,20 @@ public class ReportsController {
     }
 
     @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
-    @GetMapping("/{id}")
-    public HttpEntity<?> getAllBranchAmount(@PathVariable UUID id) {
-        ApiResponse apiResponse = reportsService.allProductAmountByBranch(id);
+    @GetMapping("/{branchId}")
+    public HttpEntity<?> getAllBranchAmount(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
+    @GetMapping("/{branch_id}")
+    public HttpEntity<?> mostSaleProducts(@PathVariable UUID branch_id) {
+        ApiResponse apiResponse = reportsService.mostSaleProducts(branch_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+
 
 
 }
