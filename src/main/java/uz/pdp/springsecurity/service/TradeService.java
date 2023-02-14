@@ -155,18 +155,18 @@ public class TradeService {
             if (tradeProductDto.isDelete()) {
                 if(tradeProductRepository.existsById(tradeProductDto.getProductId())){
                     TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
-                    tradeProductDto.setTradedQuantity(0);//  to make 0 sold quantity
-                    warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
-                    /**
-                     * todo fifo
-                     */
+                    double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
+                    tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
+                    profit -= tradeProduct.getProfit();// to subtract profit of product
+                    TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
+                    fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
+                    tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
                 }
-
             } else if (tradeProductDto.getTradeProductId() == null) {
                 TradeProduct tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
                 if (tradeProduct != null) {
                     tradeProduct.setTrade(trade);
-                    TradeProduct savedTradeProduct = fifoCalculationService.trade(branch, tradeProduct);
+                    TradeProduct savedTradeProduct = fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
                     tradeProductList.add(savedTradeProduct);
                     profit += savedTradeProduct.getProfit();
                 }
@@ -176,13 +176,17 @@ public class TradeService {
                 TradeProduct tradeProduct = optionalTradeProduct.get();
                 if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
                 double difference = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
+                profit -= tradeProduct.getProfit();// to subtract profit of product
                 TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
                 if (savedTradeProduct != null){
-
+                    if (difference > 0) {
+                        fifoCalculationService.createOrEditTradeProduct(branch, savedTradeProduct, difference);
+                    } else if (difference < 0) {
+                        fifoCalculationService.returnedTrade(branch, savedTradeProduct, difference);
+                    }
+                    tradeProductList.add(savedTradeProduct);
+                    profit += savedTradeProduct.getProfit();
                 }
-                /**
-                 * todo fifo
-                 */
             }
         }
         trade.setTotalProfit(profit);

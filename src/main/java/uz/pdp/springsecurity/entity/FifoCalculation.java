@@ -40,7 +40,7 @@ public class FifoCalculation extends AbsEntity {
 
     private Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PurchaseProduct purchaseProduct;
 
