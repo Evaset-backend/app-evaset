@@ -22,6 +22,4 @@ public class Business extends AbsEntity {
     private String name;
 
     private String description;
-
-
 }
