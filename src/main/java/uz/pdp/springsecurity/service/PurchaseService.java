@@ -213,14 +213,11 @@ public class PurchaseService {
         if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         Purchase purchase = purchaseRepository.findById(id).get();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
-        if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCTS", false);
         PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();
         purchaseGetOneDto.setPurchase(purchase);
         purchaseGetOneDto.setPurchaseProductList(purchaseProductList);
         return new ApiResponse("FOUND", true, purchaseGetOneDto);
-
-        /*Purchase changePrices = changePrices(purchase);
-        return new ApiResponse("FOUND", true, changePrices);*/
     }
 
     public ApiResponse delete(UUID id) {
