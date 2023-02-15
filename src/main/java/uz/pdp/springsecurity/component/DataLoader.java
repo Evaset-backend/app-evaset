@@ -404,9 +404,10 @@ public class DataLoader implements CommandLineRunner {
 
                             VIEW_INFO,
 
+                            GET_BUSINESS_ALL_AMOUNT,
+
                             GET_TARIFF,
                             GET_BY_TARIFF,
-                            GET_BUSINESS_ALL_AMOUNT
 
                     ),
                     business
