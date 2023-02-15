@@ -9,17 +9,24 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class Business extends AbsEntity {
 
     @Column(nullable = false)
     private String name;
 
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tariff tariff;
+
+    private boolean isActive;
 }
