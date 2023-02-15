@@ -3,15 +3,13 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Tariff;
+import uz.pdp.springsecurity.entity.TradeProduct;
 import uz.pdp.springsecurity.mapper.TariffMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TariffDto;
 import uz.pdp.springsecurity.repository.TariffRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +25,8 @@ public class TariffService {
                 tariffList.add(tariff);
             }
         }
+        all.sort(Comparator.comparing(Tariff::getPrice));
+        Collections.reverse(all);
         return new ApiResponse("all tariff", true, mapper.toDtoList(tariffList));
     }
 
