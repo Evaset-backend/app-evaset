@@ -133,7 +133,13 @@ public class DataLoader implements CommandLineRunner {
             Permissions[] permissions = Permissions.values();
             SuperAdmin[] superAdmins = SuperAdmin.values();
 
-            Role admin = roleRepository.save(new Role(Constants.ADMIN, Arrays.asList(    ADD_ADDRESS,
+            Role superAdmin = roleRepository.save(new Role(
+                    Constants.SUPERADMIN,
+                    List.of(permissions)
+            ));
+
+            Role admin = roleRepository.save(new Role(Constants.ADMIN, Arrays.asList(
+                    ADD_ADDRESS,
                     EDIT_ADDRESS,
                     VIEW_ADDRESS,
                     DELETE_ADDRESS,
@@ -273,16 +279,17 @@ public class DataLoader implements CommandLineRunner {
                     VIEW_INFO,
 
                     GET_TARIFF,
-                    GET_BY_TARIFF
+                    GET_BY_TARIFF,
+
+                    CREATE_CONTENT,
+                    EDIT_CONTENT,
+                    GET_CONTENT,
+                    DELETE_CONTENT,
+
+                    CREATE_PRODUCTION,
+                    GET_PRODUCTION
             ),
                     business));
-
-            Role superAdmin = roleRepository.save(new Role(Constants.SUPERADMIN, Arrays.asList(ADD_BUSINESS, EDIT_BUSINESS, VIEW_BUSINESS, DELETE_BUSINESS,
-                    GET_TARIFF,
-                    GET_BY_TARIFF,
-                    CREATE_TARIFF,
-                    EDIT_TARIFF,
-                    DELETE_TARIFF)));
 
             Role manager = roleRepository.save(new Role(
                     Constants.MANAGER,
@@ -408,7 +415,15 @@ public class DataLoader implements CommandLineRunner {
                             GET_BUSINESS_ALL_AMOUNT,
 
                             GET_TARIFF,
-                            GET_BY_TARIFF
+                            GET_BY_TARIFF,
+
+                            CREATE_CONTENT,
+                            EDIT_CONTENT,
+                            GET_CONTENT,
+                            DELETE_CONTENT,
+
+                            CREATE_PRODUCTION,
+                            GET_PRODUCTION
 
                     ),
                     business
@@ -445,7 +460,15 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_MY_PROFILE,
                             VIEW_PRODUCT,
                             GET_TARIFF,
-                            GET_BY_TARIFF
+                            GET_BY_TARIFF,
+
+                            CREATE_CONTENT,
+                            EDIT_CONTENT,
+                            GET_CONTENT,
+                            DELETE_CONTENT,
+
+                            CREATE_PRODUCTION,
+                            GET_PRODUCTION
 
                     ),
                     business

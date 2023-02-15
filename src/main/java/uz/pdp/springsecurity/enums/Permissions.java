@@ -1,6 +1,12 @@
 package uz.pdp.springsecurity.enums;
 
 public enum Permissions {
+    ADD_BUSINESS,
+    EDIT_BUSINESS,
+    VIEW_BUSINESS,
+    DELETE_BUSINESS,
+
+    //WRITE SUPER ADMIN PERMISSIONS ABOVE
 
     ADD_ADDRESS,
     EDIT_ADDRESS,
@@ -113,10 +119,6 @@ public enum Permissions {
 
     VIEW_BENEFIT_AND_LOST,
 
-    ADD_BUSINESS,
-    EDIT_BUSINESS,
-    VIEW_BUSINESS,
-    DELETE_BUSINESS,
 
     ADD_CUSTOMER_GROUP,
     DELETE_CUSTOMER_GROUP,
@@ -146,6 +148,14 @@ public enum Permissions {
     CREATE_TARIFF,
     EDIT_TARIFF,
     DELETE_TARIFF,
-    
-    GET_BUSINESS_ALL_AMOUNT
+
+    CREATE_CONTENT,
+    EDIT_CONTENT,
+    GET_CONTENT,
+    DELETE_CONTENT,
+
+    CREATE_PRODUCTION,
+    GET_PRODUCTION,
+
+    GET_BUSINESS_ALL_AMOUNT,
 }
