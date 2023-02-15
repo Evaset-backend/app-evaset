@@ -22,6 +22,10 @@ public class ContentProduct extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Production production;
+
     //USE FOR SINGLE TYPE// OR NULL
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

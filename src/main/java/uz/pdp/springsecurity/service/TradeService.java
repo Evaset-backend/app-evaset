@@ -156,7 +156,7 @@ public class TradeService {
 
         for (TradeProductDto tradeProductDto : tradeProductDtoList) {
             if (tradeProductDto.isDelete()) {
-                if(tradeProductRepository.existsById(tradeProductDto.getProductId())){
+                if(tradeProductRepository.existsById(tradeProductDto.getTradeProductId())){
                     TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
                     double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                     tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
