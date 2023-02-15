@@ -13,4 +13,6 @@ public class InfoDto {
     private double myPurchase;
 
     private double myTrade;
+
+    private double tradersDebt;
 }
