@@ -2,16 +2,10 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.Currency;
-import uz.pdp.springsecurity.entity.Role;
-import uz.pdp.springsecurity.entity.User;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BusinessDto;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.CurrencyRepository;
-import uz.pdp.springsecurity.repository.RoleRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +24,9 @@ public class BusinessService {
     @Autowired
     CurrencyRepository currencyRepository;
 
+    @Autowired
+    TariffRepository tariffRepository;
+
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -37,7 +34,10 @@ public class BusinessService {
         Business business = new Business();
         business.setName(businessDto.getName());
         business.setDescription(businessDto.getDescription());
-
+        UUID tariffId = businessDto.getTariffId();
+        Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
+        optionalTariff.ifPresent(business::setTariff);
+        business.setActive(businessDto.isActive());
         business = businessRepository.save(business);
         Currency currencyUZB = currencyRepository.save(new Currency(
                 "SO'M",
@@ -45,12 +45,12 @@ public class BusinessService {
                 business,
                 true
         ));
-        return new ApiResponse("ADDED",true);
+        return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse edit(UUID id, BusinessDto businessDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(id);
-        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND",false);
+        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
 
         if (businessRepository.existsByName(businessDto.getName()))
             return new ApiResponse("A BUSINESS WITH THAT NAME ALREADY EXISTS", false);
@@ -58,18 +58,22 @@ public class BusinessService {
         Business business = optionalBusiness.get();
         business.setName(businessDto.getName());
         business.setDescription(businessDto.getDescription());
+        UUID tariffId = businessDto.getTariffId();
+        Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
+        optionalTariff.ifPresent(business::setTariff);
+        business.setActive(businessDto.isActive());
 
         businessRepository.save(business);
-        return new ApiResponse("EDITED",true);
+        return new ApiResponse("EDITED", true);
     }
 
     public ApiResponse getOne(UUID id) {
-        if (!businessRepository.existsById(id)) return new ApiResponse("NOT FOUND",false);
-        return new ApiResponse("FOUND",true,businessRepository.findById(id).get());
+        if (!businessRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, businessRepository.findById(id).get());
     }
 
     public ApiResponse getAll() {
-        return new ApiResponse("FOUND",true,businessRepository.findAll());
+        return new ApiResponse("FOUND", true, businessRepository.findAll());
     }
 
     public ApiResponse deleteOne(UUID id) {
@@ -81,8 +85,8 @@ public class BusinessService {
             roleRepository.deleteById(role.getId());
         }
 
-        if (!businessRepository.existsById(id)) return new ApiResponse("NOT FOUND",false);
+        if (!businessRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         businessRepository.deleteById(id);
-        return new ApiResponse("DELETED",true);
+        return new ApiResponse("DELETED", true);
     }
 }
