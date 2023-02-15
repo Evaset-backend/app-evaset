@@ -18,25 +18,26 @@ public class ReportsController {
     ReportsService reportsService;
 
     @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
-    @GetMapping("/{branchId}")
+    @GetMapping("/all-by-business/{branchId}")
     public HttpEntity<?> getAllBusinessAmount(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmount(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
-    @GetMapping("/{branchId}")
+    @GetMapping("/all-by-branch/{branchId}")
     public HttpEntity<?> getAllBranchAmount(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
-    @GetMapping("/{branch_id}")
-    public HttpEntity<?> mostSaleProducts(@PathVariable UUID branch_id) {
-        ApiResponse apiResponse = reportsService.mostSaleProducts(branch_id);
+    @GetMapping("/most-sale/{branchId}")
+    public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = reportsService.mostSaleProducts(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
 
 
 
