@@ -38,6 +38,13 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
+    @GetMapping("/purchase/{branchId}")
+    public HttpEntity<?> purchaseReports(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = reportsService.purchaseReports(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 
 
 }
