@@ -2,16 +2,11 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.Product;
-import uz.pdp.springsecurity.entity.Warehouse;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ReportsService {
@@ -53,7 +48,8 @@ public class ReportsService {
             return new ApiResponse("No Found Products");
         }
 
-        double totalSum = 0D;
+        double totalSumBySalePrice = 0D;
+        double totalSumByBuyPrice = 0D;
         for (Product product : productList) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
             if (optionalWarehouse.isEmpty()){
@@ -62,10 +58,25 @@ public class ReportsService {
             Warehouse warehouse = optionalWarehouse.get();
             double amount = warehouse.getAmount();
             double salePrice = product.getSalePrice();
-            totalSum = amount * salePrice;
+            totalSumBySalePrice = amount * salePrice;
+        }
+        for (Product product : productList) {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            if (optionalWarehouse.isEmpty()){
+                return new ApiResponse("No Found Product Amount");
+            }
+
+            Warehouse warehouse = optionalWarehouse.get();
+            double amount = warehouse.getAmount();
+            double buyPrice = product.getBuyPrice();
+            totalSumBySalePrice = amount * buyPrice;
         }
 
-        return new ApiResponse("All Business Products Amount" , true , totalSum);
+        List<Double> doubleList=new ArrayList<>();
+        doubleList.add(totalSumByBuyPrice);
+        doubleList.add(totalSumBySalePrice);
+
+        return new ApiResponse("Business Products Amount" , true , doubleList);
     }
 
     public ApiResponse allProductAmountByBranch(UUID branchId) {
@@ -94,13 +105,25 @@ public class ReportsService {
             totalSum = amount * salePrice;
         }
 
-        return new ApiResponse("All Branch Products Amount" , true , totalSum);
+        return new ApiResponse("Branch Products Amount" , true , totalSum);
     }
 
 
     public ApiResponse mostSaleProducts(UUID branchId){
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found");
+        }
+        Business business = optionalBranch.get().getBusiness();
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BusinessId(business.getId());
+        if (tradeProductList.isEmpty()){
+            return new ApiResponse("Traded Product Not Found");
+        }
 
+        tradeProductList.sort(Comparator.comparing(TradeProduct::getTradedQuantity));
 
-        return new ApiResponse("Found",true);
+        return new ApiResponse("Found",true,tradeProductList);
     }
+
+
 }
