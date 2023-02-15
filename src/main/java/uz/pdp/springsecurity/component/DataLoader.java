@@ -29,7 +29,6 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     UserRepository userRepository;
 
-
     @Autowired
     RoleRepository roleRepository;
 

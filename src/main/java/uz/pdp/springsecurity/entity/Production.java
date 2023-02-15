@@ -20,4 +20,12 @@ public class Production extends AbsEntity {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
+
+    private Double quantity;
+
+    private double contentPrice;
+
+    private double cost;
+
+    private double totalPrice;
 }
