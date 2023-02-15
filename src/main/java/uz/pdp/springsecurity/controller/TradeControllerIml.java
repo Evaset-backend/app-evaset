@@ -44,12 +44,12 @@ public class TradeControllerIml {
      * @param tradeDTO
      * @return ApiResponse(success - > true, message - > EDITED)
      */
-    /*@CheckPermission("EDIT_TRADE")
+    @CheckPermission("EDIT_TRADE")
     @PutMapping("/{trade_id}")
     public HttpEntity<?> edit(@PathVariable UUID trade_id, @RequestBody TradeDTO tradeDTO) {
         ApiResponse apiResponse = tradeService.edit(trade_id, tradeDTO);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
+    }
 
     /**
      * ID ORQALI BITTA SAVDONI OLIB CHIQISH
