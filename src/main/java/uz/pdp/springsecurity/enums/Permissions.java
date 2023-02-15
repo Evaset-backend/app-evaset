@@ -146,6 +146,6 @@ public enum Permissions {
     CREATE_TARIFF,
     EDIT_TARIFF,
     DELETE_TARIFF,
-
+    
     GET_BUSINESS_ALL_AMOUNT
 }

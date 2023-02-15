@@ -407,7 +407,8 @@ public class DataLoader implements CommandLineRunner {
                             GET_BUSINESS_ALL_AMOUNT,
 
                             GET_TARIFF,
-                            GET_BY_TARIFF
+                            GET_BY_TARIFF,
+
                     ),
                     business
             ));
