@@ -25,7 +25,7 @@ public class ReportsController {
     }
 
     @CheckPermission("GET_BUSINESS_ALL_AMOUNT")
-    @GetMapping("/all-by-branch/{branchId}")
+    @GetMapping("/amounts/{branchId}")
     public HttpEntity<?> getAllBranchAmount(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
