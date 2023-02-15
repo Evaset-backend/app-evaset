@@ -26,7 +26,6 @@ public class TariffService {
             }
         }
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
-        Collections.reverse(tariffList);
         return new ApiResponse("all tariff", true, mapper.toDtoList(tariffList));
     }
 
