@@ -40,7 +40,7 @@ public class InfoService {
             allTradeDebt += trade.getDebtSum();
         }
         infoDto.setMyTrade(allTrade);
-        infoDto.setMyTrade(allTradeDebt);
+        infoDto.setTradersDebt(allTradeDebt);
 
         return new ApiResponse("FOUND", true, infoDto);
     }
@@ -67,7 +67,7 @@ public class InfoService {
             allTradeDebt += trade.getDebtSum();
         }
         infoDto.setMyTrade(allTrade);
-        infoDto.setMyTrade(allTradeDebt);
+        infoDto.setTradersDebt(allTradeDebt);
 
         return new ApiResponse("FOUND", true, infoDto);
     }

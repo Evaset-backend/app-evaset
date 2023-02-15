@@ -2,14 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.Content;
-import uz.pdp.springsecurity.entity.ContentProduct;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ContentDto;
+import uz.pdp.springsecurity.payload.ContentProductDto;
 import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
-import uz.pdp.springsecurity.repository.ContentProductRepository;
-import uz.pdp.springsecurity.repository.ContentRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +18,8 @@ import java.util.UUID;
 public class ContentService {
     private final ContentRepository contentRepository;
     private final ContentProductRepository contentProductRepository;
+    private final ProductRepository productRepository;
+    private final ProductTypePriceRepository productTypePriceRepository;
 
     public ApiResponse add(Business business, ContentDto contentDto){
         Content content = new Content();
@@ -34,7 +34,33 @@ public class ContentService {
     }
 
     private ApiResponse createOrEdit(Content content, ContentDto contentDto) {
+        if (contentDto.getProductId() != null) {
+            Optional<Product> optional = productRepository.findById(contentDto.getProductId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
+            content.setProduct(optional.get());
+        } else {
+            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentDto.getProductTypePriceId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
+            content.setProductTypePrice(optional.get());
+        }
 
+        content.setQuantity(contentDto.getQuantity());
+        content.setCostForPerQuantity(contentDto.getCostForPerQuantity());
+        content.setTotalPrice(contentDto.getTotalPrice());
+        contentRepository.save(content);
+
+        List<ContentProductDto> contentProductDtoList = contentDto.getContentProductDtoList();
+        for (ContentProductDto contentProductDto : contentProductDtoList) {
+            if (contentProductDto.getProductId() != null) {
+                Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
+                if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
+                content.setProduct(optional.get());
+            } else {
+                Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
+                if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
+                content.setProductTypePrice(optional.get());
+            }
+        }
         return new ApiResponse();
     }
 

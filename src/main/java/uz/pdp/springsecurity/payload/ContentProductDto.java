@@ -36,6 +36,6 @@ public class ContentProductDto{
 
     private UUID ContentProductIdForEditOrNull;
 
-    private boolean deleteForDeleteOrFalse;
+    private boolean delete;
 
 }
