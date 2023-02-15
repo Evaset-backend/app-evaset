@@ -67,6 +67,9 @@ public class TradeService {
     @Autowired
     FifoCalculationService fifoCalculationService;
 
+    @Autowired
+    WarehouseRepository warehouseRepository;
+
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
         Trade trade = new Trade();
@@ -201,6 +204,15 @@ public class TradeService {
         Trade trade = optionalTrade.get();
         List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
         if (allByTradeId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        for (TradeProduct tradeProduct : allByTradeId) {
+            Optional<Warehouse> optionalWarehouse = null;
+            if (tradeProduct.getProduct() != null)
+                optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(trade.getBranch().getId(), tradeProduct.getProduct().getId());
+            else
+                optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(trade.getBranch().getId(), tradeProduct.getProductTypePrice().getId());
+
+            tradeProduct.setRemainQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
+        }
         TradeGetOneDto tradeGetOneDto = new TradeGetOneDto();
         tradeGetOneDto.setTrade(trade);
         tradeGetOneDto.setTradeProductList(allByTradeId);

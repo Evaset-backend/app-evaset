@@ -6,22 +6,21 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.Transient;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-public class TradeProduct extends AbsEntity {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ContentProduct extends AbsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Trade trade;
+    private Content content;
 
     //USE FOR SINGLE TYPE// OR NULL
     @ManyToOne
@@ -33,14 +32,7 @@ public class TradeProduct extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductTypePrice productTypePrice;
 
-    private double tradedQuantity;
+    private double quantity;
 
-//    private double buyPrice;
-    private double totalSalePrice;
-
-    //TOTAL PROFIT OF PRODUCT
-    private double profit = 0;
-
-    @Transient
-    private Double remainQuantity;
+    private double totalPrice;
 }
