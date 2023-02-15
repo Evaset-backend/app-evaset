@@ -3,9 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.Amount;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ProductReportDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.*;
@@ -28,6 +26,12 @@ public class ReportsService {
 
     @Autowired
     TradeProductRepository tradeProductRepository;
+
+    @Autowired
+    PurchaseRepository purchaseRepository;
+
+    @Autowired
+    PurchaseProductRepository purchaseProductRepository;
 
     public ApiResponse allProductAmount(UUID branchId){
 
@@ -59,7 +63,7 @@ public class ReportsService {
             productReportDto=new ProductReportDto();
             productReportDto.setName(product.getName());
             productReportDto.setBrand(product.getBrand().getName());
-            productReportDto.setBranch(product.getBranch().toString());
+            productReportDto.setBranch(optionalBranch.get().getName());
             productReportDto.setCategory(product.getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
@@ -87,13 +91,14 @@ public class ReportsService {
 
     public ApiResponse allProductAmountByBranch(UUID branchId) {
 
-        Optional<Business> optionalBusiness = businessRepository.findById(branchId);
-
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+
 
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found",false);
         }
+
+        Optional<Business> optionalBusiness = businessRepository.findById(optionalBranch.get().getBusiness().getId());
 
         if (optionalBusiness.isEmpty()){
             return new ApiResponse("Business Not Found",false);
@@ -140,10 +145,61 @@ public class ReportsService {
         if (tradeProductList.isEmpty()){
             return new ApiResponse("Traded Product Not Found");
         }
+        List<MostSaleProductsDto> mostSaleProductsDtoList=new ArrayList<>();
+        double amount = 0;
+        for (TradeProduct tradeProduct : tradeProductList) {
+            MostSaleProductsDto mostSaleProductsDto=new MostSaleProductsDto();
+            mostSaleProductsDto.setName(tradeProduct.getProduct().getName());
+            mostSaleProductsDto.setBarcode(tradeProduct.getProduct().getBarcode());
+            mostSaleProductsDto.setMeasurement(tradeProduct.getProduct().getMeasurement().getName());
+            mostSaleProductsDtoList.add(mostSaleProductsDto);
 
-        tradeProductList.sort(Comparator.comparing(TradeProduct::getTradedQuantity));
+//            for (TradeProduct product : tradeProductList) {
+//                if (tradeProduct.getProduct().getName().equals(product.getProduct().getName())){
+//                    amount += tradeProduct.getTradedQuantity();
+//                }
+//            }
+            mostSaleProductsDto.setAmount(tradeProduct.getTradedQuantity()
+            );
+        }
+        mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount).reversed());
 
-        return new ApiResponse("Found",true,tradeProductList);
+        return new ApiResponse("Found",true,mostSaleProductsDtoList);
+    }
+
+
+    public ApiResponse purchaseReports(UUID branchId) {
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found");
+        }
+        Branch branch = optionalBranch.get();
+
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchId(branch.getId());
+
+        if (purchaseProductList.isEmpty()){
+            return new ApiResponse("Purchase Product Not Found");
+        }
+
+        List<PurchaseReportsDto> purchaseReportsDtoList=new ArrayList<>();
+
+        for (PurchaseProduct purchaseProduct : purchaseProductList) {
+            PurchaseReportsDto purchaseReportsDto=new PurchaseReportsDto();
+            purchaseReportsDto.setName(purchaseProduct.getProduct().getName());
+            purchaseReportsDto.setPurchasedAmount(purchaseProduct.getPurchasedQuantity());
+            purchaseReportsDto.setBuyPrice(purchaseProduct.getBuyPrice());
+            purchaseReportsDto.setBarcode(purchaseProduct.getProduct().getBarcode());
+            purchaseReportsDto.setTax(purchaseProduct.getProduct().getTax());
+            purchaseReportsDto.setTotalSum(purchaseProduct.getTotalSum());
+            purchaseReportsDto.setPurchasedDate(purchaseProduct.getCreatedAt());
+            purchaseReportsDto.setSupplier(purchaseProduct.getPurchase().getSupplier().getName());
+            purchaseReportsDto.setDebt(purchaseProduct.getPurchase().getDebtSum());
+            purchaseReportsDtoList.add(purchaseReportsDto);
+        }
+
+
+        return new ApiResponse("Found",true,purchaseReportsDtoList);
     }
 
 

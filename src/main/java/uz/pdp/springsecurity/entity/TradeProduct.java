@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity
 public class TradeProduct extends AbsEntity {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Trade trade;
 
