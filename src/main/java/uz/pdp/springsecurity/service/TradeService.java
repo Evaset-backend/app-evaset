@@ -175,7 +175,7 @@ public class TradeService {
                 if (optionalTradeProduct.isEmpty()) continue;
                 TradeProduct tradeProduct = optionalTradeProduct.get();
                 if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
-                double difference = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
+                double difference = tradeProductDto.getTradedQuantity() - tradeProduct.getTradedQuantity();
                 profit -= tradeProduct.getProfit();// to subtract profit of product
                 TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
                 if (savedTradeProduct != null){
