@@ -29,8 +29,12 @@ public class ContentDto{
     @NotNull
     private Double quantity;
 
-    @NotNull
+
     private double costForPerQuantity;
+
+
+    @NotNull
+    private double totalPrice;
 
     List<ContentProductDto> contentProductDtoList;
 }

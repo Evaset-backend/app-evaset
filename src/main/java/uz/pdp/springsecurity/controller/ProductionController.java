@@ -31,7 +31,7 @@ public class ProductionController {
     @CheckPermission("EDIT_PRODUCTION")
     @GetMapping()
     public HttpEntity<?> getAll(@CurrentUser User user) {
-        ApiResponse apiResponse = productionService.getAll(user.getBusiness());
+        ApiResponse apiResponse = productionService.getAll(user.getBusiness().getId());
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
