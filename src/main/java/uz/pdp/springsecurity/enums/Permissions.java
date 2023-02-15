@@ -139,5 +139,7 @@ public enum Permissions {
     GET_EXCEL,
     POST_EXCEL,
 
-    VIEW_INFO
+    VIEW_INFO,
+
+    GET_BUSINESS_ALL_AMOUNT
 }
