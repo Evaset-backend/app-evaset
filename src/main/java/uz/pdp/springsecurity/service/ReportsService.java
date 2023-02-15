@@ -58,18 +58,7 @@ public class ReportsService {
             Warehouse warehouse = optionalWarehouse.get();
             double amount = warehouse.getAmount();
             double salePrice = product.getSalePrice();
-            totalSumBySalePrice = amount * salePrice;
-        }
-        for (Product product : productList) {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
-            if (optionalWarehouse.isEmpty()){
-                return new ApiResponse("No Found Product Amount");
-            }
-
-            Warehouse warehouse = optionalWarehouse.get();
-            double amount = warehouse.getAmount();
-            double buyPrice = product.getBuyPrice();
-            totalSumBySalePrice = amount * buyPrice;
+            totalSumBySalePrice += amount * salePrice;
         }
 
         List<Double> doubleList=new ArrayList<>();
@@ -93,17 +82,31 @@ public class ReportsService {
             return new ApiResponse("No Found Products");
         }
 
-        double totalSum = 0D;
+        double totalSum = 0;
+        double amount = 0;
+        double salePrice = 0;
         for (Product product : productList) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
             if (optionalWarehouse.isEmpty()){
                 return new ApiResponse("No Found Product Amount");
             }
             Warehouse warehouse = optionalWarehouse.get();
-            double amount = warehouse.getAmount();
-            double salePrice = product.getSalePrice();
-            totalSum = amount * salePrice;
+            amount = warehouse.getAmount();
+            salePrice = product.getSalePrice();
+            totalSum += amount * salePrice;
         }
+
+        for (Product product : productList) {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            if (optionalWarehouse.isEmpty()){
+                return new ApiResponse("No Found Product Amount");
+            }
+            Warehouse warehouse = optionalWarehouse.get();
+            amount = warehouse.getAmount();
+            salePrice = product.getBuyPrice();
+            totalSum += amount * salePrice;
+        }
+
 
         return new ApiResponse("Branch Products Amount" , true , totalSum);
     }
