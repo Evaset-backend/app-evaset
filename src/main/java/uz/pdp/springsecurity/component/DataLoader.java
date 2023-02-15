@@ -273,7 +273,9 @@ public class DataLoader implements CommandLineRunner {
                     VIEW_INFO,
 
                     GET_TARIFF,
-                    GET_BY_TARIFF), business));
+                    GET_BY_TARIFF
+            ),
+                    business));
 
             Role superAdmin = roleRepository.save(new Role(Constants.SUPERADMIN, Arrays.asList(ADD_BUSINESS, EDIT_BUSINESS, VIEW_BUSINESS, DELETE_BUSINESS,
                     GET_TARIFF,
