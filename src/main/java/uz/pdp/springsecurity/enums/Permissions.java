@@ -145,5 +145,7 @@ public enum Permissions {
     GET_BY_TARIFF,
     CREATE_TARIFF,
     EDIT_TARIFF,
-    DELETE_TARIFF
+    DELETE_TARIFF,
+
+    GET_BUSINESS_ALL_AMOUNT
 }
