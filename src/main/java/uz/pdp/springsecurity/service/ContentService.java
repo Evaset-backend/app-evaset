@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.Content;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ContentDto;
 
@@ -20,6 +21,11 @@ public class ContentService {
         return new ApiResponse();
     }
 
+    private ApiResponse createOrEdit(Content content, ContentDto contentDto) {
+
+        return new ApiResponse();
+    }
+
     public ApiResponse getAll(Business business) {
         return new ApiResponse();
     }
@@ -29,10 +35,6 @@ public class ContentService {
     }
 
     public ApiResponse deleteOne(UUID contentId) {
-        return new ApiResponse();
-    }
-
-    public ApiResponse deleteFew(List<UUID> contentIdList) {
         return new ApiResponse();
     }
 }

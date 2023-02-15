@@ -21,22 +21,21 @@ import java.util.UUID;
 public class ProductionController {
     @Autowired
     ProductionService productionService;
-
-    @CheckPermission("")
+    @CheckPermission("CREATE_PRODUCTION")
     @PostMapping
     public HttpEntity<?> add(@CurrentUser User user, @Valid @RequestBody ProductionDto productionDto) {
         ApiResponse apiResponse = productionService.add(user.getBusiness(), productionDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("EDIT_PRODUCTION")
     @GetMapping()
     public HttpEntity<?> getAll(@CurrentUser User user) {
         ApiResponse apiResponse = productionService.getAll(user.getBusiness());
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("EDIT_PRODUCTION")
     @GetMapping("/{productionId}")
     public HttpEntity<?> getOne(@PathVariable UUID productionId) {
         ApiResponse apiResponse = productionService.getOne(productionId);

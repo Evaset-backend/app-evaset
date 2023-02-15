@@ -22,45 +22,38 @@ public class ContentController {
     @Autowired
     ContentService contentService;
 
-    @CheckPermission("")
+    @CheckPermission("CREATE_CONTENT")
     @PostMapping
     public HttpEntity<?> add(@CurrentUser User user, @Valid @RequestBody ContentDto contentDto) {
         ApiResponse apiResponse = contentService.add(user.getBusiness(), contentDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("EDIT_CONTENT")
     @PutMapping("/{contentId}")
     public HttpEntity<?> edit(@PathVariable UUID contentId, @Valid @RequestBody ContentDto contentDto) {
         ApiResponse apiResponse = contentService.edit(contentId, contentDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("GET_CONTENT")
     @GetMapping()
     public HttpEntity<?> getAll(@CurrentUser User user) {
         ApiResponse apiResponse = contentService.getAll(user.getBusiness());
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("GET_CONTENT")
     @GetMapping("/{contentId}")
     public HttpEntity<?> getOne(@PathVariable UUID contentId) {
         ApiResponse apiResponse = contentService.getOne(contentId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("")
+    @CheckPermission("DELETE_CONTENT")
     @DeleteMapping("/{contentId}")
     public HttpEntity<?> deleteOne(@PathVariable UUID contentId) {
         ApiResponse apiResponse = contentService.deleteOne(contentId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("")
-    @DeleteMapping()
-    public HttpEntity<?> deleteFew(@RequestBody List<UUID> contentIdList) {
-        ApiResponse apiResponse = contentService.deleteFew(contentIdList);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
