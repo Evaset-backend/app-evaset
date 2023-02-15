@@ -127,6 +127,7 @@ public class PurchaseService {
                 PurchaseProduct purchaseProduct = createOrEditPurchaseProduct(new PurchaseProduct(), purchaseProductDto);
                 if (purchaseProduct == null)continue;
                 purchaseProduct.setPurchase(purchase);
+                purchaseProductRepository.save(purchaseProduct);
                 purchaseProductList.add(purchaseProduct);
                 warehouseService.createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
                 fifoCalculationService.createCalculation(purchaseProduct);

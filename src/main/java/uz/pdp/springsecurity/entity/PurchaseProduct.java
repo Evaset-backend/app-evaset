@@ -26,10 +26,12 @@ public class PurchaseProduct extends AbsEntity {
 
     // USE FOR SINGLE TYPE
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
 
     // USE FOR MANY TYPE
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductTypePrice productTypePrice;
 
     private Double purchasedQuantity;
