@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.payload.Amount;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductReportDto;
 import uz.pdp.springsecurity.repository.*;
@@ -32,8 +33,6 @@ public class ReportsService {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
 
-
-
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found",false);
         }
@@ -54,16 +53,13 @@ public class ReportsService {
         double SumBySalePrice = 0D;
         double SumByBuyPrice = 0D;
 
-        double totalSumBySalePrice = 0D;
-        double totalSumByBuyPrice = 0D;
-
         List<ProductReportDto> productReportDtoList=new ArrayList<>();
         ProductReportDto productReportDto=new ProductReportDto();
         for (Product product : productList) {
             productReportDto=new ProductReportDto();
             productReportDto.setName(product.getName());
             productReportDto.setBrand(product.getBrand().getName());
-            productReportDto.setBranch(product.getBranch().getClass().getName());
+            productReportDto.setBranch(product.getBranch().toString());
             productReportDto.setCategory(product.getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
@@ -112,37 +108,25 @@ public class ReportsService {
 
         double totalSumBySalePrice = 0D;
         double totalSumByBuyPrice = 0D;
-
-        List<ProductReportDto> productReportDtoList=new ArrayList<>();
+        Amount amounts=new Amount();
         for (Product product : productList) {
-            ProductReportDto productReportDto=new ProductReportDto();
-            productReportDto.setName(product.getName());
-            productReportDto.setBrand(product.getBrand().getName());
-            productReportDto.setBranch(product.getBranch().getClass().getName());
-            productReportDto.setCategory(product.getCategory().getName());
-            productReportDto.setBuyPrice(product.getBuyPrice());
-            productReportDto.setSalePrice(product.getSalePrice());
-
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
             if (optionalWarehouse.isEmpty()){
                 return new ApiResponse("No Found Product Amount");
             }
             Warehouse warehouse = optionalWarehouse.get();
-            productReportDto.setAmount(warehouse.getAmount());
-
 
             double amount = warehouse.getAmount();
             double salePrice = product.getSalePrice();
             double buyPrice = product.getBuyPrice();
 
-
             totalSumBySalePrice += amount * salePrice;
             totalSumByBuyPrice += amount * buyPrice;
-
-            productReportDtoList.add(productReportDto);
+            amounts.setTotalSumBySalePrice(totalSumBySalePrice);
+            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
         }
 
-        return new ApiResponse("Business Products Amount" , true , productReportDtoList);
+        return new ApiResponse("Business Products Amount" , true,amounts);
     }
 
 
