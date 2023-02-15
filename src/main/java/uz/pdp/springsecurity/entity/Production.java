@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -17,9 +18,10 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Production extends AbsEntity {
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Content content;
+    private Business business;
 
     private Double quantity;
 

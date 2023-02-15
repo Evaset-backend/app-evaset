@@ -288,7 +288,7 @@ public class TradeService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Trade> allByBusinessId = tradeRepository.findAllByBusinessId(businessId);
+        List<Trade> allByBusinessId = tradeRepository.findAllByBranch_BusinessId(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
         /*List<Trade> tradeList = new ArrayList<>();
         for (Trade trade : allByBusinessId) {

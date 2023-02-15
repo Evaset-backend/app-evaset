@@ -15,6 +15,8 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     List<Trade> findAllByBranch_Id(UUID branch_id);
 
+    List<Trade> findAllByBranch_BusinessId(UUID businessId);
+
     List<Trade> findAllByCustomer_Id(UUID customer_id);
 
     List<Trade> findAllByPaymentStatus_Id(UUID paymentStatus_id);
@@ -29,14 +31,16 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     void deleteAllByTrader_Id(UUID trader_id);
 
+
+
     List<Trade> findAllByPayDateIsBetweenAndBranch_Id(Date payDate, Date payDate2, UUID branch_id);
 
 
     @Query(value = "SELECT * FROM Trade t WHERE DATE(t.pay_date) = ?1", nativeQuery = true)
     List<Trade> findTradeByOneDate(Timestamp date);
 
-    @Query(value = "select * from Trade t inner join branches b on t.branch_id = b.id where b.business_id = ?1",nativeQuery = true)
-    List<Trade> findAllByBusinessId(UUID businessId);
+    /*@Query(value = "select * from Trade t inner join branches b on t.branch_id = b.id where b.business_id = ?1",nativeQuery = true)
+    List<Trade> findAllByBusinessId(UUID businessId);*/
 
     List<Trade> findAllByPayDateAndBranchBetween(Date payDate,Date date2, UUID id);
 
