@@ -114,6 +114,8 @@ public enum Manager {
     GET_PRODUCT_TYPE_PRODUCT_ID,
 
     GET_EXCEL,
-    POST_EXCEL
+    POST_EXCEL,
+
+    GET_BUSINESS_ALL_AMOUNT
 
 }
