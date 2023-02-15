@@ -13,6 +13,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TariffMapper {
+
+    @Mapping(target = "id",source = "id")
     TariffDto toDto(Tariff tariff);
     List<TariffDto> toDtoList(List<Tariff> tariffList);
 

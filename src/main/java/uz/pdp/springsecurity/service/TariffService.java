@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TariffDto;
 import uz.pdp.springsecurity.repository.TariffRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,8 +20,14 @@ public class TariffService {
     private final TariffMapper mapper;
 
     public ApiResponse getAll() {
-        List<Tariff> allByDeletedIsFalse = repository.findAll();
-        return new ApiResponse("all tariff", true, mapper.toDtoList(allByDeletedIsFalse));
+        List<Tariff> all = repository.findAll();
+        List<Tariff> tariffList = new ArrayList<>();
+        for (Tariff tariff : all) {
+            if (!tariff.isDelete()) {
+                tariffList.add(tariff);
+            }
+        }
+        return new ApiResponse("all tariff", true, mapper.toDtoList(tariffList));
     }
 
     public ApiResponse getById(UUID id) {
