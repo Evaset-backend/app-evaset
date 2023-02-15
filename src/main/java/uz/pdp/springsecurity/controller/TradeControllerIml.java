@@ -59,7 +59,7 @@ public class TradeControllerIml {
      */
     @CheckPermission("VIEW_TRADE")
     @GetMapping("/{id}")
-    public HttpEntity<?> get(@PathVariable UUID id) {
+    public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = tradeService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
