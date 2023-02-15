@@ -15,10 +15,10 @@ import javax.persistence.*;
 @Entity
 public class ProductTypePrice extends AbsEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private ProductTypeValue productTypeValue;
 
     @OneToOne(cascade = CascadeType.ALL)
