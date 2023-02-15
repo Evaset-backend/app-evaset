@@ -139,5 +139,11 @@ public enum Permissions {
     GET_EXCEL,
     POST_EXCEL,
 
-    VIEW_INFO
+    VIEW_INFO,
+
+    GET_TARIFF,
+    GET_BY_TARIFF,
+    CREATE_TARIFF,
+    EDIT_TARIFF,
+    DELETE_TARIFF
 }

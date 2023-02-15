@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.ExchangeStatusName.*;
+import uz.pdp.springsecurity.enums.Lifetime;
 import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.enums.StatusName;
 import uz.pdp.springsecurity.enums.SuperAdmin;
@@ -65,16 +66,41 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     AttachmentContentRepository attachmentContentRepository;
 
+    @Autowired
+    TariffRepository tariffRepository;
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
     @Override
     public void run(String... args) throws Exception {
 
+        List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
+        Tariff tariff = null;
+        Tariff saveTariff = null;
+        if (tariffRepositoryAll.isEmpty()) {
+            tariff = new Tariff(
+                    "test tariff",
+                    "test uchun",
+                    0,
+                    0,
+                    0,
+                    0,
+                    Lifetime.MONTH,
+                    0,
+                    1,
+                    100,
+                    0,
+                    true,
+                    false
+            );
+            saveTariff = tariffRepository.save(tariff);
+        }
+
         List<Business> allBusiness = businessRepository.findAll();
         Business business = null;
         if (allBusiness.isEmpty()) {
-            business = new Business("Application", "Test Uchun");
+            business = new Business("Application", "Test Uchun",saveTariff,true);
             businessRepository.save(business);
         }
 //------------------------------------------------------------------------------------------//
@@ -110,7 +136,11 @@ public class DataLoader implements CommandLineRunner {
 
             Role admin = roleRepository.save(new Role(Constants.ADMIN, Arrays.asList(permissions), business));
 
-            Role superAdmin = roleRepository.save(new Role(Constants.SUPERADMIN, Arrays.asList(ADD_BUSINESS, EDIT_BUSINESS, VIEW_BUSINESS, DELETE_BUSINESS)));
+            Role superAdmin = roleRepository.save(new Role(Constants.SUPERADMIN, Arrays.asList(ADD_BUSINESS, EDIT_BUSINESS, VIEW_BUSINESS, DELETE_BUSINESS,    GET_TARIFF,
+                    GET_BY_TARIFF,
+                    CREATE_TARIFF,
+                    EDIT_TARIFF,
+                    DELETE_TARIFF)));
 
             Role manager = roleRepository.save(new Role(
                     Constants.MANAGER,
