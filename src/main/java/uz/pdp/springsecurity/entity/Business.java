@@ -25,7 +25,7 @@ public class Business extends AbsEntity {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Tariff tariff;
 
     private boolean isActive;
