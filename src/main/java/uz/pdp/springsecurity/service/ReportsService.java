@@ -140,33 +140,51 @@ public class ReportsService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found");
         }
+
         Business business = optionalBranch.get().getBusiness();
         List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BusinessId(business.getId());
+
         if (tradeProductList.isEmpty()){
             return new ApiResponse("Traded Product Not Found");
         }
-        List<MostSaleProductsDto> mostSaleProductsDtoList=new ArrayList<>();
-        double amount = 0;
-        for (TradeProduct tradeProduct : tradeProductList) {
-            MostSaleProductsDto mostSaleProductsDto=new MostSaleProductsDto();
-            mostSaleProductsDto.setName(tradeProduct.getProduct().getName());
-            mostSaleProductsDto.setBarcode(tradeProduct.getProduct().getBarcode());
-            mostSaleProductsDto.setMeasurement(tradeProduct.getProduct().getMeasurement().getName());
-            mostSaleProductsDtoList.add(mostSaleProductsDto);
 
-//            for (TradeProduct product : tradeProductList) {
-//                if (tradeProduct.getProduct().getName().equals(product.getProduct().getName())){
-//                    amount += tradeProduct.getTradedQuantity();
-//                }
-//            }
-            mostSaleProductsDto.setAmount(tradeProduct.getTradedQuantity()
-            );
+        List<MostSaleProductsDto> mostSaleProductsDtoList=new ArrayList<>();
+        for (int i = 0; i < tradeProductList.size(); i++) {
+            MostSaleProductsDto mostSaleProductsDto=new MostSaleProductsDto();
+            for (int i1 = 0; i1 < tradeProductList.size(); i1++) {
+                if (tradeProductList.get(i).getProduct().getId().equals(tradeProductList.get(i1).getProduct().getId())){
+                    mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
+                    mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
+                    mostSaleProductsDto.setMeasurement(tradeProductList.get(i).getProduct().getMeasurement().getName());
+                    double amount = mostSaleProductsDto.getAmount();
+                    mostSaleProductsDto.setAmount(amount += tradeProductList.get(i).getTradedQuantity());
+                    mostSaleProductsDtoList.add(mostSaleProductsDto);
+                }
+                MostSaleProductsDto mostSaleProductsDtos=new MostSaleProductsDto();
+                mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
+                mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
+                mostSaleProductsDto.setMeasurement(tradeProductList.get(i).getProduct().getMeasurement().getName());
+                mostSaleProductsDto.setAmount(tradeProductList.get(i).getTradedQuantity());
+                mostSaleProductsDtoList.add(mostSaleProductsDtos);
+            }
         }
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount).reversed());
-
         return new ApiResponse("Found",true,mostSaleProductsDtoList);
     }
 
+    public ApiResponse findByName(UUID branchId,String name){
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Not Found");
+        }
+        Business business = optionalBranch.get().getBusiness();
+        List<Product> productList = productRepository.findAllByNameAndBusinessId(name, business.getId());
+        if (productList.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,productList);
+    }
 
     public ApiResponse purchaseReports(UUID branchId) {
 

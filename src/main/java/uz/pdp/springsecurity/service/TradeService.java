@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.TradeDTO;
-import uz.pdp.springsecurity.payload.TradeGetOneDto;
-import uz.pdp.springsecurity.payload.TradeProductDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -246,10 +243,18 @@ public class TradeService {
     }
 
     public ApiResponse getAllByBranchId(UUID branch_id) {
-        List<Trade> allByBranch_id = tradeRepository.findAllByBranch_Id(branch_id);
-        if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Optional<Branch> optionalBranch = branchRepository.findById(branch_id);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        List<Trade> tradeList = tradeRepository.findAllByBranch_Id(optionalBranch.get().getId());
+        if (tradeList.isEmpty()){
+            return new ApiResponse("Traded Products Not Found");
+        }
+        List<TradeProductDtos> tradeProductDtosList=new ArrayList<>();
 
-        return new ApiResponse("FOUND", true, allByBranch_id);
+
+        return new ApiResponse("FOUND", true, tradeProductDtosList);
     }
 
     public ApiResponse getByCustomerId(UUID customer_id) {
