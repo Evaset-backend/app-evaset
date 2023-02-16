@@ -196,4 +196,9 @@ public class WarehouseService {
         fifoCalculationService.createExchange(exchangeProductBranch);
         return new ApiResponse("successfully saved",true);
     }
+
+    public ContentProduct createContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
+
+        return contentProduct;
+    }
 }

@@ -23,15 +23,15 @@ public class ProductionController {
     ProductionService productionService;
     @CheckPermission("CREATE_PRODUCTION")
     @PostMapping
-    public HttpEntity<?> add(@CurrentUser User user, @Valid @RequestBody ProductionDto productionDto) {
-        ApiResponse apiResponse = productionService.add(user.getBusiness(), productionDto);
+    public HttpEntity<?> add(@Valid @RequestBody ProductionDto productionDto) {
+        ApiResponse apiResponse = productionService.add(productionDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_PRODUCTION")
-    @GetMapping()
-    public HttpEntity<?> getAll(@CurrentUser User user) {
-        ApiResponse apiResponse = productionService.getAll(user.getBusiness().getId());
+    @GetMapping("/by-branch/{branchId}")
+    public HttpEntity<?> getAll(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = productionService.getAll(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
