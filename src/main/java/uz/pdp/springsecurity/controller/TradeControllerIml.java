@@ -53,8 +53,7 @@ public class TradeControllerIml {
 
     /**
      * ID ORQALI BITTA SAVDONI OLIB CHIQISH
-     *
-     * @param id
+     * @id id
      * @return ApiResponse(success - > true, object - > value)
      */
     @CheckPermission("VIEW_TRADE")
