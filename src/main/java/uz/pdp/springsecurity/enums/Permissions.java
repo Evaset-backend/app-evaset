@@ -158,4 +158,5 @@ public enum Permissions {
     GET_PRODUCTION,
 
     GET_BUSINESS_ALL_AMOUNT,
+    GET_TO_CHOOSE_A_TARIFF
 }

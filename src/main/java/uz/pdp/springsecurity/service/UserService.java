@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Attachment;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Role;
-import uz.pdp.springsecurity.entity.User;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
@@ -41,46 +38,59 @@ public class UserService {
     AttachmentRepository attachmentRepository;
 
     public ApiResponse add(UserDto userDto) {
-        boolean b = userRepository.existsByUsername(userDto.getUsername());
-        if (b) return new ApiResponse("USER ALREADY EXISTS", false);
-
-        ApiResponse response = roleService.get(userDto.getRoleId());
-        if (!response.isSuccess())
-            return response;
-
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole((Role) response.getObject());
-
-
-        HashSet<Branch> branches = new HashSet<>();
-        for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
-            UUID branchId = iterator.next();
-            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-            if (optionalBranch.isPresent()) {
-                branches.add(optionalBranch.get());
-            } else {
-                return new ApiResponse("BRANCH NOT FOUND", false);
-            }
+        UUID businessId = userDto.getBusinessId();
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("NOT FOUND BUSINESS", false);
         }
-        user.setBranches(branches);
+        Business business = optionalBusiness.get();
+
+        List<User> allUser = userRepository.findAllByBusiness_Id(businessId);
+        int size = allUser.size();
+
+        if (business.getTariff().getEmployeeAmount() >= size || business.getTariff().getEmployeeAmount() == 0) {
+
+            boolean b = userRepository.existsByUsername(userDto.getUsername());
+            if (b) return new ApiResponse("USER ALREADY EXISTS", false);
+
+            ApiResponse response = roleService.get(userDto.getRoleId());
+            if (!response.isSuccess())
+                return response;
+
+            User user = new User();
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            user.setUsername(userDto.getUsername());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setRole((Role) response.getObject());
+
+
+            HashSet<Branch> branches = new HashSet<>();
+            for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
+                UUID branchId = iterator.next();
+                Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+                if (optionalBranch.isPresent()) {
+                    branches.add(optionalBranch.get());
+                } else {
+                    return new ApiResponse("BRANCH NOT FOUND", false);
+                }
+            }
+
 //        if (optionalBranch.isEmpty()) return new ApiResponse("BRANCH NOT FOUND", false);
 //        user.setBranch(optionalBranch.get());
 
-        if (!businessRepository.existsById(userDto.getBusinessId()))
-            return new ApiResponse("BUSINESS NOT FOUND", false);
-        user.setBusiness(businessRepository.findById(userDto.getBusinessId()).get());
 
-        user.setEnabled(userDto.getEnabled());
+            user.setBranches(branches);
+            user.setBusiness(business);
+            user.setEnabled(userDto.getEnabled());
 
-        if (userDto.getPhotoId() != null) {
-            user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
+            if (userDto.getPhotoId() != null) {
+                user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
+            }
+            userRepository.save(user);
+            return new ApiResponse("ADDED", true);
         }
-        userRepository.save(user);
-        return new ApiResponse("ADDED", true);
+        return new ApiResponse("You have opened a sufficient branch according to the employee", false);
     }
 
     public ApiResponse edit(UUID id, UserDto userDto) {
@@ -156,7 +166,7 @@ public class UserService {
             return new ApiResponse("NOT FOUND USER");
 
         Optional<User> userOptional = userRepository.findByUsernameAndIdNot(profileDto.getUsername(), id);
-        if (userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             return new ApiResponse("USERNAME ALREADY EXISTS", false);
         }
 
