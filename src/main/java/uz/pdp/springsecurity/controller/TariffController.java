@@ -26,7 +26,7 @@ public class TariffController {
     }
 
     @CheckPermission("GET_TO_CHOOSE_A_TARIFF")
-    @GetMapping
+    @GetMapping("/getToChooseATariff")
     public HttpEntity<?> getToChooseATariff() {
         ApiResponse apiResponse = service.getToChooseATariff();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
