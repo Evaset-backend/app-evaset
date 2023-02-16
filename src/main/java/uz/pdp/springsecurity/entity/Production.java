@@ -21,7 +21,15 @@ public class Production extends AbsEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Business business;
+    private Branch branch;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Product product;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ProductTypePrice productTypePrice;
 
     private Double quantity;
 

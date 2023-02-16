@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.TradeDTO;
-import uz.pdp.springsecurity.payload.TradeGetOneDto;
-import uz.pdp.springsecurity.payload.TradeProductDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -257,13 +254,6 @@ public class TradeService {
         if (allByTrader_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByTrader_id);
-    }
-
-    public ApiResponse getAllByBranchId(UUID branch_id) {
-        List<Trade> allByBranch_id = tradeRepository.findAllByBranch_Id(branch_id);
-        if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByBranch_id);
     }
 
     public ApiResponse getByCustomerId(UUID customer_id) {

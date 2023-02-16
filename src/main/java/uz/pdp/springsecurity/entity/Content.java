@@ -20,7 +20,7 @@ import javax.persistence.ManyToOne;
 public class Content extends AbsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Business business;
+    private Branch branch;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -32,7 +32,9 @@ public class Content extends AbsEntity {
 
     private Double quantity;
 
-    private double costForPerQuantity;
+    private double cost;
+
+    private double contentPrice;
 
     private double totalPrice;
 }

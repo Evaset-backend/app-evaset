@@ -5,6 +5,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
+import uz.pdp.springsecurity.entity.Product;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.service.ReportsService;
 
@@ -42,6 +43,13 @@ public class ReportsController {
     @GetMapping("/purchase/{branchId}")
     public HttpEntity<?> purchaseReports(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.purchaseReports(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @GetMapping("/name/{branchId}/{name}")
+    public HttpEntity<?> findByName(@PathVariable UUID branchId,
+                                    @PathVariable String name) {
+        ApiResponse apiResponse = reportsService.findByName(branchId, name);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

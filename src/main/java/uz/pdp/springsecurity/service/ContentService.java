@@ -21,10 +21,13 @@ public class ContentService {
     private final ContentProductRepository contentProductRepository;
     private final ProductRepository productRepository;
     private final ProductTypePriceRepository productTypePriceRepository;
+    private final BranchRepository branchRepository;
 
-    public ApiResponse add(Business business, ContentDto contentDto){
+    public ApiResponse add(ContentDto contentDto){
+        Optional<Branch> optionalBranch = branchRepository.findById(contentDto.getBranchId());
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
         Content content = new Content();
-        content.setBusiness(business);
+        content.setBranch(optionalBranch.get());
         return createOrEdit(content, contentDto);
     }
 
@@ -46,7 +49,8 @@ public class ContentService {
         }
 
         content.setQuantity(contentDto.getQuantity());
-        content.setCostForPerQuantity(contentDto.getCostForPerQuantity());
+        content.setContentPrice(contentDto.getContentPrice());
+        content.setCost(contentDto.getCost());
         content.setTotalPrice(contentDto.getTotalPrice());
         contentRepository.save(content);
 
@@ -90,8 +94,10 @@ public class ContentService {
         return contentProduct;
     }
 
-    public ApiResponse getAll(Business business) {
-        List<Content> contentList = contentRepository.findAll();
+    public ApiResponse getAll(UUID branchId) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
+        List<Content> contentList = contentRepository.findAllByBranchId(branchId);
         if (contentList.isEmpty())return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, contentList);
     }

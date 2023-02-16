@@ -33,6 +33,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findAllByMeasurementIdAndBranchIdAndActiveTrue(UUID measurement_id, UUID branch_id);
 
+    List<Product> findAllByNameAndBusinessId(String name, UUID business_id);
+
 
     @Query(value = "select * from product p inner join branches b on p.branch_id = b.id where b.business_id = ?1 AND b.id = ?2 AND p.active =true", nativeQuery = true)
     List<Product> findAllByBusinessIdAndBranchIdAndActiveTrue(@Param("businessId") UUID businessId, @Param("branchId") UUID branchId);//tekshirib korish kere
