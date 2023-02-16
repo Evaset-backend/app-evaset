@@ -116,21 +116,7 @@ public class TradeControllerIml {
     }
 
     /**
-     * FILIAL ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
-     *
-     * @param branch_id
-     * @return ApiResponse(success - > true, message - > FOUND)
-     */
-    @CheckPermission("VIEW_TRADE")
-    @GetMapping("/get-by-branchId/{branch_id}")
-    public HttpEntity<?> getAllByBranch(@PathVariable UUID branch_id) {
-        ApiResponse apiResponse = tradeService.getAllByBranchId(branch_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    /**
      * MIJOZ ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
-     *
      * @param customer_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
