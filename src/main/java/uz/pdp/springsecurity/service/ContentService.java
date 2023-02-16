@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.payload.ContentProductDto;
 import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class ContentService {
 
     public ApiResponse edit(UUID contentId, ContentDto contentDto) {
         Optional<Content> optionalContent = contentRepository.findById(contentId);
-        if (optionalContent.isEmpty())return new ApiResponse("NOT FOUND", false);
+        if (optionalContent.isEmpty())return new ApiResponse("NOT FOUND CONTENT", false);
         return createOrEdit(optionalContent.get(), contentDto);
     }
 
@@ -50,18 +51,43 @@ public class ContentService {
         contentRepository.save(content);
 
         List<ContentProductDto> contentProductDtoList = contentDto.getContentProductDtoList();
+        List<ContentProduct>contentProductList = new ArrayList<>();
         for (ContentProductDto contentProductDto : contentProductDtoList) {
-            if (contentProductDto.getProductId() != null) {
-                Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
-                if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
-                content.setProduct(optional.get());
+
+            if (contentProductDto.getContentProductIdForEditOrNull() == null) {
+                ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
+                if (contentProduct == null) return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
+                contentProduct.setContent(content);
+                contentProductList.add(contentProduct);
+            } else if (contentProductDto.isDelete()) {
+                if (!contentProductRepository.existsById(contentProductDto.getContentProductIdForEditOrNull()))return new ApiResponse("NOT FOUND", false);
+                contentRepository.deleteById(contentProductDto.getContentProductIdForEditOrNull());
             } else {
-                Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
-                if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
-                content.setProductTypePrice(optional.get());
+                Optional<ContentProduct> optionalContentProduct = contentProductRepository.findById(contentProductDto.getContentProductIdForEditOrNull());
+                if (optionalContentProduct.isEmpty())return new ApiResponse("NOT FOUND CONTENT PRODUCT", false);
+                ContentProduct contentProduct = createOrEditContentProduct(optionalContentProduct.get(), contentProductDto);
+                if (contentProduct == null) return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
+                contentProduct.setContent(content);
+                contentProductList.add(contentProduct);
             }
         }
+        contentProductRepository.saveAll(contentProductList);
         return new ApiResponse();
+    }
+
+    private ContentProduct createOrEditContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
+        if (contentProductDto.getProductId() != null) {
+            Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
+            if (optional.isEmpty()) return null;
+            contentProduct.setProduct(optional.get());
+        } else {
+            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
+            if (optional.isEmpty()) return null;
+            contentProduct.setProductTypePrice(optional.get());
+        }
+        contentProduct.setQuantity(contentProductDto.getQuantity());
+        contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+        return contentProduct;
     }
 
     public ApiResponse getAll(Business business) {
