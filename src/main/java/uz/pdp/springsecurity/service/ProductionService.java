@@ -51,7 +51,13 @@ public class ProductionService {
         List<ContentProduct>contentProductList = new ArrayList<>();
 
         for (ContentProductDto contentProductDto : contentProductDtoList) {
-
+            ContentProduct contentProduct = new ContentProduct();
+            contentProduct.setProduction(production);
+            ContentProduct savedContentProduct = warehouseService.createContentProduct(contentProduct, contentProductDto);
+            if (savedContentProduct == null) continue;
+            savedContentProduct.setQuantity(contentProductDto.getQuantity());
+            savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+            contentProductList.add(savedContentProduct);
         }
         return new ApiResponse();
     }
