@@ -72,8 +72,22 @@ public class TradeService {
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
-        Trade trade = new Trade();
-        return createOrEditTrade(trade, tradeDTO);
+        UUID branchId = tradeDTO.getBranchId();
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("not found branch", false);
+        }
+        Branch branch = optionalBranch.get();
+        Business business = branch.getBusiness();
+
+        List<Trade> allTrade = tradeRepository.findAllByBranch_BusinessId(business.getId());
+        int size = allTrade.size();
+
+        if (business.getTariff().getTradeAmount() >= size || business.getTariff().getTradeAmount() == 0) {
+            Trade trade = new Trade();
+            return createOrEditTrade(trade, tradeDTO);
+        }
+        return new ApiResponse("You have opened a sufficient branch according to the trade", false);
     }
 
     public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
@@ -86,7 +100,7 @@ public class TradeService {
         Timestamp createdAt = trade.getCreatedAt();
         long difference = System.currentTimeMillis() - createdAt.getTime();
         long oneDay = 1000 * 60 * 60 * 24;
-        if (difference > oneDay){
+        if (difference > oneDay) {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
@@ -124,7 +138,7 @@ public class TradeService {
         trade.setBranch(branch);
 
         Optional<PaymentStatus> optionalPaymentStatus = paymentStatusRepository.findById(tradeDTO.getPaymentStatusId());
-        if(optionalPaymentStatus.isEmpty()){
+        if (optionalPaymentStatus.isEmpty()) {
             return new ApiResponse("PAYMENTSTATUS NOT FOUND", false);
         }
         trade.setPaymentStatus(optionalPaymentStatus.get());
@@ -156,7 +170,7 @@ public class TradeService {
 
         for (TradeProductDto tradeProductDto : tradeProductDtoList) {
             if (tradeProductDto.isDelete()) {
-                if(tradeProductRepository.existsById(tradeProductDto.getTradeProductId())){
+                if (tradeProductRepository.existsById(tradeProductDto.getTradeProductId())) {
                     TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
                     double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                     tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
@@ -173,7 +187,7 @@ public class TradeService {
                     tradeProductList.add(savedTradeProduct);
                     profit += savedTradeProduct.getProfit();
                 }
-            }else {
+            } else {
                 Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                 if (optionalTradeProduct.isEmpty()) continue;
                 TradeProduct tradeProduct = optionalTradeProduct.get();
@@ -181,7 +195,7 @@ public class TradeService {
                 double difference = tradeProductDto.getTradedQuantity() - tradeProduct.getTradedQuantity();
                 profit -= tradeProduct.getProfit();// to subtract profit of product
                 TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
-                if (savedTradeProduct != null){
+                if (savedTradeProduct != null) {
                     if (difference > 0) {
                         fifoCalculationService.createOrEditTradeProduct(branch, savedTradeProduct, difference);
                     } else if (difference < 0) {
@@ -200,7 +214,7 @@ public class TradeService {
 
     public ApiResponse getOne(UUID id) {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);
-        if (optionalTrade.isEmpty())return new ApiResponse("NOT FOUND", false);
+        if (optionalTrade.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Trade trade = optionalTrade.get();
         List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
         if (allByTradeId.isEmpty()) return new ApiResponse("NOT FOUND", false);
@@ -216,12 +230,12 @@ public class TradeService {
         TradeGetOneDto tradeGetOneDto = new TradeGetOneDto();
         tradeGetOneDto.setTrade(trade);
         tradeGetOneDto.setTradeProductList(allByTradeId);
-        return  new ApiResponse(true, tradeGetOneDto);
+        return new ApiResponse(true, tradeGetOneDto);
     }
 
     public ApiResponse deleteTrade(UUID id) {
         Optional<Trade> byId = tradeRepository.findById(id);
-        if (byId.isEmpty()) return new ApiResponse("NOT FOUND",false);
+        if (byId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         tradeRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }
@@ -289,13 +303,13 @@ public class TradeService {
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
         List<Trade> allByBusinessId = tradeRepository.findAllByBranch_BusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
+        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         /*List<Trade> tradeList = new ArrayList<>();
         for (Trade trade : allByBusinessId) {
             Trade trade1 = generateTradeByActiveCourse(trade);
             tradeList.add(trade1);
         }*/
-        return new ApiResponse("FOUND",true,allByBusinessId);
+        return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse createPdf(UUID id, HttpServletResponse response) throws IOException {
