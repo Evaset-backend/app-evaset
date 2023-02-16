@@ -303,7 +303,7 @@ public class ProductService {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
         for (Branch branch : branches) {
-            List<Product> all = productRepository.findAllByBranchIdAndActiveTrue(branch.getId());
+            List<Product> all = productRepository.findAllByBranchIdAndActiveIsTrue(branch.getId());
             if (!all.isEmpty()) {
                 for (Product product : all) {
                     Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(businessId);
@@ -485,11 +485,12 @@ public class ProductService {
     public ApiResponse getByBranch(UUID branch_id) {
         ProductViewDto productViewDto = new ProductViewDto();
 
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branch_id);
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         } else {
             for (Product product : productList) {
+                productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
                 productViewDto.setBrandName(product.getBrand().getName());
                 productViewDto.setBuyPrice(product.getBuyPrice());
@@ -497,10 +498,15 @@ public class ProductService {
                 productViewDto.setMinQuantity(product.getMinQuantity());
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
-                Warehouse warehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId()).get();
-                if (warehouse.getProduct().getId().equals(product.getId())) {
-                    productViewDto.setAmount(warehouse.getAmount());
+
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId( product.getId());
+                if (optionalWarehouse.isPresent()) {
+                    Warehouse warehouse = optionalWarehouse.get();
+                    if (warehouse.getProduct().getId().equals(product.getId())) {
+                        productViewDto.setAmount(warehouse.getAmount());
+                    }
                 }
+
             }
             return new ApiResponse("FOUND", true, productViewDto);
         }
@@ -509,7 +515,7 @@ public class ProductService {
     public ApiResponse getByBranchForSearch(UUID branch_id) {
 
         List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branch_id);
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         } else {
@@ -579,8 +585,10 @@ public class ProductService {
                 productViewDto.setMinQuantity(product.getMinQuantity());
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
-                Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
-                attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
+                if (product.getPhoto()!=null){
+                    Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
+                    attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
+                }
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranch_BusinessIdAndProductId(businessId, product.getId());
