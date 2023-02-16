@@ -11,6 +11,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,14 +19,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductionDto{
-    private UUID contentId;
+    private UUID branchId;
 
-    private Double quantity;
+    private UUID productId;
 
+    private UUID productTypePriceId;
+
+    @NotNull
+    private double quantity = 1;
+
+    @NotNull
     private double contentPrice;
 
     private double cost;
 
+    @NotNull
     private double totalPrice;
 
     List<ContentProductDto> contentProductDtoList;

@@ -24,8 +24,8 @@ public class ContentController {
 
     @CheckPermission("CREATE_CONTENT")
     @PostMapping
-    public HttpEntity<?> add(@CurrentUser User user, @Valid @RequestBody ContentDto contentDto) {
-        ApiResponse apiResponse = contentService.add(user.getBusiness(), contentDto);
+    public HttpEntity<?> add(@Valid @RequestBody ContentDto contentDto) {
+        ApiResponse apiResponse = contentService.add(contentDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -37,9 +37,9 @@ public class ContentController {
     }
 
     @CheckPermission("GET_CONTENT")
-    @GetMapping()
-    public HttpEntity<?> getAll(@CurrentUser User user) {
-        ApiResponse apiResponse = contentService.getAll(user.getBusiness());
+    @GetMapping("/by-branch/{branchId}")
+    public HttpEntity<?> getAll(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = contentService.getAll(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
