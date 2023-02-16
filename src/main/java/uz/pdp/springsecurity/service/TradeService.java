@@ -242,21 +242,6 @@ public class TradeService {
         return new ApiResponse("FOUND", true, allByTrader_id);
     }
 
-    public ApiResponse getAllByBranchId(UUID branch_id) {
-        Optional<Branch> optionalBranch = branchRepository.findById(branch_id);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Branch Not Found",false);
-        }
-        List<Trade> tradeList = tradeRepository.findAllByBranch_Id(optionalBranch.get().getId());
-        if (tradeList.isEmpty()){
-            return new ApiResponse("Traded Products Not Found");
-        }
-        List<TradeProductDtos> tradeProductDtosList=new ArrayList<>();
-
-
-        return new ApiResponse("FOUND", true, tradeProductDtosList);
-    }
-
     public ApiResponse getByCustomerId(UUID customer_id) {
         List<Trade> allByCustomer_id = tradeRepository.findAllByCustomer_Id(customer_id);
         if (allByCustomer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
