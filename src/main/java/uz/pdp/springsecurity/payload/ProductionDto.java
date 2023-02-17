@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ public class ProductionDto{
 
     private UUID productTypePriceId;
 
+    private Date date;
+
     @NotNull
     private double quantity = 1;
 
@@ -32,6 +35,8 @@ public class ProductionDto{
     private double contentPrice;
 
     private double cost;
+
+    private boolean costEachOne = false;
 
     @NotNull
     private double totalPrice;
