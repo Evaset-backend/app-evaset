@@ -34,6 +34,8 @@ public class Content extends AbsEntity {
 
     private double cost;
 
+    private boolean costEachOne;
+
     private double contentPrice;
 
     private double totalPrice;

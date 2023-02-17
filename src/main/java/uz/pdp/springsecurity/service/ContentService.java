@@ -49,6 +49,7 @@ public class ContentService {
         }
 
         content.setQuantity(contentDto.getQuantity());
+        content.setCostEachOne(contentDto.isCostEachOne());
         content.setContentPrice(contentDto.getContentPrice());
         content.setCost(contentDto.getCost());
         content.setTotalPrice(contentDto.getTotalPrice());

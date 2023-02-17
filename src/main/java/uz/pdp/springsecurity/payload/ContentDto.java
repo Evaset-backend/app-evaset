@@ -25,6 +25,8 @@ public class ContentDto{
 
     private double cost;
 
+    private boolean costEachOne;
+
     @NotNull
     private double contentPrice;
 

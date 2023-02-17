@@ -41,6 +41,8 @@ public class ProductionService {
             production.setProductTypePrice(optional.get());
         }
         production.setQuantity(productionDto.getQuantity());
+        production.setDate(productionDto.getDate());
+        production.setCostEachOne(productionDto.isCostEachOne());
         production.setContentPrice(productionDto.getContentPrice());
         production.setCost(productionDto.getCost());
         production.setTotalPrice(productionDto.getTotalPrice());
@@ -59,7 +61,10 @@ public class ProductionService {
             savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
             contentProductList.add(savedContentProduct);
         }
-        return new ApiResponse();
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        contentProductRepository.saveAll(contentProductList);
+        warehouseService.createOrEditWareHouse(production);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse getAll(UUID branchId) {
