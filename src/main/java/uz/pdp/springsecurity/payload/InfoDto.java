@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InfoDto {
     private double myDebt;
-
     private double myPurchase;
-
     private double myTrade;
-
     private double tradersDebt;
+    private double myOutlay;
 }

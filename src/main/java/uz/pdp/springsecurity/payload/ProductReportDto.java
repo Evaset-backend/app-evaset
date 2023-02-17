@@ -15,7 +15,6 @@ public class ProductReportDto {
     private double buyPrice;
     private double salePrice;
     private double amount;
-
     private double SumBySalePrice;
     private double SumByBuyPrice;
 

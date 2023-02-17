@@ -1,15 +1,21 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.Outlay;
 import uz.pdp.springsecurity.entity.Purchase;
 import uz.pdp.springsecurity.entity.Trade;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
+import uz.pdp.springsecurity.repository.BranchRepository;
+import uz.pdp.springsecurity.repository.OutlayRepository;
 import uz.pdp.springsecurity.repository.PurchaseRepository;
 import uz.pdp.springsecurity.repository.TradeRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,6 +23,10 @@ import java.util.UUID;
 public class InfoService {
     private final PurchaseRepository purchaseRepository;
     private final TradeRepository tradeRepository;
+    @Autowired
+    OutlayRepository outlayRepository;
+    @Autowired
+    BranchRepository branchRepository;
 
     public ApiResponse getInfoByBusiness(UUID businessId) {
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
@@ -46,8 +56,16 @@ public class InfoService {
     }
 
     public ApiResponse getInfoByBranch(UUID branchId) {
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("Branch Not Found", false);
+        }
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
-//        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        if (purchaseList.isEmpty()){
+            return new ApiResponse("Purchased Product Not Found");
+        }
+
         double allPurchase = 0;
         double allMyDebt = 0;
         double allTrade = 0;
@@ -69,6 +87,14 @@ public class InfoService {
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
 
+        List<Outlay> outlayList = outlayRepository.findAllByBranch_Id(branchId);
+        double totalOutlay = 0;
+        if (!outlayList.isEmpty()){
+            for (Outlay outlay : outlayList) {
+                totalOutlay += outlay.getTotalSum();
+            }
+            infoDto.setMyOutlay(totalOutlay);
+        }
         return new ApiResponse("FOUND", true, infoDto);
     }
 }

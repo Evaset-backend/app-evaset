@@ -33,6 +33,9 @@ public class ReportsService {
     @Autowired
     PurchaseProductRepository purchaseProductRepository;
 
+    @Autowired
+    OutlayRepository outlayRepository;
+
     public ApiResponse allProductAmount(UUID branchId){
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -136,6 +139,7 @@ public class ReportsService {
 
 
     public ApiResponse mostSaleProducts(UUID branchId){
+
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found");
@@ -149,10 +153,15 @@ public class ReportsService {
         }
 
         List<MostSaleProductsDto> mostSaleProductsDtoList=new ArrayList<>();
+
         for (int i = 0; i < tradeProductList.size(); i++) {
+
             MostSaleProductsDto mostSaleProductsDto=new MostSaleProductsDto();
+
             for (int i1 = 0; i1 < tradeProductList.size(); i1++) {
+
                 if (tradeProductList.get(i).getProduct().getId().equals(tradeProductList.get(i1).getProduct().getId())){
+
                     mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
                     mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
                     mostSaleProductsDto.setMeasurement(tradeProductList.get(i).getProduct().getMeasurement().getName());
@@ -160,6 +169,7 @@ public class ReportsService {
                     mostSaleProductsDto.setAmount(amount += tradeProductList.get(i).getTradedQuantity());
                     mostSaleProductsDtoList.add(mostSaleProductsDto);
                 }
+
                 MostSaleProductsDto mostSaleProductsDtos=new MostSaleProductsDto();
                 mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
                 mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
@@ -218,6 +228,73 @@ public class ReportsService {
 
 
         return new ApiResponse("Found",true,purchaseReportsDtoList);
+    }
+
+    public ApiResponse deliveryPriceGet(UUID branchId){
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Not Found");
+        }
+
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
+
+        if (purchaseList.isEmpty()){
+            return new ApiResponse("Not Found Purchase",false);
+        }
+
+        double totalDelivery = 0;
+        for (Purchase purchase : purchaseList) {
+            totalDelivery += purchase.getDeliveryPrice();
+        }
+        return new ApiResponse("Found",true, totalDelivery);
+    }
+
+    public ApiResponse outlayReports(UUID branchId){
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Not Found");
+        }
+        List<Outlay> outlayList = outlayRepository.findAllByBranch_Id(branchId);
+        if (outlayList.isEmpty()){
+            return new ApiResponse("Not Found Outlay");
+        }
+        outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
+        return new ApiResponse("Found",true, outlayList);
+    }
+
+    public ApiResponse customerReports(UUID branchId){
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Not Found");
+        }
+
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
+
+        if (tradeProductList.isEmpty()){
+            return new ApiResponse("Not Found Purchase",false);
+        }
+
+        List<CustomerReportsDto> customerReportsDtoList=new ArrayList<>();
+        for (TradeProduct tradeProduct : tradeProductList) {
+            CustomerReportsDto customerReportsDto=new CustomerReportsDto();
+            customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+            customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+            customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+            customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+            customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+            customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+            customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+            customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+            customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+            customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+            customerReportsDtoList.add(customerReportsDto);
+        }
+        customerReportsDtoList.sort(Comparator.comparing(CustomerReportsDto::getTotalSum).reversed());
+
+        return new ApiResponse("Found",true,customerReportsDtoList);
     }
 
 
