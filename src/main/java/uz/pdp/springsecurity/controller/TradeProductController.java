@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.service.TradeProductService;
-import uz.pdp.springsecurity.service.TradeService;
 
 import java.util.UUID;
 
@@ -25,6 +24,7 @@ public class TradeProductController {
     @GetMapping("/get-all-trade/{businessId}")
     public HttpEntity<?> getAllByTrader(@PathVariable UUID businessId) {
         ApiResponse apiResponse = tradeProductService.getAllTrade(businessId);
+
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

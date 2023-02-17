@@ -19,31 +19,20 @@ import java.sql.Date;
 public class Purchase extends AbsEntity {
     @ManyToOne
     private Supplier supplier;
-
     @ManyToOne
     private User seller;
-
     @ManyToOne
     private ExchangeStatus purchaseStatus;
-
     @ManyToOne
     private PaymentStatus paymentStatus;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
     private Date date;
-
     private String description;
-
     private double deliveryPrice;
-
     private double totalSum;
-
     private double paidSum;
-
     private double debtSum = 0;
-
     private boolean editable = true;
 }
