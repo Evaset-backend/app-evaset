@@ -29,6 +29,18 @@ public class TariffService {
         return new ApiResponse("all tariff", true, mapper.toDtoList(tariffList));
     }
 
+    public ApiResponse getToChooseATariff() {
+        List<Tariff> all = repository.findAll();
+        List<Tariff> tariffList = new ArrayList<>();
+        for (Tariff tariff : all) {
+            if (!tariff.isDelete() && tariff.isActive()) {
+                tariffList.add(tariff);
+            }
+        }
+        tariffList.sort(Comparator.comparing(Tariff::getPrice));
+        return new ApiResponse("all tariff", true, mapper.toDtoList(tariffList));
+    }
+
     public ApiResponse getById(UUID id) {
         Optional<Tariff> optionalTariff = repository.findById(id);
         if (optionalTariff.isEmpty()) {

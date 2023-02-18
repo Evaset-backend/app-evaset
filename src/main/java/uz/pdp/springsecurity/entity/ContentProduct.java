@@ -39,4 +39,6 @@ public class ContentProduct extends AbsEntity {
     private double quantity;
 
     private double totalPrice;
+
+    private boolean delete;
 }

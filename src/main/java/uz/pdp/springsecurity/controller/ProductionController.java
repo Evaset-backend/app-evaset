@@ -5,9 +5,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
-import uz.pdp.springsecurity.annotations.CurrentUser;
-import uz.pdp.springsecurity.entity.Production;
-import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductionDto;
 import uz.pdp.springsecurity.service.ProductionService;
@@ -23,15 +20,15 @@ public class ProductionController {
     ProductionService productionService;
     @CheckPermission("CREATE_PRODUCTION")
     @PostMapping
-    public HttpEntity<?> add(@CurrentUser User user, @Valid @RequestBody ProductionDto productionDto) {
-        ApiResponse apiResponse = productionService.add(user.getBusiness(), productionDto);
+    public HttpEntity<?> add(@Valid @RequestBody ProductionDto productionDto) {
+        ApiResponse apiResponse = productionService.add(productionDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_PRODUCTION")
-    @GetMapping()
-    public HttpEntity<?> getAll(@CurrentUser User user) {
-        ApiResponse apiResponse = productionService.getAll(user.getBusiness().getId());
+    @GetMapping("/by-branch/{branchId}")
+    public HttpEntity<?> getAll(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = productionService.getAll(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

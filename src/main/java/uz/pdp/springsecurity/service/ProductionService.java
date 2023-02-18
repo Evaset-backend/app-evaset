@@ -2,15 +2,14 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.ContentProduct;
-import uz.pdp.springsecurity.entity.Production;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.ContentProductDto;
 import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
 import uz.pdp.springsecurity.payload.ProductionDto;
-import uz.pdp.springsecurity.repository.ContentProductRepository;
-import uz.pdp.springsecurity.repository.ProductionRepository;
+import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,12 +19,58 @@ import java.util.UUID;
 public class ProductionService {
     private final ProductionRepository productionRepository;
     private final ContentProductRepository contentProductRepository;
-    public ApiResponse add(Business business, ProductionDto productionDto) {
-        return new ApiResponse();
+    private final ProductRepository productRepository;
+    private final ProductTypePriceRepository productTypePriceRepository;
+    private final BranchRepository branchRepository;
+    private final WarehouseService warehouseService;
+
+    public ApiResponse add(ProductionDto productionDto) {
+        Optional<Branch> optionalBranch = branchRepository.findById(productionDto.getBranchId());
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
+
+        Production production = new Production();
+        production.setBranch(optionalBranch.get());
+
+        if (productionDto.getProductId() != null) {
+            Optional<Product> optional = productRepository.findById(productionDto.getProductId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
+            production.setProduct(optional.get());
+        } else {
+            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productionDto.getProductTypePriceId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
+            production.setProductTypePrice(optional.get());
+        }
+        production.setQuantity(productionDto.getQuantity());
+        production.setDate(productionDto.getDate());
+        production.setCostEachOne(productionDto.isCostEachOne());
+        production.setContentPrice(productionDto.getContentPrice());
+        production.setCost(productionDto.getCost());
+        production.setTotalPrice(productionDto.getTotalPrice());
+
+        productionRepository.save(production);
+
+        List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
+        List<ContentProduct>contentProductList = new ArrayList<>();
+
+        for (ContentProductDto contentProductDto : contentProductDtoList) {
+            ContentProduct contentProduct = new ContentProduct();
+            contentProduct.setProduction(production);
+            ContentProduct savedContentProduct = warehouseService.createContentProduct(contentProduct, contentProductDto);
+            if (savedContentProduct == null) continue;
+            savedContentProduct.setQuantity(contentProductDto.getQuantity());
+            savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+            contentProductList.add(savedContentProduct);
+        }
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        contentProductRepository.saveAll(contentProductList);
+        warehouseService.createOrEditWareHouse(production);
+        return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse getAll(UUID businessId) {
-        List<Production> productionList = productionRepository.findAllByBusinessId(businessId);
+    public ApiResponse getAll(UUID branchId) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
+        List<Production> productionList = productionRepository.findAllByBranchId(branchId);
         if (productionList.isEmpty())return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, productionList);
     }

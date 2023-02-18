@@ -33,22 +33,22 @@ public class InfoService {
 //        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         double allPurchase = 0;
         double allMyDebt = 0;
+        double allTrade = 0;
+        double allTradeDebt = 0;
         for (Purchase purchase : purchaseList) {
             allPurchase += purchase.getTotalSum();
             allMyDebt += purchase.getDebtSum();
         }
-        InfoDto infoDto = new InfoDto();
-        infoDto.setMyPurchase(allPurchase);
-        infoDto.setMyDebt(allMyDebt);
 
         List<Trade> tradeList = tradeRepository.findAllByBranch_BusinessId(businessId);
 //        if (tradeList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allTrade = 0;
-        double allTradeDebt = 0;
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
         }
+        InfoDto infoDto = new InfoDto();
+        infoDto.setMyPurchase(allPurchase);
+        infoDto.setMyDebt(allMyDebt);
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
 
@@ -68,22 +68,22 @@ public class InfoService {
 
         double allPurchase = 0;
         double allMyDebt = 0;
+        double allTrade = 0;
+        double allTradeDebt = 0;
         for (Purchase purchase : purchaseList) {
             allPurchase += purchase.getTotalSum();
             allMyDebt += purchase.getDebtSum();
         }
-        InfoDto infoDto = new InfoDto();
-        infoDto.setMyPurchase(allPurchase);
-        infoDto.setMyDebt(allMyDebt);
 
         List<Trade> tradeList = tradeRepository.findAllByBranch_Id(branchId);
 //        if (tradeList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        double allTrade = 0;
-        double allTradeDebt = 0;
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
         }
+        InfoDto infoDto = new InfoDto();
+        infoDto.setMyPurchase(allPurchase);
+        infoDto.setMyDebt(allMyDebt);
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
 

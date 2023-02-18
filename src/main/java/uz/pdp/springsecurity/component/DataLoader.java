@@ -278,7 +278,7 @@ public class DataLoader implements CommandLineRunner {
 
                     VIEW_INFO,
 
-                    GET_TARIFF,
+                    GET_TO_CHOOSE_A_TARIFF,
                     GET_BY_TARIFF,
 
                     CREATE_CONTENT,
@@ -414,7 +414,7 @@ public class DataLoader implements CommandLineRunner {
 
                             GET_BUSINESS_ALL_AMOUNT,
 
-                            GET_TARIFF,
+                            GET_TO_CHOOSE_A_TARIFF,
                             GET_BY_TARIFF,
 
                             CREATE_CONTENT,
@@ -459,7 +459,7 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_PAY_STATUS,
                             EDIT_MY_PROFILE,
                             VIEW_PRODUCT,
-                            GET_TARIFF,
+                            GET_TO_CHOOSE_A_TARIFF,
                             GET_BY_TARIFF,
 
                             CREATE_CONTENT,

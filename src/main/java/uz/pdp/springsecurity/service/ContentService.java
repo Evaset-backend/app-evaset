@@ -21,58 +21,65 @@ public class ContentService {
     private final ContentProductRepository contentProductRepository;
     private final ProductRepository productRepository;
     private final ProductTypePriceRepository productTypePriceRepository;
+    private final BranchRepository branchRepository;
 
-    public ApiResponse add(Business business, ContentDto contentDto){
+    public ApiResponse add(ContentDto contentDto) {
+        Optional<Branch> optionalBranch = branchRepository.findById(contentDto.getBranchId());
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
         Content content = new Content();
-        content.setBusiness(business);
+        content.setBranch(optionalBranch.get());
         return createOrEdit(content, contentDto);
     }
 
     public ApiResponse edit(UUID contentId, ContentDto contentDto) {
         Optional<Content> optionalContent = contentRepository.findById(contentId);
-        if (optionalContent.isEmpty())return new ApiResponse("NOT FOUND CONTENT", false);
+        if (optionalContent.isEmpty()) return new ApiResponse("NOT FOUND CONTENT", false);
         return createOrEdit(optionalContent.get(), contentDto);
     }
 
     private ApiResponse createOrEdit(Content content, ContentDto contentDto) {
         if (contentDto.getProductId() != null) {
             Optional<Product> optional = productRepository.findById(contentDto.getProductId());
-            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
+            if (optional.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT", false);
             content.setProduct(optional.get());
         } else {
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentDto.getProductTypePriceId());
-            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
+            if (optional.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
             content.setProductTypePrice(optional.get());
         }
 
         content.setQuantity(contentDto.getQuantity());
-        content.setCostForPerQuantity(contentDto.getCostForPerQuantity());
+        content.setCostEachOne(contentDto.isCostEachOne());
+        content.setContentPrice(contentDto.getContentPrice());
+        content.setCost(contentDto.getCost());
         content.setTotalPrice(contentDto.getTotalPrice());
         contentRepository.save(content);
 
         List<ContentProductDto> contentProductDtoList = contentDto.getContentProductDtoList();
-        List<ContentProduct>contentProductList = new ArrayList<>();
+        List<ContentProduct> contentProductList = new ArrayList<>();
         for (ContentProductDto contentProductDto : contentProductDtoList) {
-
             if (contentProductDto.getContentProductIdForEditOrNull() == null) {
                 ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
-                if (contentProduct == null) return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
+                if (contentProduct == null)
+                    return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
                 contentProduct.setContent(content);
                 contentProductList.add(contentProduct);
             } else if (contentProductDto.isDelete()) {
-                if (!contentProductRepository.existsById(contentProductDto.getContentProductIdForEditOrNull()))return new ApiResponse("NOT FOUND", false);
+                if (!contentProductRepository.existsById(contentProductDto.getContentProductIdForEditOrNull()))
+                    return new ApiResponse("NOT FOUND", false);
                 contentRepository.deleteById(contentProductDto.getContentProductIdForEditOrNull());
             } else {
                 Optional<ContentProduct> optionalContentProduct = contentProductRepository.findById(contentProductDto.getContentProductIdForEditOrNull());
-                if (optionalContentProduct.isEmpty())return new ApiResponse("NOT FOUND CONTENT PRODUCT", false);
+                if (optionalContentProduct.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCT", false);
                 ContentProduct contentProduct = createOrEditContentProduct(optionalContentProduct.get(), contentProductDto);
-                if (contentProduct == null) return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
+                if (contentProduct == null)
+                    return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
                 contentProduct.setContent(content);
                 contentProductList.add(contentProduct);
             }
         }
         contentProductRepository.saveAll(contentProductList);
-        return new ApiResponse();
+        return new ApiResponse("successfully saved",true);
     }
 
     private ContentProduct createOrEditContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
@@ -87,21 +94,24 @@ public class ContentService {
         }
         contentProduct.setQuantity(contentProductDto.getQuantity());
         contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+        contentProduct.setDelete(contentProductDto.isDelete());
         return contentProduct;
     }
 
-    public ApiResponse getAll(Business business) {
-        List<Content> contentList = contentRepository.findAll();
-        if (contentList.isEmpty())return new ApiResponse("NOT FOUND", false);
+    public ApiResponse getAll(UUID branchId) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
+        List<Content> contentList = contentRepository.findAllByBranchId(branchId);
+        if (contentList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, contentList);
     }
 
     public ApiResponse getOne(UUID contentId) {
         Optional<Content> optionalContent = contentRepository.findById(contentId);
-        if (optionalContent.isEmpty())return new ApiResponse("NOT FOUND", false);
+        if (optionalContent.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Content content = optionalContent.get();
         List<ContentProduct> contentProductList = contentProductRepository.findAllByContentId(contentId);
-        if (contentProductList.isEmpty())return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         GetOneContentProductionDto getOneContentProductionDto = new GetOneContentProductionDto(
                 content,
                 contentProductList
@@ -110,7 +120,7 @@ public class ContentService {
     }
 
     public ApiResponse deleteOne(UUID contentId) {
-        if (!contentRepository.existsById(contentId))return new ApiResponse("NOT FOUND", false);
+        if (!contentRepository.existsById(contentId)) return new ApiResponse("NOT FOUND", false);
         contentRepository.deleteById(contentId);
         return new ApiResponse("SUCCESS", true);
     }
