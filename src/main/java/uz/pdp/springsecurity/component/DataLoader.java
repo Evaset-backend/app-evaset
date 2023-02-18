@@ -500,7 +500,9 @@ public class DataLoader implements CommandLineRunner {
                     "superadmin",
                     passwordEncoder.encode("admin123"),
                     superAdmin,
-                    true
+                    true,
+                    business,
+                    branches
             ));
             userRepository.save(new User(
                     "Manager",
