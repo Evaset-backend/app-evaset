@@ -131,6 +131,8 @@ public class DataLoader implements CommandLineRunner {
             );
             branchRepository.save(branch);
         }
+
+
 //------------------------------------------------------------------------------------------//
 
         if (initMode.equals("always")) {
@@ -139,8 +141,10 @@ public class DataLoader implements CommandLineRunner {
 
             Role superAdmin = roleRepository.save(new Role(
                     Constants.SUPERADMIN,
-                    List.of(permissions)
+                    List.of(permissions),
+                    business
             ));
+
 
             Role admin = roleRepository.save(new Role(Constants.ADMIN, Arrays.asList(
                     ADD_ADDRESS,
@@ -294,7 +298,6 @@ public class DataLoader implements CommandLineRunner {
                     GET_PRODUCTION
             ),
                     business));
-
             Role manager = roleRepository.save(new Role(
                     Constants.MANAGER,
                     Arrays.asList(
