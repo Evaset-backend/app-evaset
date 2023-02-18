@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
     List<Category> findAllByBusiness_Id(UUID business_id);
     List<Category> findCategoriesByParentCategoryId(UUID parentCategory_id);
-
     List<Category> findAllByBusiness_IdAndAndParentCategoryNull(UUID businessId);
     List<Category> findByBusinessIdAndParentCategoryNull(UUID business_id);
     List<Category> findAllByBusinessIdAndParentCategoryNotNull(UUID business_id);

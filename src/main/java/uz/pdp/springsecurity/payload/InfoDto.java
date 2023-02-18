@@ -13,4 +13,5 @@ public class InfoDto {
     private double myTrade;
     private double tradersDebt;
     private double myOutlay;
+    private double totalProfit;
 }

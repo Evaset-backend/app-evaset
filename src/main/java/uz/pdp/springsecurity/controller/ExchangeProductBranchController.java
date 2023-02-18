@@ -102,7 +102,7 @@ public class ExchangeProductBranchController {
 
     /**
      * BUSINESS ID ORQALI BUSINESSGA TEGISHLI O'TKAZMALARNI KO'RIB CHIQISH
-     * @param businessId
+     * @Id businessId
      * @return  ApiResponse(success - > true object - > value)
      */
     @CheckPermission("VIEW_EXCHANGE_ADMIN")
