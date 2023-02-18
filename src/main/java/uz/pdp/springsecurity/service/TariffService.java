@@ -3,7 +3,6 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Tariff;
-import uz.pdp.springsecurity.entity.TradeProduct;
 import uz.pdp.springsecurity.mapper.TariffMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TariffDto;

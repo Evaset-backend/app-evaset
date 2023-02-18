@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import java.sql.Timestamp;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -27,6 +28,10 @@ public class Business extends AbsEntity {
 
     @ManyToOne
     private Tariff tariff;
+
+    private Timestamp startDay;
+
+    private Timestamp endDay;
 
     private boolean isActive;
 }
