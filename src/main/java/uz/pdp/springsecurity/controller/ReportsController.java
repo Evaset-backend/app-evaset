@@ -57,6 +57,11 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.customerReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+//    @GetMapping("/customer/{branchId}")
+//    public HttpEntity<?> customerReports(@PathVariable UUID branchId) {
+//        ApiResponse apiResponse = reportsService.customerReports(branchId);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 
 
 }

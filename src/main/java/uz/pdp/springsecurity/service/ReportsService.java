@@ -23,19 +23,14 @@ public class ReportsService {
 
     @Autowired
     BranchRepository branchRepository;
-
     @Autowired
     TradeProductRepository tradeProductRepository;
-
     @Autowired
     PurchaseRepository purchaseRepository;
-
     @Autowired
     PurchaseProductRepository purchaseProductRepository;
-
     @Autowired
     OutlayRepository outlayRepository;
-
     public ApiResponse allProductAmount(UUID branchId){
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -91,7 +86,6 @@ public class ReportsService {
 
         return new ApiResponse("Business Products Amount" , true , productReportDtoList);
     }
-
     public ApiResponse allProductAmountByBranch(UUID branchId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -136,22 +130,17 @@ public class ReportsService {
 
         return new ApiResponse("Business Products Amount" , true,amounts);
     }
-
-
     public ApiResponse mostSaleProducts(UUID branchId){
-
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found");
         }
-
         Business business = optionalBranch.get().getBusiness();
         List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BusinessId(business.getId());
 
         if (tradeProductList.isEmpty()){
             return new ApiResponse("Traded Product Not Found");
         }
-
         List<MostSaleProductsDto> mostSaleProductsDtoList=new ArrayList<>();
 
         for (int i = 0; i < tradeProductList.size(); i++) {
@@ -164,6 +153,7 @@ public class ReportsService {
 
                     mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
                     mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
+                    mostSaleProductsDto.setSalePrice(tradeProductList.get(i).getProduct().getSalePrice());
                     mostSaleProductsDto.setMeasurement(tradeProductList.get(i).getProduct().getMeasurement().getName());
                     double amount = mostSaleProductsDto.getAmount();
                     mostSaleProductsDto.setAmount(amount += tradeProductList.get(i).getTradedQuantity());
@@ -172,6 +162,7 @@ public class ReportsService {
 
                 MostSaleProductsDto mostSaleProductsDtos=new MostSaleProductsDto();
                 mostSaleProductsDto.setName(tradeProductList.get(i).getProduct().getName());
+                mostSaleProductsDto.setSalePrice(tradeProductList.get(i).getProduct().getSalePrice());
                 mostSaleProductsDto.setBarcode(tradeProductList.get(i).getProduct().getBarcode());
                 mostSaleProductsDto.setMeasurement(tradeProductList.get(i).getProduct().getMeasurement().getName());
                 mostSaleProductsDto.setAmount(tradeProductList.get(i).getTradedQuantity());
@@ -211,11 +202,11 @@ public class ReportsService {
         }
 
         List<PurchaseReportsDto> purchaseReportsDtoList=new ArrayList<>();
-
         for (PurchaseProduct purchaseProduct : purchaseProductList) {
             PurchaseReportsDto purchaseReportsDto=new PurchaseReportsDto();
-            purchaseReportsDto.setName(purchaseProduct.getProduct().getName());
+            purchaseReportsDto.setPurchaseId(purchaseProduct.getPurchase().getId());
             purchaseReportsDto.setPurchasedAmount(purchaseProduct.getPurchasedQuantity());
+            purchaseReportsDto.setName(purchaseProduct.getProduct().getName());
             purchaseReportsDto.setBuyPrice(purchaseProduct.getBuyPrice());
             purchaseReportsDto.setBarcode(purchaseProduct.getProduct().getBarcode());
             purchaseReportsDto.setTax(purchaseProduct.getProduct().getTax());
@@ -225,8 +216,6 @@ public class ReportsService {
             purchaseReportsDto.setDebt(purchaseProduct.getPurchase().getDebtSum());
             purchaseReportsDtoList.add(purchaseReportsDto);
         }
-
-
         return new ApiResponse("Found",true,purchaseReportsDtoList);
     }
 

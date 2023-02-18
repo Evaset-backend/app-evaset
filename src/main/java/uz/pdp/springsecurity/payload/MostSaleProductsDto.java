@@ -11,6 +11,7 @@ public class MostSaleProductsDto {
 
     private String name;
     private String barcode;
+    private double salePrice;
     private double amount;
     private String measurement;
 }
