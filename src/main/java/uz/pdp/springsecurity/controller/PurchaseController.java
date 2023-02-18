@@ -131,6 +131,7 @@ public class PurchaseController {
      * @param branch_id
      * @return ApiResponse(success - > true message - > FOUND)
      */
+
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("get-purchase-by-branch/{branch_id}")
     public HttpEntity<?> getByBranchId(@PathVariable UUID branch_id) {
