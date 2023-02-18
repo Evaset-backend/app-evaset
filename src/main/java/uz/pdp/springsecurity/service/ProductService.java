@@ -411,10 +411,34 @@ public class ProductService {
                 productAllByBarcode.add(product);
             }
         }
-        if (productAllByBarcode.isEmpty()) {
+
+
+        List<ProductViewDto> viewDtos = new ArrayList<>();
+        for (Product product : productAllByBarcode) {
+            ProductViewDto productViewDto = new ProductViewDto();
+            productViewDto.setProductId(product.getId());
+            productViewDto.setProductName(product.getName());
+            productViewDto.setBrandName(product.getBrand().getName());
+            productViewDto.setBuyPrice(product.getBuyPrice());
+            productViewDto.setSalePrice(product.getSalePrice());
+            productViewDto.setMinQuantity(product.getMinQuantity());
+            productViewDto.setBranch(product.getBranch());
+            productViewDto.setExpiredDate(product.getExpireDate());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            if (optionalWarehouse.isPresent()) {
+                Warehouse warehouse = optionalWarehouse.get();
+                if (warehouse.getProduct().getId().equals(product.getId())) {
+                    productViewDto.setAmount(warehouse.getAmount());
+                }
+            }
+            viewDtos.add(productViewDto);
+        }
+
+        if (viewDtos.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
-        return new ApiResponse("FOUND", true, productAllByBarcode);
+        return new ApiResponse("FOUND", true, viewDtos);
     }
 
     public ApiResponse getByCategory(UUID category_id, User user) {
@@ -436,10 +460,34 @@ public class ProductService {
                 productList.addAll(all);
             }
         }
-        if (productList.isEmpty()) {
+
+        List<ProductViewDto> viewDtos = new ArrayList<>();
+        for (Product product : productList) {
+            ProductViewDto productViewDto = new ProductViewDto();
+            productViewDto.setProductId(product.getId());
+            productViewDto.setProductName(product.getName());
+            productViewDto.setBrandName(product.getBrand().getName());
+            productViewDto.setBuyPrice(product.getBuyPrice());
+            productViewDto.setSalePrice(product.getSalePrice());
+            productViewDto.setMinQuantity(product.getMinQuantity());
+            productViewDto.setBranch(product.getBranch());
+            productViewDto.setExpiredDate(product.getExpireDate());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            if (optionalWarehouse.isPresent()) {
+                Warehouse warehouse = optionalWarehouse.get();
+                if (warehouse.getProduct().getId().equals(product.getId())) {
+                    productViewDto.setAmount(warehouse.getAmount());
+                }
+            }
+            viewDtos.add(productViewDto);
+        }
+
+
+        if (viewDtos.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
-        return new ApiResponse("FOUND", true, productList);
+        return new ApiResponse("FOUND", true, viewDtos);
     }
 
     public ApiResponse getByBrand(UUID brand_id, User user) {
@@ -461,8 +509,31 @@ public class ProductService {
                 productList.addAll(all);
             }
         }
-        if (productList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, productList);
+
+        List<ProductViewDto> viewDtos = new ArrayList<>();
+        for (Product product : productList) {
+            ProductViewDto productViewDto = new ProductViewDto();
+            productViewDto.setProductId(product.getId());
+            productViewDto.setProductName(product.getName());
+            productViewDto.setBrandName(product.getBrand().getName());
+            productViewDto.setBuyPrice(product.getBuyPrice());
+            productViewDto.setSalePrice(product.getSalePrice());
+            productViewDto.setMinQuantity(product.getMinQuantity());
+            productViewDto.setBranch(product.getBranch());
+            productViewDto.setExpiredDate(product.getExpireDate());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            if (optionalWarehouse.isPresent()) {
+                Warehouse warehouse = optionalWarehouse.get();
+                if (warehouse.getProduct().getId().equals(product.getId())) {
+                    productViewDto.setAmount(warehouse.getAmount());
+                }
+            }
+            viewDtos.add(productViewDto);
+        }
+
+        if (viewDtos.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, viewDtos);
     }
 
     public ApiResponse getByBranchAndBarcode(UUID branch_id, User user, ProductBarcodeDto barcodeDto) {
@@ -489,6 +560,7 @@ public class ProductService {
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         } else {
+            List<ProductViewDto> viewDtos = new ArrayList<>();
             for (Product product : productList) {
                 productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
@@ -499,16 +571,18 @@ public class ProductService {
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
 
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId( product.getId());
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
                 if (optionalWarehouse.isPresent()) {
                     Warehouse warehouse = optionalWarehouse.get();
                     if (warehouse.getProduct().getId().equals(product.getId())) {
                         productViewDto.setAmount(warehouse.getAmount());
                     }
                 }
-
+                viewDtos.add(productViewDto);
             }
-            return new ApiResponse("FOUND", true, productViewDto);
+            if (viewDtos.isEmpty()) return new ApiResponse("NOT FOUND", false);
+
+            return new ApiResponse("FOUND", true, viewDtos);
         }
     }
 
@@ -585,7 +659,7 @@ public class ProductService {
                 productViewDto.setMinQuantity(product.getMinQuantity());
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
-                if (product.getPhoto()!=null){
+                if (product.getPhoto() != null) {
                     Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
                     attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
                 }
