@@ -41,4 +41,7 @@ public class ContentProduct extends AbsEntity {
     private double totalPrice;
 
     private boolean delete;
+
+    //get uchun omborda bor maxsulotning amounti
+    private double productWarehouseAmount;
 }
