@@ -163,6 +163,12 @@ public class ExchangeProductBranchService {
         return new ApiResponse("FOUND", true, mapper.toDtoList(allByBusinessId));
     }
 
+    public ApiResponse getByBranchId(UUID businessId) {
+        List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByShippedBranch_Id(businessId);
+        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, mapper.toDtoList(allByBusinessId));
+    }
+
     public ApiResponse getByShippedBranchId(UUID shippedBranch_id) {
         List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByShippedBranch_Id(shippedBranch_id);
         if (allByShippedBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);

@@ -3,16 +3,10 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Outlay;
-import uz.pdp.springsecurity.entity.Purchase;
-import uz.pdp.springsecurity.entity.Trade;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.OutlayRepository;
-import uz.pdp.springsecurity.repository.PurchaseRepository;
-import uz.pdp.springsecurity.repository.TradeRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +21,9 @@ public class InfoService {
     OutlayRepository outlayRepository;
     @Autowired
     BranchRepository branchRepository;
+
+    @Autowired
+    TradeProductRepository tradeProductRepository;
 
     public ApiResponse getInfoByBusiness(UUID businessId) {
         List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
@@ -66,13 +63,22 @@ public class InfoService {
             return new ApiResponse("Purchased Product Not Found");
         }
 
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
+
+
+
         double allPurchase = 0;
         double allMyDebt = 0;
         double allTrade = 0;
         double allTradeDebt = 0;
+        double totalProfit = 0;
         for (Purchase purchase : purchaseList) {
             allPurchase += purchase.getTotalSum();
             allMyDebt += purchase.getDebtSum();
+        }
+
+        for (TradeProduct tradeProduct : tradeProductList) {
+            totalProfit += (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getSalePrice()) - (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getBuyPrice());
         }
 
         List<Trade> tradeList = tradeRepository.findAllByBranch_Id(branchId);
@@ -86,6 +92,7 @@ public class InfoService {
         infoDto.setMyDebt(allMyDebt);
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
+        infoDto.setTotalProfit(totalProfit);
 
         List<Outlay> outlayList = outlayRepository.findAllByBranch_Id(branchId);
         double totalOutlay = 0;
