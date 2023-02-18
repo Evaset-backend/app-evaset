@@ -99,7 +99,11 @@ public class DataLoader implements CommandLineRunner {
         List<Business> allBusiness = businessRepository.findAll();
         Business business = null;
         if (allBusiness.isEmpty()) {
-            business = new Business("Application", "Test Uchun",saveTariff,true);
+            business = new Business();
+            business.setDescription("Test Uchun");
+            business.setName("Application");
+            business.setTariff(saveTariff);
+            business.setActive(true);
             businessRepository.save(business);
         }
 //------------------------------------------------------------------------------------------//

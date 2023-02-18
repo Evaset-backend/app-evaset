@@ -556,7 +556,6 @@ public class ProductService {
     public ApiResponse getByBranch(UUID branch_id) {
         ProductViewDto productViewDto = new ProductViewDto();
 
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
 
 
         List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branch_id);
@@ -685,7 +684,7 @@ public class ProductService {
             return new ApiResponse("Branch Not Found");
         }
 
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branchId);
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         } else {
