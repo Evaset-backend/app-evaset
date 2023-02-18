@@ -23,6 +23,8 @@ public class ContentService {
     private final ProductTypePriceRepository productTypePriceRepository;
     private final BranchRepository branchRepository;
 
+    private final WarehouseRepository warehouseRepository;
+
     public ApiResponse add(ContentDto contentDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(contentDto.getBranchId());
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
@@ -79,7 +81,7 @@ public class ContentService {
             }
         }
         contentProductRepository.saveAll(contentProductList);
-        return new ApiResponse("successfully saved",true);
+        return new ApiResponse("successfully saved", true);
     }
 
     private ContentProduct createOrEditContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
@@ -116,6 +118,18 @@ public class ContentService {
                 content,
                 contentProductList
         );
+        for (ContentProduct contentProduct : contentProductList) {
+            if (contentProduct.getProduct() != null) {
+                UUID productId = contentProduct.getProduct().getId();
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(productId);
+                if (optionalWarehouse.isPresent()) {
+                    Warehouse warehouse = optionalWarehouse.get();
+                    double amount = warehouse.getAmount();
+                    contentProduct.setProductWarehouseAmount(amount);
+                }
+            }
+        }
+
         return new ApiResponse(true, getOneContentProductionDto);
     }
 
