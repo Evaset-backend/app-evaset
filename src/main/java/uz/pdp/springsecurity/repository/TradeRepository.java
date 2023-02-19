@@ -42,6 +42,8 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
     /*@Query(value = "select * from Trade t inner join branches b on t.branch_id = b.id where b.business_id = ?1",nativeQuery = true)
     List<Trade> findAllByBusinessId(UUID businessId);*/
 
+    List<Trade> findAllByPayDateBetween(Date startDate, Date endDate);
+
     List<Trade> findAllByPayDateAndBranchBetween(Date payDate,Date date2, UUID id);
 
 }

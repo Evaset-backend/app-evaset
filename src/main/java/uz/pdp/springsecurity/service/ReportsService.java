@@ -6,6 +6,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,6 +39,9 @@ public class ReportsService {
 
     @Autowired
     BrandRepository brandRepository;
+
+    @Autowired
+    TradeRepository tradeRepository;
 
     @Autowired
     CustomerRepository customerRepository;
@@ -77,7 +81,7 @@ public class ReportsService {
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(product.getId(),optionalBranch.get().getId());
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
@@ -123,7 +127,7 @@ public class ReportsService {
         double totalSumByBuyPrice = 0D;
         Amount amounts = new Amount();
         for (Product product : productList) {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(product.getId(),optionalBranch.get().getId());
             if (optionalWarehouse.isEmpty()) {
                 return new ApiResponse("No Found Product Amount");
             }
@@ -356,6 +360,18 @@ public class ReportsService {
             profitByProductDtoList.add(profitByProductDto);
         }
         profitByProductDtoList.sort(Comparator.comparing(ProfitByProductDto::getProfit).reversed());
+
+//        String s = "2014-05-01";
+//        String e = "2014-05-10";
+//        LocalDate start = LocalDate.parse(s);
+//        LocalDate end = LocalDate.parse(e);
+//        List<ProfitByProductDto> productDtoArrayList = new ArrayList<>();
+//        while (!start.isAfter(end)) {
+//            productDtoArrayList.add(start);
+//            start = start.plusDays(1);
+//        }
+
+
         return new ApiResponse("Found",true,profitByProductDtoList);
     }
     public ApiResponse benefitAndLostByCategoryReports(UUID branchId) {
@@ -448,37 +464,26 @@ public class ReportsService {
         profitByCategoryDtoList.sort(Comparator.comparing(ProfitByCategoryDto::getProfit).reversed());
         return new ApiResponse("Found",true,profitByCategoryDtoList);
     }
-    public ApiResponse benefitAndLostByDateReports(UUID branchId) {
-
+    public ApiResponse benefitAndLostByOneDateReports(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
-            return new ApiResponse("Branch Not Found");
+            return new ApiResponse("Branch Not Found",false);
         }
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
-        if (tradeProductList.isEmpty()){
-            return new ApiResponse("Traded Product Not Found");
-        }
-        Map<UUID, Double> productAmount = new HashMap<>();
-//        for (TradeProduct tradeProduct : tradeProductList) {
-//            double amount  = 0;
-//            LocalDate localDate = LocalDate.now();
-//            List<TradeProduct> allByProductId = tradeProductRepository.findAllByTrade_PayDate(tradeProduct.getTrade().getCustomer().getId());
-//            for (TradeProduct product : allByProductId) {
-//                amount += (product.getProduct().getSalePrice() * product.getTradedQuantity())-(product.getProduct().getBuyPrice() * product.getTradedQuantity());
-//                productAmount.put(product.getTrade().getCustomer().getId(), amount);
-//            }
-//        }
-        List<ProfitByCategoryDto> profitByCategoryDtoList=new ArrayList<>();
-        for ( Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
-            ProfitByCategoryDto profitByCategoryDto=new ProfitByCategoryDto();
-            Optional<Customer> optionalCustomer = customerRepository.findById(entry.getKey());
-            profitByCategoryDto.setCategoryName(optionalCustomer.get().getName());
-            profitByCategoryDto.setProfit(entry.getValue());
-            profitByCategoryDtoList.add(profitByCategoryDto);
-        }
-        profitByCategoryDtoList.sort(Comparator.comparing(ProfitByCategoryDto::getProfit).reversed());
-        return new ApiResponse("Found",true,profitByCategoryDtoList);
-    }
+        Timestamp timestamp=new Timestamp(System.currentTimeMillis());
+        long aLong = timestamp.getTime();
+        long bLong = timestamp.getTime()-86400000;
+        Date startDate=new Date(aLong);
+        Date endDate=new Date(bLong);
+        List<Trade> tradeList = tradeRepository.findAllByPayDateBetween(endDate, startDate);
+        for (Trade trade : tradeList) {
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTradeId(trade.getId());
+            List<ProfitByCategoryDto> profitByCategoryDtoList=new ArrayList<>();
+            for (TradeProduct tradeProduct : tradeProductList) {
 
+            }
+        }
+
+        return new ApiResponse("Found",true,tradeList);
+    }
 
 }
