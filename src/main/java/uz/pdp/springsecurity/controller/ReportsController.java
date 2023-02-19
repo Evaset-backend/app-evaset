@@ -82,11 +82,11 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @GetMapping("/benefit-by-customer/{branchId}")
-    public HttpEntity<?> benefitByDateReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+//    @GetMapping("/benefit-by-customer/{branchId}")
+//    public HttpEntity<?> benefitByDateReports(@PathVariable UUID branchId) {
+//        ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 
 
 }
