@@ -94,7 +94,6 @@ public class AttachmentController {
      * @param response
      * @throws IOException
      */
-    @CheckPermission("DOWNLOAD_MEDIA")
     @GetMapping("/download/{id}")
     public void download(@PathVariable UUID id, HttpServletResponse response) throws IOException {
         Optional<Attachment> byId = attachmentRepository.findById(id);
@@ -106,7 +105,6 @@ public class AttachmentController {
                 response.setContentType(attachment.getContentType());
                 response.setHeader("Content-Disposition", attachment.getFileOriginalName() + "/:" + attachment.getSize());
                 FileCopyUtils.copy(attachmentContent.getMainContent(), response.getOutputStream());
-
             }
 
         }
@@ -118,6 +116,7 @@ public class AttachmentController {
      * @param response
      * @throws IOException
      */
+
     @CheckPermission("DOWNLOAD_MEDIA")
     @GetMapping("/downloadWithName")
     public void downloadWithName(@RequestBody String name, HttpServletResponse response) throws IOException {
