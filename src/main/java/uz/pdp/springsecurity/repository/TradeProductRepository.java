@@ -22,6 +22,10 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   List<TradeProduct> findAllByProduct_BranchId(UUID product_branch_id);
   List<TradeProduct> findAllByTrade_CustomerId(UUID customerId);
   List<TradeProduct> findAllByTrade_PayDate(Date date);
+//  @Query(
+//          value = "select * from (SELECT * FROM TradeProduct tp WHERE u.status = 1)",
+//          nativeQuery = true)
+//  List<TradeProduct> findAllByProduct_BranchId();
   List<TradeProduct> findAllByProduct_Business_IdOrderByTradedQuantity(UUID product_business_id);
 
     TradeProduct findByProduct_Id(UUID key);

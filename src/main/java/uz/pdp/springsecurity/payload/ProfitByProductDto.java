@@ -12,4 +12,5 @@ import java.util.Date;
 public class ProfitByProductDto {
     private String name;
     private double profit;
+    private Date date;
 }
