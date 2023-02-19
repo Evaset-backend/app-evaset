@@ -129,7 +129,6 @@ public class ContentService {
                 }
             }
         }
-
         return new ApiResponse(true, getOneContentProductionDto);
     }
 
