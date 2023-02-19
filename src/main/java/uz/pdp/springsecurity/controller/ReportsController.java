@@ -64,7 +64,7 @@ public class ReportsController {
     }
     @GetMapping("/benefit-by-branch/{branchId}")
     public HttpEntity<?> benefitByBranchReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.benefitAndLostByProductReports(branchId);
+        ApiResponse apiResponse = reportsService.dateBenefitAndLostByProductReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @GetMapping("/benefit-by-category/{branchId}")

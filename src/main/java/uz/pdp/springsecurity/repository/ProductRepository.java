@@ -46,5 +46,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     Optional<Product> findByBarcodeAndBranch_IdAndActiveTrue(String barcode, UUID receivedBranch);
 
     List<Product> findAllByBusiness_IdAndActiveTrue(UUID businessId);
+    List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
 
 }
