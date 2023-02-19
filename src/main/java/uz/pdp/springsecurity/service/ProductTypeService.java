@@ -94,7 +94,7 @@ public class ProductTypeService {
                 optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoId(attachment.getId()));
             }
             productTypeViewDtoList.add(productTypeViewDto);
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
             optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
         }
 

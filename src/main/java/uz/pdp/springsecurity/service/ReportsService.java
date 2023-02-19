@@ -105,19 +105,11 @@ public class ReportsService {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
 
-
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
 
-        Optional<Business> optionalBusiness = businessRepository.findById(optionalBranch.get().getBusiness().getId());
-
-        if (optionalBusiness.isEmpty()) {
-            return new ApiResponse("Business Not Found", false);
-        }
-
-        UUID businessId = optionalBranch.get().getBusiness().getId();
-        List<Product> productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(optionalBranch.get().getId());
 
         if (productList.isEmpty()) {
             return new ApiResponse("No Found Products");

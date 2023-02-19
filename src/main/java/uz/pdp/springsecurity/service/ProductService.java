@@ -425,7 +425,7 @@ public class ProductService {
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
             if (optionalWarehouse.isPresent()) {
                 Warehouse warehouse = optionalWarehouse.get();
                 if (warehouse.getProduct().getId().equals(product.getId())) {
@@ -473,7 +473,7 @@ public class ProductService {
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
             if (optionalWarehouse.isPresent()) {
                 Warehouse warehouse = optionalWarehouse.get();
                 if (warehouse.getProduct().getId().equals(product.getId())) {
@@ -522,7 +522,7 @@ public class ProductService {
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
             if (optionalWarehouse.isPresent()) {
                 Warehouse warehouse = optionalWarehouse.get();
                 if (warehouse.getProduct().getId().equals(product.getId())) {
@@ -557,7 +557,6 @@ public class ProductService {
         ProductViewDto productViewDto = new ProductViewDto();
 
 
-
         List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branch_id);
 
         if (productList.isEmpty()) {
@@ -574,7 +573,7 @@ public class ProductService {
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
 
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
                 if (optionalWarehouse.isPresent()) {
                     Warehouse warehouse = optionalWarehouse.get();
                     if (warehouse.getProduct().getId().equals(product.getId())) {
@@ -668,8 +667,16 @@ public class ProductService {
                 }
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranch_BusinessIdAndProductId(businessId, product.getId());
-                optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
+                List<Warehouse> allByByProductId = warehouseRepository.findAllByProduct_Id(product.getId());
+                if (allByByProductId.isEmpty()) {
+                    productViewDto.setAmount(0);
+                } else {
+                    double totalAmount = 0;
+                    for (Warehouse warehouse : allByByProductId) {
+                        totalAmount += warehouse.getAmount();
+                    }
+                    productViewDto.setAmount(totalAmount);
+                }
                 productViewDtoList.add(productViewDto);
             }
             return new ApiResponse("FOUND", true, productViewDtoList);
@@ -680,7 +687,7 @@ public class ProductService {
         List<ProductViewDto> productViewDtoList = new ArrayList<>();
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
 
-        if (optionalBranch.isEmpty()){
+        if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found");
         }
 
