@@ -121,7 +121,7 @@ public class ContentService {
         for (ContentProduct contentProduct : contentProductList) {
             if (contentProduct.getProduct() != null) {
                 UUID productId = contentProduct.getProduct().getId();
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(productId);
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(productId);
                 if (optionalWarehouse.isPresent()) {
                     Warehouse warehouse = optionalWarehouse.get();
                     double amount = warehouse.getAmount();
