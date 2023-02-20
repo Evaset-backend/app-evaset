@@ -7,9 +7,11 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ReportsService {
@@ -47,8 +49,20 @@ public class ReportsService {
     @Autowired
     CustomerRepository customerRepository;
 
-    private final static long LAST_DAY  = 1;
+    private final static Date currentDay = new Date();
+    private final static Timestamp starDate = new Timestamp(currentDay.getTime());
+    private final static Timestamp enDate = new Timestamp(currentDay.getTime());
+    private final static LocalDateTime dateTime = enDate.toLocalDateTime();
+    private final static LocalDateTime LAST_DAY = dateTime.minusDays(1);
+    private final static LocalDateTime LAST_WEEK = dateTime.minusDays(7);
+    private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
+    private final static LocalDateTime THIS_MONTH = dateTime.minusMonths(1);
+    private final static LocalDateTime THIS_YEAR = dateTime.minusMonths(1);
+    private final static LocalDateTime LAST_YEAR = dateTime.minusYears(1);
+    static LocalDate localDate = LocalDate.now();
+    private final static LocalDate getEnDate = localDate.with(DayOfWeek.FRIDAY);
 
+    static Timestamp FRIDAY=new Timestamp(getEnDate.toEpochDay());
     public ApiResponse allProductAmount(UUID branchId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -327,50 +341,7 @@ public class ReportsService {
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount).reversed());
         return new ApiResponse("Found", true,mostSaleProductsDtoList);
     }
-
-//    public ApiResponse benefitAndLostByProductReports(UUID branchId) {
-//
-//        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-//        if (optionalBranch.isEmpty()){
-//            return new ApiResponse("Branch Not Found");
-//        }
-//        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
-//        if (tradeProductList.isEmpty()){
-//            return new ApiResponse("Traded Product Not Found");
-//        }
-//        Map<UUID, Double> productAmount = new HashMap<>();
-//        for (TradeProduct tradeProduct : tradeProductList) {
-//            double amount  = 0;
-//            List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
-//            for (TradeProduct product : allByProductId) {
-//                amount += (product.getProduct().getSalePrice()*product.getTradedQuantity())-(product.getProduct().getBuyPrice()* product.getTradedQuantity());
-//                productAmount.put(product.getProduct().getId(), amount);
-//            }
-//        }
-//        List<ProfitByProductDto> profitByProductDtoList=new ArrayList<>();
-//        for ( Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
-//            ProfitByProductDto profitByProductDto=new ProfitByProductDto();
-//            Optional<Product> optionalProduct = productRepository.findById(entry.getKey());
-//            profitByProductDto.setName(optionalProduct.get().getName());
-//            profitByProductDto.setProfit(entry.getValue());
-//            profitByProductDtoList.add(profitByProductDto);
-//        }
-//        profitByProductDtoList.sort(Comparator.comparing(ProfitByProductDto::getProfit).reversed());
-//
-////        String s = "2014-05-01";
-////        String e = "2014-05-10";
-////        LocalDate start = LocalDate.parse(s);
-////        LocalDate end = LocalDate.parse(e);
-////        List<ProfitByProductDto> productDtoArrayList = new ArrayList<>();
-////        while (!start.isAfter(end)) {
-////            productDtoArrayList.add(start);
-////            start = start.plusDays(1);
-////        }
-//
-//
-//        return new ApiResponse("Found",true,profitByProductDtoList);
-//    }
-    public ApiResponse dateBenefitAndLostByProductReports(UUID branchId) {
+    public ApiResponse dateBenefitAndLostByProductReports(UUID branchId, String date, Date comingStartDate, Date comingEndDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
@@ -382,14 +353,52 @@ public class ReportsService {
         }
         Map<UUID, Double> productAmount = new HashMap<>();
         for (TradeProduct tradeProduct : tradeProductList) {
-            double amount  = 0;
-            Timestamp startDate=new Timestamp(System.currentTimeMillis());
-            Timestamp endDate=new Timestamp(System.currentTimeMillis()-1000000);
+            double amount = 0;
+            if (Objects.equals(date, "LAST_DAY")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_DAY), starDate, tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_WEEK")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_WEEK), starDate, tradeProduct.getProduct().getId());
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_MONTH")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_MONTH), starDate, tradeProduct.getProduct().getId());
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_YEAR")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_YEAR), starDate, tradeProduct.getProduct().getId());
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (comingEndDate != null && comingStartDate != null) {
 
-            List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(endDate,startDate,tradeProduct.getProduct().getId());
-            for (TradeProduct product : allByProductId) {
-                amount += (product.getProduct().getSalePrice()*product.getTradedQuantity())-(product.getProduct().getBuyPrice()* product.getTradedQuantity());
-                productAmount.put(product.getProduct().getId(), amount);
+                Timestamp start = new Timestamp(comingStartDate.getTime());
+                Timestamp end = new Timestamp(comingEndDate.getTime());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(start,end,tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For This Date",false);
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
             }
         }
         List<ProfitByProductDto> profitByProductDtoList=new ArrayList<>();
@@ -404,7 +413,7 @@ public class ReportsService {
 
         return new ApiResponse("Found",true,profitByProductDtoList);
     }
-    public ApiResponse benefitAndLostByCategoryReports(UUID branchId) {
+    public ApiResponse benefitAndLostByCategoryReports(UUID branchId, String date, Date comingStartDate, Date comingEndDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
@@ -417,10 +426,63 @@ public class ReportsService {
         Map<UUID, Double> productAmount = new HashMap<>();
         for (TradeProduct tradeProduct : tradeProductList) {
             double amount  = 0;
-            List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_CategoryId(tradeProduct.getProduct().getCategory().getId());
-            for (TradeProduct product : allByProductId) {
-                amount += (product.getProduct().getSalePrice() * product.getTradedQuantity())-(product.getProduct().getBuyPrice() * product.getTradedQuantity());
-                productAmount.put(product.getProduct().getCategory().getId(), amount);
+            if (Objects.equals(date, "LAST_DAY")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_DAY), starDate, tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_WEEK")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_WEEK), starDate, tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_MONTH")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_MONTH), starDate, tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (Objects.equals(date, "LAST_YEAR")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(LAST_YEAR), starDate, tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else if (comingEndDate != null && comingStartDate != null) {
+
+                Timestamp start = new Timestamp(comingStartDate.getTime());
+                Timestamp end = new Timestamp(comingEndDate.getTime());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(start,end,tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For This Date",false);
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            }else {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+                if (allByProductId.isEmpty()){
+                    return new ApiResponse("Traded Product Not Found For Last Day");
+                }
+                for (TradeProduct product : allByProductId) {
+                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
             }
         }
         List<ProfitByCategoryDto> profitByCategoryDtoList=new ArrayList<>();
