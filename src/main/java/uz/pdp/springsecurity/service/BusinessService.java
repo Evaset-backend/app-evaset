@@ -1,16 +1,21 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.BusinessDto;
+import uz.pdp.springsecurity.mapper.AddressMapper;
+import uz.pdp.springsecurity.mapper.BranchMapper;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BusinessService {
     @Autowired
     BusinessRepository businessRepository;
@@ -30,6 +35,14 @@ public class BusinessService {
     @Autowired
     UserService userService;
 
+    private final BranchRepository branchRepository;
+
+    private final AddressRepository addressRepository;
+
+    private final BranchMapper branchMapper;
+
+    private final AddressMapper addressMapper;
+
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -46,16 +59,31 @@ public class BusinessService {
                 "SO'M",
                 "UZB",
                 business,
-                true
-        ));
-<<<<<<<<< Temporary merge branch 1
-        /**
-         * TODO ADD USER AFTER BUSINESS
-         */
-//        userService.add()
-=========
+                true));
 
->>>>>>>>> Temporary merge branch 2
+        AddressDto addressDto = businessDto.getAddressDto();
+        BranchDto branchDto = businessDto.getBranchDto();
+        UserDto userDto = businessDto.getUserDto();
+
+        Address address = addressRepository.save(addressMapper.toEntity(addressDto));
+
+        branchDto.setAddressId(address.getId());
+        branchDto.setBusinessId(business.getId());
+        Branch branch = branchRepository.save(branchMapper.toEntity(branchDto));
+        List<UUID> branchIds = new ArrayList<>();
+        branchIds.add(branch.getId());
+        userDto.setBranchId(branchIds);
+
+        Optional<Role> optionalRole = roleRepository.findByName("Admin");
+        if (optionalRole.isPresent()) {
+            Role roleAdmin = optionalRole.get();
+            Role role = new Role(roleAdmin.getName(), roleAdmin.getPermissions(), business);
+            Role save = roleRepository.save(role);
+            userDto.setRoleId(save.getId());
+        }
+
+        userService.add(userDto);
+
         return new ApiResponse("ADDED", true);
     }
 

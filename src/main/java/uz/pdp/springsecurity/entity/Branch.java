@@ -29,5 +29,4 @@ public class Branch extends AbsEntity {
     private Business business;
 
     private double percent;
-
 }
