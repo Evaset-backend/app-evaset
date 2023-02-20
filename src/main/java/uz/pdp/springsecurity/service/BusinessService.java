@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Permissions;
@@ -117,18 +118,19 @@ public class BusinessService {
         return new ApiResponse("FOUND", true, businessRepository.findById(id).get());
     }
 
-    public ApiResponse getAll() {
-        return new ApiResponse("FOUND", true, businessRepository.findAll());
+    public ApiResponse getAllSubscription() {
+        List<Subscription> subscriptionList = subscriptionRepository.findAll();
+        if (subscriptionList.isEmpty())return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, subscriptionList);
     }
 
-    public ApiResponse deleteOne(UUID id) {
+    /*public ApiResponse getAllBusinessmen() {
+        userRepository.findAllByRole_Id();
+        if (businessList.isEmpty())return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, businessList);
+    }*/
 
-        for (User user : userRepository.findAllByBusiness_Id(id)) {
-            userRepository.deleteById(user.getId());
-        }
-        for (Role role : roleRepository.findAllByBusiness_Id(id)) {
-            roleRepository.deleteById(role.getId());
-        }
+    public ApiResponse deleteOne(UUID id) {
 
         if (!businessRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         businessRepository.deleteById(id);

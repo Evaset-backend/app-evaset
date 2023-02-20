@@ -46,6 +46,7 @@ public class User extends AbsEntity implements UserDetails {
     private Role role;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
     @ManyToMany
