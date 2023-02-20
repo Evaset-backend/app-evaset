@@ -59,17 +59,24 @@ public class BusinessController {
     }
 
     /**
-     * HAMMA BUSINESSLARNI  OLIB CHIQISH
      *
-     * @param id
-     * @return ApiResponse(success - > true object - > value)
+     * @return
      */
     @CheckPermission("VIEW_BUSINESS")
     @GetMapping
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = businessService.getAll();
+    public HttpEntity<?> getAllSubscription() {
+        ApiResponse apiResponse = businessService.getAllSubscription();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+    /**
+     * todo
+     */
+    /*@CheckPermission("VIEW_BUSINESS")
+    @GetMapping
+    public HttpEntity<?> getAllBusinessmen() {
+        ApiResponse apiResponse = businessService.getAllBusinessmen();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }*/
 
     /**
      * ID ORQALI O'CHIRISH
@@ -83,7 +90,4 @@ public class BusinessController {
         ApiResponse apiResponse = businessService.deleteOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
-
 }
