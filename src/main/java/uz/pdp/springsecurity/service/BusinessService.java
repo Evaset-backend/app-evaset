@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BusinessDto;
+import uz.pdp.springsecurity.payload.UserDto;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.Optional;
@@ -48,6 +49,7 @@ public class BusinessService {
                 business,
                 true
         ));
+
         /**
          * TODO ADD USER AFTER BUSINESS
          */

@@ -18,4 +18,6 @@ public class BusinessDto {
     private UUID tariffId;
 
     private boolean isActive;
+
+    private UserDto userDto;
 }

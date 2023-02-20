@@ -83,4 +83,7 @@ public class BusinessController {
         ApiResponse apiResponse = businessService.deleteOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+
+
 }
