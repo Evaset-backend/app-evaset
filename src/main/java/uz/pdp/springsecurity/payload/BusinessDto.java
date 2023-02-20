@@ -20,4 +20,8 @@ public class BusinessDto {
     private boolean isActive;
 
     private UserDto userDto;
+
+    private BranchDto branchDto;
+
+    private AddressDto addressDto;
 }
