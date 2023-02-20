@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +55,7 @@ public class BusinessService {
         UUID tariffId = businessDto.getTariffId();
         Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
         optionalTariff.ifPresent(business::setTariff);
-        business.setActive(businessDto.isActive());
+        business.setActive(false);
         business = businessRepository.save(business);
         Currency currencyUZB = currencyRepository.save(new Currency(
                 "SO'M",
@@ -74,13 +76,15 @@ public class BusinessService {
         branchIds.add(branch.getId());
         userDto.setBranchId(branchIds);
 
-        Optional<Role> optionalRole = roleRepository.findByName("Admin");
-        if (optionalRole.isPresent()) {
-            Role roleAdmin = optionalRole.get();
-            Role role = new Role(roleAdmin.getName(), roleAdmin.getPermissions(), business);
-            Role save = roleRepository.save(role);
-            userDto.setRoleId(save.getId());
+
+        Optional<Role> optionalAdmin = roleRepository.findByName("Admin");
+        if (optionalAdmin.isPresent()) {
+            Role role = optionalAdmin.get();
+            role.setBusiness(business);
+            roleRepository.save(role);
+            userDto.setRoleId(role.getId());
         }
+        userDto.setBusinessId(business.getId());
 
         userService.add(userDto);
 
