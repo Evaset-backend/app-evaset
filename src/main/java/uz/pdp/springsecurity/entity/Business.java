@@ -26,12 +26,5 @@ public class Business extends AbsEntity {
 
     private String description;
 
-    @ManyToOne
-    private Tariff tariff;
-
-    private Timestamp startDay;
-
-    private Timestamp endDay;
-
     private boolean isActive;
 }

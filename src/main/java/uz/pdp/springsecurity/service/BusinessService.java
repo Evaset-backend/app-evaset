@@ -43,6 +43,8 @@ public class BusinessService {
 
     private final AddressMapper addressMapper;
 
+    private final SubscriptionRepository subscriptionRepository;
+
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -52,7 +54,6 @@ public class BusinessService {
         business.setDescription(businessDto.getDescription());
         UUID tariffId = businessDto.getTariffId();
         Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
-        optionalTariff.ifPresent(business::setTariff);
         business.setActive(businessDto.isActive());
         business = businessRepository.save(business);
         Currency currencyUZB = currencyRepository.save(new Currency(
@@ -60,6 +61,14 @@ public class BusinessService {
                 "UZB",
                 business,
                 true));
+
+        Subscription subscription = new Subscription();
+
+        subscription.setBusiness(business);
+        optionalTariff.ifPresent(subscription::setTariff);
+        subscription.setActive(false);
+        subscriptionRepository.save(subscription);
+
 
         AddressDto addressDto = businessDto.getAddressDto();
         BranchDto branchDto = businessDto.getBranchDto();
@@ -97,9 +106,6 @@ public class BusinessService {
         Business business = optionalBusiness.get();
         business.setName(businessDto.getName());
         business.setDescription(businessDto.getDescription());
-        UUID tariffId = businessDto.getTariffId();
-        Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
-        optionalTariff.ifPresent(business::setTariff);
         business.setActive(businessDto.isActive());
 
         businessRepository.save(business);

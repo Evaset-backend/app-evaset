@@ -6,10 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
+import uz.pdp.springsecurity.enums.StatusTariff;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 @EqualsAndHashCode(callSuper = true)
@@ -18,7 +17,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
-public class BusinessTariff extends AbsEntity {
+public class Subscription extends AbsEntity {
 
     @ManyToOne
     private Business business;
@@ -30,5 +29,8 @@ public class BusinessTariff extends AbsEntity {
 
     private Timestamp endDay;
 
-    private String StatusTariff;
+    @Enumerated(EnumType.STRING)
+    private StatusTariff StatusTariff;
+
+    private boolean isActive;
 }

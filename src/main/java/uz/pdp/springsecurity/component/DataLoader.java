@@ -1,23 +1,20 @@
 package uz.pdp.springsecurity.component;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.entity.Currency;
+import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.enums.ExchangeStatusName.*;
-import uz.pdp.springsecurity.enums.Lifetime;
-import uz.pdp.springsecurity.enums.Permissions;
-import uz.pdp.springsecurity.enums.StatusName;
-import uz.pdp.springsecurity.enums.SuperAdmin;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static uz.pdp.springsecurity.enums.ExchangeStatusName.*;
 import static uz.pdp.springsecurity.enums.Permissions.*;
@@ -68,6 +65,9 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     TariffRepository tariffRepository;
 
+    @Autowired
+    SubscriptionRepository subscriptionRepository;
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
@@ -93,7 +93,7 @@ public class DataLoader implements CommandLineRunner {
                     true,
                     false
             );
-            saveTariff = tariffRepository.save(tariff);
+            tariffRepository.save(tariff);
         }
 
         List<Business> allBusiness = businessRepository.findAll();
@@ -102,9 +102,25 @@ public class DataLoader implements CommandLineRunner {
             business = new Business();
             business.setDescription("Test Uchun");
             business.setName("Application");
-            business.setTariff(saveTariff);
             business.setActive(true);
             businessRepository.save(business);
+        }
+
+        List<Subscription> subscriptionList = subscriptionRepository.findAllByBusinessIdAndActiveTrue(business.getId());
+        if (subscriptionList.isEmpty()) {
+            Timestamp startDay = new Timestamp(System.currentTimeMillis());
+            Long oneMonth = 1000 * 60 * 60 * 24 * 30L;
+            Timestamp endDay = new Timestamp(System.currentTimeMillis() + oneMonth);
+
+            Subscription subscription = new Subscription(
+                    business,
+                    tariff,
+                    startDay,
+                    endDay,
+                    StatusTariff.CONFIRMED,
+                    true
+            );
+            subscriptionRepository.save(subscription);
         }
 //------------------------------------------------------------------------------------------//
         List<Address> addresses = addressRepository.findAll();
