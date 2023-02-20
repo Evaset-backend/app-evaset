@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.payload.*;
@@ -66,7 +67,7 @@ public class BusinessService {
 
         subscription.setBusiness(business);
         optionalTariff.ifPresent(subscription::setTariff);
-        subscription.setActive(false);
+        subscription.setActive(true);
         subscriptionRepository.save(subscription);
 
 
@@ -86,10 +87,9 @@ public class BusinessService {
         Optional<Role> optionalRole = roleRepository.findByName("Admin");
         if (optionalRole.isPresent()) {
             Role roleAdmin = optionalRole.get();
-            Role role = new Role(roleAdmin.getName(), roleAdmin.getPermissions(), business);
-            Role save = roleRepository.save(role);
-            userDto.setRoleId(save.getId());
+            userDto.setRoleId(roleAdmin.getId());
         }
+        userDto.setBusinessId(business.getId());
 
         userService.add(userDto);
 
