@@ -101,24 +101,26 @@ public class DataLoader implements CommandLineRunner {
             business.setDescription("Test Uchun");
             business.setName("Application");
             business.setActive(true);
-            businessRepository.save(business);
+            business = businessRepository.save(business);
         }
 
-        Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
-        if (subscriptionOptional.isEmpty()) {
-            Timestamp startDay = new Timestamp(System.currentTimeMillis());
-            Long oneMonth = 1000 * 60 * 60 * 24 * 30L;
-            Timestamp endDay = new Timestamp(System.currentTimeMillis() + oneMonth);
+        if (business!=null){
+            Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+            if (subscriptionOptional.isEmpty()) {
+                Timestamp startDay = new Timestamp(System.currentTimeMillis());
+                Long oneMonth = 1000 * 60 * 60 * 24 * 30L;
+                Timestamp endDay = new Timestamp(System.currentTimeMillis() + oneMonth);
 
-            Subscription subscription = new Subscription(
-                    business,
-                    tariff,
-                    startDay,
-                    endDay,
-                    StatusTariff.CONFIRMED,
-                    true
-            );
-            subscriptionRepository.save(subscription);
+                Subscription subscription = new Subscription(
+                        business,
+                        tariff,
+                        startDay,
+                        endDay,
+                        StatusTariff.CONFIRMED,
+                        true
+                );
+                subscriptionRepository.save(subscription);
+            }
         }
 //------------------------------------------------------------------------------------------//
         List<Address> addresses = addressRepository.findAll();
