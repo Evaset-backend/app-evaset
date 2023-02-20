@@ -28,6 +28,9 @@ public class BusinessService {
     @Autowired
     TariffRepository tariffRepository;
 
+    @Autowired
+    UserService userService;
+
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -47,6 +50,10 @@ public class BusinessService {
                 true
         ));
 
+        /**
+         * TODO ADD USER AFTER BUSINESS
+         */
+//        userService.add()
         return new ApiResponse("ADDED", true);
     }
 
