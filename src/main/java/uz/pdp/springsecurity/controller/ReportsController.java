@@ -80,13 +80,19 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @GetMapping("/benefit-by-brand/{branchId}")
-    public HttpEntity<?> benefitByBrandReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.benefitAndLostByBrandReports(branchId);
+    public HttpEntity<?> benefitByBrandReports(@PathVariable UUID branchId,
+                                               @RequestParam(required = false) String date,
+                                               @RequestParam(required = false) Date startDate,
+                                               @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.benefitAndLostByBrandReports(branchId,date,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @GetMapping("/benefit-by-customer/{branchId}")
-    public HttpEntity<?> benefitByCustomerReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId);
+    public HttpEntity<?> benefitByCustomerReports(@PathVariable UUID branchId,
+                                                  @RequestParam(required = false) String date,
+                                                  @RequestParam(required = false) Date startDate,
+                                                  @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId,date,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @GetMapping("/benefit-by-one-date/{branchId}")
