@@ -27,4 +27,6 @@ public class Business extends AbsEntity {
     private String description;
 
     private boolean isActive;
+
+    private boolean delete;
 }
