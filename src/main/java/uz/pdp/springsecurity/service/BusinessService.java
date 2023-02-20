@@ -27,6 +27,9 @@ public class BusinessService {
     @Autowired
     TariffRepository tariffRepository;
 
+    @Autowired
+    UserService userService;
+
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -45,11 +48,14 @@ public class BusinessService {
                 business,
                 true
         ));
+<<<<<<<<< Temporary merge branch 1
         /**
          * TODO ADD USER AFTER BUSINESS
          */
 //        userService.add()
+=========
 
+>>>>>>>>> Temporary merge branch 2
         return new ApiResponse("ADDED", true);
     }
 
