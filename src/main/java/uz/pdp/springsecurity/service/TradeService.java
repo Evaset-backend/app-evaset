@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class TradeService {
     @Autowired
     TradeRepository tradeRepository;
@@ -67,6 +69,8 @@ public class TradeService {
     @Autowired
     WarehouseRepository warehouseRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
         UUID branchId = tradeDTO.getBranchId();
@@ -80,7 +84,15 @@ public class TradeService {
         List<Trade> allTrade = tradeRepository.findAllByBranch_BusinessId(business.getId());
         int size = allTrade.size();
 
-        if (business.getTariff().getTradeAmount() >= size || business.getTariff().getTradeAmount() == 0) {
+
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+        if (optionalSubscription.isEmpty()) {
+            return new ApiResponse("tariff aktiv emas", false);
+        }
+
+        Subscription subscription = optionalSubscription.get();
+
+        if (subscription.getTariff().getTradeAmount() >= size || subscription.getTariff().getTradeAmount() == 0) {
             Trade trade = new Trade();
             return createOrEditTrade(trade, tradeDTO);
         }

@@ -32,5 +32,5 @@ public class Subscription extends AbsEntity {
     @Enumerated(EnumType.STRING)
     private StatusTariff StatusTariff;
 
-    private boolean isActive;
+    private boolean active;
 }

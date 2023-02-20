@@ -57,6 +57,8 @@ public class ProductService {
     private final RoleRepository roleRepository;
     private final ProductTypeRepository productTypeRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
 
     public ApiResponse addProduct(@Valid ProductDto productDto) throws ParseException {
         UUID businessId = productDto.getBusinessId();
@@ -70,7 +72,15 @@ public class ProductService {
         List<Product> allProduct = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
         int size = allProduct.size();
 
-        if (business.getTariff().getProductAmount() >= size || business.getTariff().getProductAmount() == 0) {
+
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+        if (optionalSubscription.isEmpty()) {
+            return new ApiResponse("tariff aktiv emas", false);
+        }
+
+        Subscription subscription = optionalSubscription.get();
+
+        if (subscription.getTariff().getProductAmount() >= size || subscription.getTariff().getProductAmount() == 0) {
 
             for (UUID integer : productDto.getBranchId()) {
                 Optional<Product> optionalProduct = productRepository.findAllByBarcodeAndBranchIdAndActiveTrue(productDto.getBarcode(), integer);

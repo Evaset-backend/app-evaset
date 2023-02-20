@@ -1,21 +1,25 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Brand;
 import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.Subscription;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BrandDto;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BrandRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
+import uz.pdp.springsecurity.repository.SubscriptionRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BrandService {
 
     @Autowired
@@ -25,6 +29,8 @@ public class BrandService {
     BusinessRepository businessRepository;
     @Autowired
     private BranchRepository branchRepository;
+
+    private final SubscriptionRepository subscriptionRepository;
 
     public ApiResponse addBrand(BrandDto brandDto) {
         Brand brand = new Brand();
@@ -37,7 +43,15 @@ public class BrandService {
         List<Branch> branchList = branchRepository.findAllByBusiness_Id(business.getId());
         int size = branchList.size();
 
-        if (business.getTariff().getBranchAmount() >= size || business.getTariff().getBranchAmount() == 0) {
+
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+        if (optionalSubscription.isEmpty()) {
+            return new ApiResponse("tariff aktiv emas", false);
+        }
+
+        Subscription subscription = optionalSubscription.get();
+
+        if (subscription.getTariff().getBranchAmount() >= size || subscription.getTariff().getBranchAmount() == 0) {
             brand.setName(brandDto.getName());
             brandRepository.save(brand);
             return new ApiResponse("ADDED", true);

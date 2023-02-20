@@ -1,6 +1,5 @@
 package uz.pdp.springsecurity.component;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
-import uz.pdp.springsecurity.enums.ExchangeStatusName.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
@@ -106,8 +104,8 @@ public class DataLoader implements CommandLineRunner {
             businessRepository.save(business);
         }
 
-        List<Subscription> subscriptionList = subscriptionRepository.findAllByBusinessIdAndActiveTrue(business.getId());
-        if (subscriptionList.isEmpty()) {
+        Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+        if (subscriptionOptional.isEmpty()) {
             Timestamp startDay = new Timestamp(System.currentTimeMillis());
             Long oneMonth = 1000 * 60 * 60 * 24 * 30L;
             Timestamp endDay = new Timestamp(System.currentTimeMillis() + oneMonth);

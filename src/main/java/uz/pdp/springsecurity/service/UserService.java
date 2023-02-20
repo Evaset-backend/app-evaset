@@ -1,22 +1,19 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
-import uz.pdp.springsecurity.repository.AttachmentRepository;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
+import uz.pdp.springsecurity.repository.*;
 
-import javax.validation.Valid;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     @Autowired
@@ -37,6 +34,8 @@ public class UserService {
     @Autowired
     AttachmentRepository attachmentRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
     public ApiResponse add(UserDto userDto) {
         UUID businessId = userDto.getBusinessId();
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
@@ -45,10 +44,18 @@ public class UserService {
         }
         Business business = optionalBusiness.get();
 
+
         List<User> allUser = userRepository.findAllByBusiness_Id(businessId);
         int size = allUser.size();
 
-        if (business.getTariff().getEmployeeAmount() >= size || business.getTariff().getEmployeeAmount() == 0) {
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+        if (optionalSubscription.isEmpty()) {
+            return new ApiResponse("tariff aktiv emas", false);
+        }
+
+        Subscription subscription = optionalSubscription.get();
+
+        if (subscription.getTariff().getEmployeeAmount() >= size || subscription.getTariff().getEmployeeAmount() == 0) {
 
             boolean b = userRepository.existsByUsername(userDto.getUsername());
             if (b) return new ApiResponse("USER ALREADY EXISTS", false);
