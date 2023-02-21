@@ -132,7 +132,7 @@ public class BusinessService {
         return new ApiResponse("FOUND", true, subscriptionList);
     }
 
-    public ApiResponse getAllBusinessmen() {
+    public ApiResponse getAllPartners() {
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
         if (optionalRole.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Role superAdmin = optionalRole.get();
@@ -141,7 +141,7 @@ public class BusinessService {
         if (optionalAdmin.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Role admin = optionalAdmin.get();
 
-        List<User> userList = userRepository.findAllByRole_Id(admin.getId());
+        List<User> userList = userRepository.findAllByRole_IdAndBusiness_Delete(admin.getId(), false);
         if (userList.isEmpty())return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, userList);
     }
