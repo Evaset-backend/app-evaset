@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.enums;
 
 public enum Permissions {
+
     ADD_BUSINESS,
     EDIT_BUSINESS,
     VIEW_BUSINESS,
@@ -62,7 +63,6 @@ public enum Permissions {
     ADD_PRODUCT,
     EDIT_PRODUCT,
     VIEW_PRODUCT,
-
     VIEW_PRODUCT_ADMIN,
     DELETE_PRODUCT,
 

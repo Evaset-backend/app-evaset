@@ -153,6 +153,7 @@ public class BusinessService {
         }
         Business business = optionalBusiness.get();
         business.setDelete(true);
+        business.setActive(false);
         businessRepository.save(business);
         return new ApiResponse("DELETED", true);
     }
