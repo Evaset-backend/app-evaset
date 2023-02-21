@@ -132,7 +132,6 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-
         List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(optionalBranch.get().getId());
 
         if (productList.isEmpty()) {
@@ -144,19 +143,17 @@ public class ReportsService {
         Amount amounts = new Amount();
         for (Product product : productList) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(product.getId(),optionalBranch.get().getId());
-            if (optionalWarehouse.isEmpty()) {
-                return new ApiResponse("No Found Product Amount");
+            if (optionalWarehouse.isPresent()) {
+                double amount = optionalWarehouse.get().getAmount();
+                double salePrice = product.getSalePrice();
+                double buyPrice = product.getBuyPrice();
+
+                totalSumBySalePrice += amount * salePrice;
+                totalSumByBuyPrice += amount * buyPrice;
+                amounts.setTotalSumBySalePrice(totalSumBySalePrice);
+                amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
             }
-            Warehouse warehouse = optionalWarehouse.get();
 
-            double amount = warehouse.getAmount();
-            double salePrice = product.getSalePrice();
-            double buyPrice = product.getBuyPrice();
-
-            totalSumBySalePrice += amount * salePrice;
-            totalSumByBuyPrice += amount * buyPrice;
-            amounts.setTotalSumBySalePrice(totalSumBySalePrice);
-            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
         }
 
         return new ApiResponse("Business Products Amount", true, amounts);
