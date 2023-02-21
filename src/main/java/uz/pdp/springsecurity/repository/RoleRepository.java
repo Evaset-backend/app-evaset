@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RoleRepository extends JpaRepository<Role, UUID> {
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCaseAndBusinessId(String name, UUID businessId);
+    boolean existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(String name, UUID businessId,UUID id);
 
 
     Optional<Role> findByName(String name);

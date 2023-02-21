@@ -23,32 +23,44 @@ public class RoleService {
     BusinessRepository businessRepository;
 
     public ApiResponse add(RoleDto roleDto) {
-        boolean b = roleRepository.existsByName(roleDto.getName());
+        // admin role is unique for each business, users can not add admin
+        boolean b = roleRepository.existsByNameIgnoreCase("Admin");
         if (b) return new ApiResponse("ROLE ALREADY EXISTS", false);
+
+        Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
+        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
+
+        boolean exists = roleRepository.existsByNameIgnoreCaseAndBusinessId(roleDto.getName(), roleDto.getBusinessId());
+        if (exists) return new ApiResponse("ROLE ALREADY EXISTS", false);
         Role role = new Role();
         role.setName(roleDto.getName());
         role.setPermissions(roleDto.getPermissions());
         role.setDescription(roleDto.getDescription());
-
-        Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
-        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         role.setBusiness(optionalBusiness.get());
+
 
         roleRepository.save(role);
         return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse edit(UUID id, RoleDto roleDto) {
+        // admin role is unique for each business, users can not add admin
+        boolean b = roleRepository.existsByNameIgnoreCase("Admin");
+        if (b) return new ApiResponse("ROLE ALREADY EXISTS", false);
+
+        Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
+        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
+
         Optional<Role> optionalRole = roleRepository.findById(id);
-        if (optionalRole.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
+        if (optionalRole.isEmpty()) return new ApiResponse("ROLE NOT FOUND", false);
+
+        boolean exist = roleRepository.existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(roleDto.getName(), roleDto.getBusinessId(), id);
+        if (exist) return new ApiResponse("ROLE ALREADY EXISTS", false);
 
         Role role = optionalRole.get();
         role.setName(roleDto.getName());
         role.setPermissions(roleDto.getPermissions());
         role.setDescription(roleDto.getDescription());
-
-        Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
-        if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         role.setBusiness(optionalBusiness.get());
 
         roleRepository.save(role);
