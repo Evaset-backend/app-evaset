@@ -23,10 +23,6 @@ public class RoleService {
     BusinessRepository businessRepository;
 
     public ApiResponse add(RoleDto roleDto) {
-        // admin role is unique for each business, users can not add admin
-        boolean b = roleRepository.existsByNameIgnoreCase("Admin");
-        if (b) return new ApiResponse("ROLE ALREADY EXISTS", false);
-
         Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
 
@@ -44,9 +40,6 @@ public class RoleService {
     }
 
     public ApiResponse edit(UUID id, RoleDto roleDto) {
-        // admin role is unique for each business, users can not add admin
-        boolean b = roleRepository.existsByNameIgnoreCase("Admin");
-        if (b) return new ApiResponse("ROLE ALREADY EXISTS", false);
 
         Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);

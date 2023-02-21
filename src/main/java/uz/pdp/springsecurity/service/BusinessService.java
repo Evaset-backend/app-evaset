@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.mapper.BusinessMapper;
@@ -132,7 +133,7 @@ public class BusinessService {
         return new ApiResponse("FOUND", true, subscriptionList);
     }
 
-    public ApiResponse getAllBusinessmen() {
+    public ApiResponse getAllPartners() {
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
         if (optionalRole.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Role superAdmin = optionalRole.get();
@@ -141,7 +142,7 @@ public class BusinessService {
         if (optionalAdmin.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Role admin = optionalAdmin.get();
 
-        List<User> userList = userRepository.findAllByRole_Id(admin.getId());
+        List<User> userList = userRepository.findAllByRole_IdAndBusiness_Delete(admin.getId(), false);
         if (userList.isEmpty())return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, userList);
     }
@@ -161,5 +162,32 @@ public class BusinessService {
     public ApiResponse getAll() {
         List<Business> all = businessRepository.findAllByDeleteIsFalse();
         return new ApiResponse("all business", true, businessMapper.toDtoList(all));
+    }
+
+    public ApiResponse deActive(UUID businessId) {
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty())new ApiResponse("not found business", false);
+        Business business = optionalBusiness.get();
+        business.setActive(!business.isActive());
+        businessRepository.save(business);
+        return new ApiResponse("SUCCESS", true);
+    }
+
+    public ApiResponse confirmSubscription(UUID subscriptionId, String statusTariff) {
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findById(subscriptionId);
+        if (optionalSubscription.isPresent())new ApiResponse("not found subscription", false);
+        Subscription subscription = optionalSubscription.get();
+        if (statusTariff.equalsIgnoreCase(StatusTariff.CONFIRMED.name())) {
+            subscription.setStatusTariff(StatusTariff.CONFIRMED);
+            return new ApiResponse("SUCCESS", true);
+        } else if (statusTariff.equalsIgnoreCase(StatusTariff.REJECTED.name())) {
+            subscription.setStatusTariff(StatusTariff.REJECTED);
+            return new ApiResponse("SUCCESS", true);
+        } else if (statusTariff.equalsIgnoreCase(StatusTariff.WAITING.name())) {
+            subscription.setStatusTariff(StatusTariff.WAITING);
+            return new ApiResponse("SUCCESS", true);
+        }
+
+        return new ApiResponse("wrong statusTariff", false);
     }
 }

@@ -20,6 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsernameAndIdNot(String userName, UUID id);
 
     List<User> findAllByRole_Id(UUID role_id);
+    List<User> findAllByRole_IdAndBusiness_Delete(UUID role_id, boolean delete);
 
 
     List<User> findAllByBusiness_Id(UUID business_id);
