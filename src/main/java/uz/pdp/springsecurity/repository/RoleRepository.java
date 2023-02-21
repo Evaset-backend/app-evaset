@@ -15,6 +15,8 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
 
     Optional<Role> findByName(String name);
 
+    Optional<Role> findByNameAndBusinessId(String name, UUID businessId);
+
     List<Role> findAllByBusiness_Id(UUID business_id);
 
     void deleteAllByBusiness_Id(UUID id);
