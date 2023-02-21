@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjuster;
 import java.util.*;
 
 @Service
@@ -55,13 +56,12 @@ public class ReportsService {
     private final static LocalDateTime LAST_DAY = dateTime.minusDays(1);
     private final static LocalDateTime LAST_WEEK = dateTime.minusDays(7);
     private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
-    private final static LocalDateTime THIS_MONTH = dateTime.minusMonths(1);
     private final static LocalDateTime THIS_YEAR = dateTime.minusMonths(1);
     private final static LocalDateTime LAST_YEAR = dateTime.minusYears(1);
-    static LocalDate localDate = LocalDate.now();
-    private final static LocalDate getEnDate = localDate.with(DayOfWeek.FRIDAY);
+    private final static LocalDate localDate = LocalDate.now();
+    private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
+    private final static LocalDate getEnDate = localDate.withDayOfMonth(1);
 
-    static Timestamp FRIDAY=new Timestamp(getEnDate.toEpochDay());
     public ApiResponse allProductAmount(UUID branchId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -586,7 +586,8 @@ public class ReportsService {
         }
         List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
         if (tradeProductList.isEmpty()){
-            return new ApiResponse("Traded Product Not Found");
+            System.out.println(getEnDate);
+            return new ApiResponse("Traded Product Not Found",false);
         }
         Map<UUID, Double> productAmount = new HashMap<>();
         for (TradeProduct tradeProduct : tradeProductList) {
@@ -609,8 +610,8 @@ public class ReportsService {
                     amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
                     productAmount.put(product.getProduct().getBrand().getId(), amount);
                 }
-            }else if (Objects.equals(date, "LAST_MONTH")) {
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(Timestamp.valueOf(LAST_MONTH), starDate, tradeProduct.getTrade().getCustomer().getId());
+            }else if (Objects.equals(date, "THIS_MONTH")) {
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(Timestamp.valueOf(THIS_MONTH), starDate, tradeProduct.getTrade().getCustomer().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For Last Day");
                 }
