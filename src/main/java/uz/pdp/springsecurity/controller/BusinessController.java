@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BusinessDto;
+import uz.pdp.springsecurity.payload.BusinessEditDto;
 import uz.pdp.springsecurity.service.BusinessService;
 
 import java.util.UUID;
@@ -35,13 +36,13 @@ public class BusinessController {
      * BUSINESSNI IDSI ORQALI EDIT QILISH
      *
      * @param id
-     * @param businessDto
+     * @param businessEditDto
      * @return ApiResponse(success - > true message - > EDITED)
      */
     @CheckPermission("EDIT_BUSINESS")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody BusinessDto businessDto) {
-        ApiResponse apiResponse = businessService.edit(id, businessDto);
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody BusinessEditDto businessEditDto) {
+        ApiResponse apiResponse = businessService.edit(id, businessEditDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -59,7 +60,6 @@ public class BusinessController {
     }
 
     /**
-     *
      * @return
      */
     @CheckPermission("VIEW_BUSINESS")
@@ -88,6 +88,13 @@ public class BusinessController {
     @DeleteMapping("/{id}")
     public HttpEntity<?> deleteOne(@PathVariable UUID id) {
         ApiResponse apiResponse = businessService.deleteOne(id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_BUSINESS")
+    @GetMapping("/all")
+    public HttpEntity<?> getAll() {
+        ApiResponse apiResponse = businessService.getAll();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

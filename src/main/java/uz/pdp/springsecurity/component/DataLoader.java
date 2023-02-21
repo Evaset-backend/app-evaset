@@ -101,10 +101,11 @@ public class DataLoader implements CommandLineRunner {
             business.setDescription("Test Uchun");
             business.setName("Application");
             business.setActive(true);
+            business.setDelete(false);
             business = businessRepository.save(business);
         }
 
-        if (business!=null){
+        if (business != null) {
             Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
             if (subscriptionOptional.isEmpty()) {
                 Timestamp startDay = new Timestamp(System.currentTimeMillis());
