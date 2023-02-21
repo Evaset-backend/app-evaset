@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.mapper.BusinessMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,11 +132,19 @@ public class BusinessService {
         return new ApiResponse("FOUND", true, subscriptionList);
     }
 
-    /*public ApiResponse getAllBusinessmen() {
-        userRepository.findAllByRole_Id();
-        if (businessList.isEmpty())return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, businessList);
-    }*/
+    public ApiResponse getAllBusinessmen() {
+        Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+        if (optionalRole.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Role superAdmin = optionalRole.get();
+
+        Optional<Role> optionalAdmin = roleRepository.findByNameAndBusinessId(Constants.ADMIN, superAdmin.getBusiness().getId());
+        if (optionalAdmin.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Role admin = optionalAdmin.get();
+
+        List<User> userList = userRepository.findAllByRole_Id(admin.getId());
+        if (userList.isEmpty())return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, userList);
+    }
 
     public ApiResponse deleteOne(UUID id) {
         Optional<Business> optionalBusiness = businessRepository.findById(id);

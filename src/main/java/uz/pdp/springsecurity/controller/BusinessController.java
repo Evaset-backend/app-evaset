@@ -63,20 +63,17 @@ public class BusinessController {
      * @return
      */
     @CheckPermission("VIEW_BUSINESS")
-    @GetMapping
+    @GetMapping("/subscription")
     public HttpEntity<?> getAllSubscription() {
         ApiResponse apiResponse = businessService.getAllSubscription();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    /**
-     * todo
-     */
-    /*@CheckPermission("VIEW_BUSINESS")
-    @GetMapping
+    @CheckPermission("VIEW_BUSINESS")
+    @GetMapping("/businessmen")
     public HttpEntity<?> getAllBusinessmen() {
         ApiResponse apiResponse = businessService.getAllBusinessmen();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
+    }
 
     /**
      * ID ORQALI O'CHIRISH
