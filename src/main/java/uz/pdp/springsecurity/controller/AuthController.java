@@ -1,5 +1,7 @@
 package uz.pdp.springsecurity.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -18,6 +20,7 @@ import uz.pdp.springsecurity.security.JwtProvider;
 import uz.pdp.springsecurity.service.AuthService;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,6 +45,10 @@ public class    AuthController {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
         User principal = (User) authenticate.getPrincipal();
         String token = jwtProvider.generateToken(principal.getUsername(), principal.getRole());
+        DecodedJWT jwt = JWT.decode(token);
+        if (jwt.getExpiresAt().before(new Date())){
+            return ResponseEntity.status(401).body(new ApiResponse("Token is expired"));
+        }
         return ResponseEntity.status(200).body(new ApiResponse(token,true,principal));
     }
 }
