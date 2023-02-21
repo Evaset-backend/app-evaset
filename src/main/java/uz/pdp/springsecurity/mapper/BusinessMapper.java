@@ -12,5 +12,6 @@ public interface BusinessMapper {
 
     BusinessGetDto toDto(Business business);
 
+
     List<BusinessGetDto> toDtoList(List<Business> business);
 }
