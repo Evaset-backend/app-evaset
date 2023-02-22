@@ -49,6 +49,14 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.purchaseReportsByDates(branchId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @GetMapping("/production/by-date/{branchId}")
+    public HttpEntity<?> productionReports(@PathVariable UUID branchId,
+                                                @RequestParam(required = false) Date startDate,
+                                                @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.purchaseReportsByDates(branchId,startDate,endDate);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
     @GetMapping("/purchase/by-date/{branchId}/{supplierId}")
     public HttpEntity<?> purchaseReportsBySupplier(@PathVariable UUID branchId,
                                                    @PathVariable UUID supplierId) {
