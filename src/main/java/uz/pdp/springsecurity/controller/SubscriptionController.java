@@ -40,7 +40,7 @@ public class SubscriptionController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @CheckPermission("ACTIVE_MY_SUBSCRIPTION")
+    @CheckPermission("ACTIVE_MY_SUBSCRIPTION")
     @PutMapping("/active/{subscriptionId}")
     public HttpEntity<?> activeSubscription(@PathVariable UUID subscriptionId) {
         ApiResponse apiResponse = subscriptionService.active(subscriptionId);
