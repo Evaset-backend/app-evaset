@@ -52,12 +52,11 @@ public class ReportsService {
     private final static LocalDateTime dateTime = enDate.toLocalDateTime();
     private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
     private final static LocalDate localDate = LocalDate.now();
-    private final static LocalDate localDate2 = LocalDate.of(localDate.getYear(),localDate.getMonth().getValue()+5,1);
     private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
     private final static LocalDate WEEK_START_DAY = localDate.minusDays(7+localDate.getDayOfWeek().getValue()-1);
     private final static LocalDate WEEK_END_DAY = localDate.minusDays(7+localDate.getDayOfWeek().getValue()-7);
     private final static LocalDate TEMP_START_OF_YEAR = LocalDate.of(localDate.getYear()-1,1,1);
-    private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR= LocalDate.of(localDate.getYear(),1,1);
+    private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR = LocalDate.of(localDate.getYear(),1,1);
     private final static LocalDate TEMP_START_OF_DAY = localDate.minusDays(1);
     private final static LocalDate TEMP_END_OF_DAY = LocalDate.of(localDate.getYear(),localDate.getMonth(),localDate.getDayOfMonth());
     private final static LocalDate TEMP_END_OF_YEAR = LocalDate.of(localDate.getYear()-1,12,31);
