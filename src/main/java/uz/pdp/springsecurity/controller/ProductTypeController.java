@@ -45,14 +45,14 @@ public class ProductTypeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PRODUCT_TYPE_PRODUCT_ID")
+    @CheckPermission("GET_PRODUCT_TYPE")
     @GetMapping("/product_type/{id}")
     public HttpEntity<?> getProductTypeByProductId(@Valid @PathVariable UUID id) {
         ApiResponse apiResponse = service.getProductTypeByProductId(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_BY_PRODUCT_TYPE")
+    @CheckPermission("GET_PRODUCT_TYPE")
     @GetMapping("/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getProductTypeById(id);

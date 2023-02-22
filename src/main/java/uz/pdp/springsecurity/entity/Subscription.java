@@ -36,5 +36,9 @@ public class Subscription extends AbsEntity {
     @Enumerated(EnumType.STRING)
     private PayType payType;
 
+    private boolean activeNewTariff;
+
     private boolean active;
+
+    private boolean delete;
 }
