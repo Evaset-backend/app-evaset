@@ -54,16 +54,16 @@ public class ReportsService {
     private final static LocalDate localDate = LocalDate.now();
     private final static LocalDate localDate2 = LocalDate.of(localDate.getYear(),localDate.getMonth().getValue()+5,1);
     private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
-    private final static LocalDate getEnDate = localDate.withDayOfMonth(1);
     private final static LocalDate WEEK_START_DAY = localDate.minusDays(7+localDate.getDayOfWeek().getValue()-1);
     private final static LocalDate WEEK_END_DAY = localDate.minusDays(7+localDate.getDayOfWeek().getValue()-7);
     private final static LocalDate TEMP_START_OF_YEAR = LocalDate.of(localDate.getYear()-1,1,1);
     private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR= LocalDate.of(localDate.getYear(),1,1);
-    private final static LocalDate TEMP_START_OF_DAY = LocalDate.of(localDate.getYear(),localDate.getMonth(),localDate.getDayOfMonth()-1);
+    private final static LocalDate TEMP_START_OF_DAY = localDate.minusDays(1);
     private final static LocalDate TEMP_END_OF_DAY = LocalDate.of(localDate.getYear(),localDate.getMonth(),localDate.getDayOfMonth());
     private final static LocalDate TEMP_END_OF_YEAR = LocalDate.of(localDate.getYear()-1,12,31);
-    private final static LocalDate TEMP_START_OF_MONTH =LocalDate.of(localDate.getYear(),localDate.getMonth().getValue()-1,1);
-    private final static LocalDate TEMP_END_OF_MONTH =LocalDate.of(localDate.getYear(),localDate.getMonth().getValue()-1, localDate2.lengthOfMonth());
+    private final static LocalDate TEMP_START_OF_MONTH_ONE =LocalDate.of(localDate.getYear(),localDate.getMonth().getValue(),1);
+    private final static LocalDate TEMP_START_OF_MONTH = TEMP_START_OF_MONTH_ONE.minusMonths(1);
+    private final static LocalDate TEMP_END_OF_MONTH = LocalDate.of(localDate.getYear(),TEMP_START_OF_MONTH.getMonth(),TEMP_START_OF_MONTH.lengthOfMonth());
     private final static LocalDateTime START_OF_YEAR = TEMP_START_OF_YEAR.atStartOfDay();
     private final static LocalDateTime START_OF_YEAR_FOR_THIS = TEMP_FOR_THIS_START_OF_YEAR.atStartOfDay();
     private final static LocalDateTime END_OF_YEAR = TEMP_END_OF_YEAR.atStartOfDay();
@@ -138,7 +138,6 @@ public class ReportsService {
         if (productList.isEmpty()) {
             return new ApiResponse("No Found Products");
         }
-
         double totalSumBySalePrice = 0D;
         double totalSumByBuyPrice = 0D;
         Amount amounts = new Amount();
@@ -156,7 +155,6 @@ public class ReportsService {
             }
 
         }
-
         return new ApiResponse("Business Products Amount", true, amounts);
     }
     public ApiResponse mostUnSaleProducts(UUID branchId) {
@@ -510,7 +508,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(start,end,tradeProduct.getProduct().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(end,start,tradeProduct.getProduct().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -623,7 +621,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(start,end,tradeProduct.getProduct().getCategory().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(end,start,tradeProduct.getProduct().getCategory().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -734,7 +732,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BrandId(start,end,tradeProduct.getProduct().getBrand().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BrandId(end,start,tradeProduct.getProduct().getBrand().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -845,7 +843,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(start,end,tradeProduct.getTrade().getCustomer().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(end,start,tradeProduct.getTrade().getCustomer().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
