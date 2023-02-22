@@ -16,4 +16,6 @@ public class SubscriptionPostDto {
     private String statusTariff;
 
     private String payType;
+
+    private boolean activeNewTariff;
 }

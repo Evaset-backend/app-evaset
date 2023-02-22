@@ -19,4 +19,5 @@ public class SubscriptionGetDto {
     private Timestamp endDay;
     private double tariffPrice;
     private String payType;
+    private boolean active;
 }

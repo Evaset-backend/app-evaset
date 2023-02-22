@@ -11,6 +11,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SubscriptionMapper {
 
+    @Mapping(target = "delete", ignore = true)
     @Mapping(target = "business", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "tariff", ignore = true)
@@ -27,8 +28,8 @@ public interface SubscriptionMapper {
     @Mapping(target = "businessName", source = "business.name")
     @Mapping(target = "tariffName", source = "tariff.name")
     @Mapping(target = "tariffPrice", source = "tariff.price")
+    @Mapping(target = "active", source = "active")
     SubscriptionGetDto toDto(Subscription subscription);
-
 
     List<SubscriptionGetDto> toDtoList(List<Subscription> subscriptionList);
 }

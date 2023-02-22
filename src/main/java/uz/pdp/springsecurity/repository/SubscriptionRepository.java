@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
     Optional<Subscription> findByBusinessIdAndActiveTrue(UUID BusinessId);
+
+    List<Subscription> findAllByDeleteIsFalse();
 }

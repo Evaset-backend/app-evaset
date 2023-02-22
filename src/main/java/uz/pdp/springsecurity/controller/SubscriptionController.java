@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,4 +39,13 @@ public class SubscriptionController {
         ApiResponse apiResponse = subscriptionService.confirmSubscription(subscriptionId, statusTariff);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("ACTIVE_MY_SUBSCRIPTION")
+    @PutMapping("/active/{subscriptionId}")
+    public HttpEntity<?> activeSubscription(@PathVariable UUID subscriptionId) {
+        ApiResponse apiResponse = subscriptionService.active(subscriptionId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+
 }
