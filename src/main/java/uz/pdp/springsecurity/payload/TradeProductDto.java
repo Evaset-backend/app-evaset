@@ -16,6 +16,8 @@ public class TradeProductDto {
     //USE FOR SINGLE TYPE// OR NULL
     private UUID productId;
 
+    private String type;
+
     //USE FOR MANY TYPE// OR NULL
     private UUID productTypePriceId;
 
