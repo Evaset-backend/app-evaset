@@ -118,6 +118,7 @@ public class DataLoader implements CommandLineRunner {
                         startDay,
                         endDay,
                         StatusTariff.CONFIRMED,
+                        PayType.OFFLINE,
                         true
                 );
                 subscriptionRepository.save(subscription);

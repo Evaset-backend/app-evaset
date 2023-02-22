@@ -111,7 +111,6 @@ public class BusinessService {
             }
         }
 
-
         Business business = optionalBusiness.get();
         business.setName(businessEditDto.getName());
         business.setDescription(businessEditDto.getDescription());
@@ -127,11 +126,6 @@ public class BusinessService {
         return optionalBusiness.map(business -> new ApiResponse("FOUND", true, business)).orElseGet(() -> new ApiResponse("not found business", false));
     }
 
-    public ApiResponse getAllSubscription() {
-        List<Subscription> subscriptionList = subscriptionRepository.findAll();
-        if (subscriptionList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, subscriptionList);
-    }
 
     public ApiResponse getAllPartners() {
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
@@ -173,21 +167,4 @@ public class BusinessService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse confirmSubscription(UUID subscriptionId, String statusTariff) {
-        Optional<Subscription> optionalSubscription = subscriptionRepository.findById(subscriptionId);
-        if (optionalSubscription.isPresent())new ApiResponse("not found subscription", false);
-        Subscription subscription = optionalSubscription.get();
-        if (statusTariff.equalsIgnoreCase(StatusTariff.CONFIRMED.name())) {
-            subscription.setStatusTariff(StatusTariff.CONFIRMED);
-            return new ApiResponse("SUCCESS", true);
-        } else if (statusTariff.equalsIgnoreCase(StatusTariff.REJECTED.name())) {
-            subscription.setStatusTariff(StatusTariff.REJECTED);
-            return new ApiResponse("SUCCESS", true);
-        } else if (statusTariff.equalsIgnoreCase(StatusTariff.WAITING.name())) {
-            subscription.setStatusTariff(StatusTariff.WAITING);
-            return new ApiResponse("SUCCESS", true);
-        }
-
-        return new ApiResponse("wrong statusTariff", false);
-    }
 }
