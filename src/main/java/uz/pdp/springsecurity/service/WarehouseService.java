@@ -120,7 +120,7 @@ public class WarehouseService {
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), combo.getContentProduct().getId());
                 if (optionalWarehouse.isEmpty())continue;
                 Warehouse warehouse = optionalWarehouse.get();
-                warehouse.setAmount(warehouse.getAmount() - amount * combo.getAmount());
+                warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
                 warehouseRepository.save(warehouse);
             }
             tradeProduct.setProduct(optionalProduct.get());
