@@ -44,47 +44,61 @@ public class SubscriptionService {
         Subscription subscription = optionalSubscription.get();
         Lifetime lifetime = subscription.getTariff().getLifetime();
         int interval = subscription.getTariff().getInterval();
+
+        boolean b = false;
+        b = statusTariff.startsWith("\"");
+        b = statusTariff.endsWith("\"");
+        if (b) {
+            statusTariff = statusTariff.substring(1, statusTariff.length() - 1);
+        }
+
         if (statusTariff.equalsIgnoreCase(StatusTariff.CONFIRMED.name())) {
             Optional<Subscription> optional = repository.findByBusinessIdAndActiveTrue(subscription.getBusiness().getId());
-            if (subscription.isActiveNewTariff()) {
-                if (optional.isPresent()) {
-                    Subscription oldSubscription = optional.get();
-                    oldSubscription.setActive(false);
-                    oldSubscription.setDelete(true);
-                    repository.save(oldSubscription);
-                }
-                if (lifetime.equals(Lifetime.MONTH)) {
-                    LocalDate date = LocalDate.now().plusMonths(interval);
-                    Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
-                    subscription.setEndDay(timestamp);
-                } else if (lifetime.equals(Lifetime.YEAR)) {
-                    LocalDate date = LocalDate.now().plusYears(interval);
-                    Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
-                    subscription.setEndDay(timestamp);
-                }
-                subscription.setStartDay(new Timestamp(System.currentTimeMillis()));
-                subscription.setStatusTariff(StatusTariff.CONFIRMED);
-                subscription.setActiveNewTariff(false);
-                subscription.setActive(true);
-            } else {
-                if (optional.isPresent()) {
-                    Subscription subscriptionBusiness = optional.get();
-                    Timestamp activeTariffEndDay = subscriptionBusiness.getEndDay();
-
+            if (!subscription.getStatusTariff().equals(StatusTariff.REJECTED) && subscription.getStatusTariff().equals(StatusTariff.WAITING)) {
+                if (subscription.isActiveNewTariff()) {
+                    if (optional.isPresent()) {
+                        Subscription oldSubscription = optional.get();
+                        oldSubscription.setActive(false);
+                        oldSubscription.setDelete(true);
+                        repository.save(oldSubscription);
+                    }
                     if (lifetime.equals(Lifetime.MONTH)) {
-                        LocalDate localDate = activeTariffEndDay.toLocalDateTime().toLocalDate().plusMonths(interval);
-                        Timestamp timestamp = Timestamp.valueOf(localDate.atStartOfDay());
+                        LocalDate date = LocalDate.now().plusMonths(interval);
+                        Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
                         subscription.setEndDay(timestamp);
                     } else if (lifetime.equals(Lifetime.YEAR)) {
-                        LocalDate localDate = activeTariffEndDay.toLocalDateTime().toLocalDate().plusYears(interval);
-                        Timestamp timestamp = Timestamp.valueOf(localDate.atStartOfDay());
+                        LocalDate date = LocalDate.now().plusYears(interval);
+                        Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
                         subscription.setEndDay(timestamp);
                     }
-                    subscription.setStartDay(activeTariffEndDay);
+                    subscription.setStartDay(new Timestamp(System.currentTimeMillis()));
                     subscription.setStatusTariff(StatusTariff.CONFIRMED);
-                    subscription.setActive(false);
+                    subscription.setActiveNewTariff(false);
+                    subscription.setActive(true);
+                } else {
+                    if (optional.isPresent()) {
+                        Subscription subscriptionBusiness = optional.get();
+                        Timestamp activeTariffEndDay = subscriptionBusiness.getEndDay();
+
+                        if (lifetime.equals(Lifetime.MONTH)) {
+                            LocalDate localDate = activeTariffEndDay.toLocalDateTime().toLocalDate().plusMonths(interval);
+                            Timestamp timestamp = Timestamp.valueOf(localDate.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        } else if (lifetime.equals(Lifetime.YEAR)) {
+                            LocalDate localDate = activeTariffEndDay.toLocalDateTime().toLocalDate().plusYears(interval);
+                            Timestamp timestamp = Timestamp.valueOf(localDate.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        }
+                        subscription.setStartDay(activeTariffEndDay);
+                        subscription.setStatusTariff(StatusTariff.CONFIRMED);
+                        subscription.setActive(false);
+                    }
                 }
+            } else if (subscription.getStatusTariff().equals(StatusTariff.REJECTED)) {
+                subscription.setStatusTariff(StatusTariff.CONFIRMED);
+                subscription.setActive(true);
             }
+
             repository.save(subscription);
             return new ApiResponse("SUCCESS", true);
         } else if (statusTariff.equalsIgnoreCase(StatusTariff.REJECTED.name())) {
