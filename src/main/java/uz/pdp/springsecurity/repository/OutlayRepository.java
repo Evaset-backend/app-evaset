@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.pdp.springsecurity.entity.Outlay;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,9 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
     List<Outlay> findAllByDateAndBusinessId(UUID business_id, java.sql.Date date);
 
     List<Outlay> findAllByBranch_Id(UUID branch_id);
+    List<Outlay> findAllByCreatedAtBetweenAndBranchId(Timestamp startDate, Timestamp endDate, UUID branch_id);
+
+    List<Outlay> findAllByBranch_IdAndOutlayCategoryId(UUID branch_id,UUID categoryId);
 
     @Query(value = "select * from outlay inner join branches b on b.business_id = ?1",nativeQuery = true)
     List<Outlay> findAllByBusinessId(UUID businessId);
