@@ -22,11 +22,28 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.allProductAmount(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+    @GetMapping("/amounts-by-brand/{branchId}")
+    public HttpEntity<?> getAllBrandAmount(@PathVariable UUID branchId,
+                                            @RequestParam UUID brandId) {
+        ApiResponse apiResponse = reportsService.allProductByBrand(branchId,brandId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+    @GetMapping("/amounts-by-category/{branchId}/{categoryId}")
+    public HttpEntity<?> getAllCategoryAmount(@PathVariable UUID branchId,
+                                           @RequestParam UUID categoryId) {
+        ApiResponse apiResponse = reportsService.allProductByCategory(branchId,categoryId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
     @GetMapping("/amounts/{branchId}")
-    public HttpEntity<?> getAllBranchAmount(@PathVariable UUID branchId) {
+    public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+//    @GetMapping("/amounts-branch/{branchId}")
+//    public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {
+//        ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
     @GetMapping("/most-sale/{branchId}")
     public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.mostSaleProducts(branchId);
