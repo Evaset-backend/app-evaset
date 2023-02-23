@@ -20,4 +20,5 @@ public class SubscriptionGetDto {
     private double tariffPrice;
     private String payType;
     private boolean active;
+    private double totalSum;
 }

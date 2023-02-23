@@ -25,6 +25,7 @@ public interface SubscriptionMapper {
     @Mapping(target = "statusTariff", constant = "WAITING")
     Subscription toEntity(SubscriptionPostDto subscriptionPostDto);
 
+    @Mapping(target = "totalSum", ignore = true)
     @Mapping(target = "businessName", source = "business.name")
     @Mapping(target = "tariffName", source = "tariff.name")
     @Mapping(target = "tariffPrice", source = "tariff.price")
