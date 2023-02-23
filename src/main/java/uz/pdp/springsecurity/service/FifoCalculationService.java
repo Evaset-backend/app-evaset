@@ -3,8 +3,9 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.Type;
 import uz.pdp.springsecurity.repository.FifoCalculationRepository;
-import uz.pdp.springsecurity.repository.PurchaseProductRepository;
+import uz.pdp.springsecurity.repository.ProductTypeComboRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +15,9 @@ public class FifoCalculationService {
     @Autowired
     private FifoCalculationRepository fifoRepository;
     @Autowired
-    private PurchaseProductRepository purchaseProductRepository;
+    private ProductTypeComboRepository productTypeComboRepository;
 
-    public void createCalculation(PurchaseProduct purchaseProduct) {
+    public void createPurchaseProduct(PurchaseProduct purchaseProduct) {
         FifoCalculation fifoCalculation = new FifoCalculation(
                 purchaseProduct.getPurchase().getBranch(),
                 purchaseProduct.getPurchasedQuantity(),
@@ -33,7 +34,7 @@ public class FifoCalculationService {
         fifoRepository.save(fifoCalculation);
     }
 
-    public void editFifoCalculation(PurchaseProduct purchaseProduct, Double amount) {
+    public void editPurchaseProduct(PurchaseProduct purchaseProduct, Double amount) {
         Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseProductId(purchaseProduct.getId());
         if (optionalFifoCalculation.isEmpty()) return;
         FifoCalculation fifoCalculation = optionalFifoCalculation.get();
@@ -47,53 +48,96 @@ public class FifoCalculationService {
     public TradeProduct createOrEditTradeProduct(Branch branch, TradeProduct tradeProduct, double quantity) {
         List<FifoCalculation> fifoList = null;
         double salePrice = 0;
+        double profit = 0;
         if (tradeProduct.getProduct() != null) {
             Product product = tradeProduct.getProduct();
-            salePrice = product.getSalePrice();
-            fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+            if (product.getType().equals(Type.SINGLE)) {
+                salePrice = product.getSalePrice();
+                fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+                profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice, branch.getBusiness().getSaleMinus());
+                fifoRepository.saveAll(fifoList);
+            }else {
+                List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(product.getId());
+                for (ProductTypeCombo combo : comboList) {
+                    salePrice = combo.getContentProduct().getSalePrice();
+                    fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), combo.getContentProduct().getId());
+                    profit += createOrEditTradeProductHelper(fifoList, quantity * combo.getAmount(), salePrice, branch.getBusiness().getSaleMinus());
+                    fifoRepository.saveAll(fifoList);
+                }
+            }
         } else {
             ProductTypePrice productTypePrice = tradeProduct.getProductTypePrice();
             salePrice = productTypePrice.getSalePrice();
             fifoList = fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
+            profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice, branch.getBusiness().getSaleMinus());
+            fifoRepository.saveAll(fifoList);
         }
 
+        tradeProduct.setProfit(tradeProduct.getProfit() + profit);
+        return tradeProduct;
+    }
+
+    private Double createOrEditTradeProductHelper(List<FifoCalculation> fifoList, Double quantity, Double salePrice, boolean saleMinus) {
         double profit = 0;
+        double buyPrice = 0;
         for (FifoCalculation fifo : fifoList) {
             if (fifo.getRemainAmount()>quantity){
+                buyPrice = fifo.getBuyPrice();
                 fifo.setRemainAmount(fifo.getRemainAmount() - quantity);
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                profit += quantity * (salePrice - buyPrice);
                 break;
             } else if (fifo.getRemainAmount() < quantity) {
+                buyPrice = fifo.getBuyPrice();
                 double amount = fifo.getRemainAmount();
                 quantity -= amount;
-                profit += amount * (salePrice - fifo.getBuyPrice());
+                profit += amount * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
             }else {
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                buyPrice = fifo.getBuyPrice();
+                profit += quantity * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
                 break;
             }
         }
-        tradeProduct.setProfit(tradeProduct.getProfit() + profit);
-        fifoRepository.saveAll(fifoList);
-        return tradeProduct;
+        if (saleMinus && quantity > 0){
+            profit += quantity * (salePrice - buyPrice);
+        }
+        return profit;
     }
 
-    public TradeProduct returnedTrade(Branch branch, TradeProduct tradeProduct, double quantity) {
+    public void returnedTrade(Branch branch, TradeProduct tradeProduct, double quantity) {
         List<FifoCalculation> fifoList = null;
         double salePrice = 0;
+        Double profit = 0d;
         if (tradeProduct.getProduct() != null) {
             Product product = tradeProduct.getProduct();
-            salePrice = product.getSalePrice();
-            fifoList = fifoRepository.findAllByBranchIdAndProductIdOrderByDateDescCreatedAtDesc(branch.getId(), product.getId());
+            if (product.getType().equals(Type.SINGLE)) {
+                salePrice = product.getSalePrice();
+                fifoList = fifoRepository.findAllByBranchIdAndProductIdOrderByDateDescCreatedAtDesc(branch.getId(), product.getId());
+                profit = returnedTradeHelper(fifoList, quantity, salePrice);
+                fifoRepository.saveAll(fifoList);
+            }else {
+                List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(product.getId());
+                for (ProductTypeCombo combo : comboList) {
+                    salePrice = combo.getContentProduct().getSalePrice();
+                    fifoList = fifoRepository.findAllByBranchIdAndProductIdOrderByDateDescCreatedAtDesc(branch.getId(), combo.getContentProduct().getId());
+                    profit += returnedTradeHelper(fifoList, quantity * combo.getAmount(), salePrice);
+                    fifoRepository.saveAll(fifoList);
+                }
+            }
         } else {
             ProductTypePrice productTypePrice = tradeProduct.getProductTypePrice();
             salePrice = productTypePrice.getSalePrice();
             fifoList = fifoRepository.findAllByBranchIdAndProductTypePriceIdOrderByDateDescCreatedAtDesc(branch.getId(), productTypePrice.getId());
+            profit = returnedTradeHelper(fifoList, quantity, salePrice);
+            fifoRepository.saveAll(fifoList);
         }
+        tradeProduct.setProfit(tradeProduct.getProfit() - profit);
+    }
 
+    private Double returnedTradeHelper(List<FifoCalculation> fifoList, Double quantity, Double salePrice) {
         double profit = 0;
         for (FifoCalculation fifo : fifoList) {
             if (fifo.getPurchasedAmount() == fifo.getRemainAmount())continue;
@@ -110,9 +154,7 @@ public class FifoCalculationService {
                 profit += soldQuantity * (salePrice - fifo.getBuyPrice());
             }
         }
-        tradeProduct.setProfit(tradeProduct.getProfit() - profit);
-        fifoRepository.saveAll(fifoList);
-        return tradeProduct;
+        return profit;
     }
 
     public void createExchange(ExchangeProductBranch exchangeProductBranch) {

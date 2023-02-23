@@ -31,4 +31,6 @@ public class ProductTypePriceGetDto {
     private double salePrice;
 
     private double profitPercent;
+
+    private double quantity;
 }

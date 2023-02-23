@@ -71,7 +71,8 @@ public class BusinessService {
 
         subscription.setBusiness(business);
         optionalTariff.ifPresent(subscription::setTariff);
-        subscription.setActive(true);
+        subscription.setActive(false);
+        subscription.setStatusTariff(StatusTariff.WAITING);
         subscriptionRepository.save(subscription);
 
 
@@ -111,12 +112,10 @@ public class BusinessService {
             }
         }
 
-
         Business business = optionalBusiness.get();
         business.setName(businessEditDto.getName());
         business.setDescription(businessEditDto.getDescription());
         business.setActive(businessEditDto.isActive());
-        business.setDelete(businessEditDto.isDelete());
 
         businessRepository.save(business);
         return new ApiResponse("EDITED", true);
@@ -127,11 +126,6 @@ public class BusinessService {
         return optionalBusiness.map(business -> new ApiResponse("FOUND", true, business)).orElseGet(() -> new ApiResponse("not found business", false));
     }
 
-    public ApiResponse getAllSubscription() {
-        List<Subscription> subscriptionList = subscriptionRepository.findAll();
-        if (subscriptionList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, subscriptionList);
-    }
 
     public ApiResponse getAllPartners() {
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
@@ -143,7 +137,7 @@ public class BusinessService {
         Role admin = optionalAdmin.get();
 
         List<User> userList = userRepository.findAllByRole_IdAndBusiness_Delete(admin.getId(), false);
-        if (userList.isEmpty())return new ApiResponse("NOT FOUND", false);
+        if (userList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, userList);
     }
 
@@ -166,28 +160,11 @@ public class BusinessService {
 
     public ApiResponse deActive(UUID businessId) {
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
-        if (optionalBusiness.isEmpty())new ApiResponse("not found business", false);
+        if (optionalBusiness.isEmpty()) new ApiResponse("not found business", false);
         Business business = optionalBusiness.get();
         business.setActive(!business.isActive());
         businessRepository.save(business);
         return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse confirmSubscription(UUID subscriptionId, String statusTariff) {
-        Optional<Subscription> optionalSubscription = subscriptionRepository.findById(subscriptionId);
-        if (optionalSubscription.isPresent())new ApiResponse("not found subscription", false);
-        Subscription subscription = optionalSubscription.get();
-        if (statusTariff.equalsIgnoreCase(StatusTariff.CONFIRMED.name())) {
-            subscription.setStatusTariff(StatusTariff.CONFIRMED);
-            return new ApiResponse("SUCCESS", true);
-        } else if (statusTariff.equalsIgnoreCase(StatusTariff.REJECTED.name())) {
-            subscription.setStatusTariff(StatusTariff.REJECTED);
-            return new ApiResponse("SUCCESS", true);
-        } else if (statusTariff.equalsIgnoreCase(StatusTariff.WAITING.name())) {
-            subscription.setStatusTariff(StatusTariff.WAITING);
-            return new ApiResponse("SUCCESS", true);
-        }
-
-        return new ApiResponse("wrong statusTariff", false);
-    }
 }

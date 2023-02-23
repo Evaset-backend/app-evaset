@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.*;
 
 import static uz.pdp.springsecurity.enums.ExchangeStatusName.*;
@@ -109,8 +110,8 @@ public class DataLoader implements CommandLineRunner {
             Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
             if (subscriptionOptional.isEmpty()) {
                 Timestamp startDay = new Timestamp(System.currentTimeMillis());
-                Long oneMonth = 1000 * 60 * 60 * 24 * 30L;
-                Timestamp endDay = new Timestamp(System.currentTimeMillis() + oneMonth);
+                LocalDate date = LocalDate.now().plusMonths(1);
+                Timestamp endDay = Timestamp.valueOf(date.atStartOfDay());
 
                 Subscription subscription = new Subscription(
                         business,
@@ -118,7 +119,10 @@ public class DataLoader implements CommandLineRunner {
                         startDay,
                         endDay,
                         StatusTariff.CONFIRMED,
-                        true
+                        PayType.OFFLINE,
+                        true,
+                        true,
+                        false
                 );
                 subscriptionRepository.save(subscription);
             }

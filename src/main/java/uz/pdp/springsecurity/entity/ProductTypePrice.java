@@ -14,6 +14,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 public class ProductTypePrice extends AbsEntity {
+    @Column(nullable = false)
+    private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Product product;

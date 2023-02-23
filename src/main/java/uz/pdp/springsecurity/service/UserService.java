@@ -104,9 +104,12 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
-        boolean b = userRepository.existsByUsername(userDto.getUsername());
 
-        if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
+        if (!optionalUser.get().getUsername().equals(userDto.getUsername())){
+            boolean b = userRepository.existsByUsername(userDto.getUsername());
+            if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
+        }
+
 
         ApiResponse response = roleService.get(userDto.getRoleId());
         if (!response.isSuccess())
@@ -134,8 +137,11 @@ public class UserService {
         }
         user.setBranches(branches);
 
-        if (!businessRepository.existsById(userDto.getBusinessId()))
+        if (businessRepository.findById(userDto.getBusinessId()).isEmpty()){
             return new ApiResponse("BUSINESS NOT FOUND", false);
+        }
+
+
         user.setBusiness(businessRepository.findById(userDto.getBusinessId()).get());
 
         user.setRole((Role) response.getObject());
@@ -172,9 +178,9 @@ public class UserService {
         if (optionalUser.isEmpty())
             return new ApiResponse("NOT FOUND USER");
 
-        Optional<User> userOptional = userRepository.findByUsernameAndIdNot(profileDto.getUsername(), id);
-        if (userOptional.isPresent()) {
-            return new ApiResponse("USERNAME ALREADY EXISTS", false);
+        if (!optionalUser.get().getUsername().equals(profileDto.getUsername())) {
+            boolean b = userRepository.existsByUsername(profileDto.getUsername());
+            if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
         }
 
         if (!profileDto.getPassword().equals(profileDto.getPrePassword()))

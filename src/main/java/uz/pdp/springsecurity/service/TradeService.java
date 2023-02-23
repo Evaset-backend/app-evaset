@@ -13,10 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +26,9 @@ public class TradeService {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    ProductTypePriceRepository productTypePriceRepository;
 
     @Autowired
     BranchRepository branchRepository;
@@ -68,8 +68,8 @@ public class TradeService {
 
     @Autowired
     WarehouseRepository warehouseRepository;
-
     private final SubscriptionRepository subscriptionRepository;
+    private final ProductTypeComboRepository productTypeComboRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -163,6 +163,36 @@ public class TradeService {
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
+        List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
+        if (!branch.getBusiness().getSaleMinus()) {
+            HashMap<UUID, Double> map = new HashMap<>();
+            for (TradeProductDto dto : tradeProductDtoList) {
+                if (dto.getType().equalsIgnoreCase("single")) {
+                    UUID productId = dto.getProductId();
+                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                } else if (dto.getType().equalsIgnoreCase("many")) {
+                    UUID productId = dto.getProductTypePriceId();
+                    if (!productTypePriceRepository.existsById(productId))
+                        return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                } else if (dto.getType().equalsIgnoreCase("combo")) {
+                    UUID productId = dto.getProductId();
+                    List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
+                    if (comboList.isEmpty()) return new ApiResponse("PRODUCT NOT FOUND", false);
+                    for (ProductTypeCombo combo : comboList) {
+                        UUID contentProduct = combo.getContentProduct().getId();
+                        map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + dto.getTradedQuantity() * combo.getAmount());
+                    }
+                } else {
+                    return new ApiResponse("PRODUCT NOT FOUND", false);
+                }
+            }
+
+            if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+        }
+
+
         trade.setPayDate(tradeDTO.getPayDate());
         trade.setTotalSum(tradeDTO.getTotalSum());
         trade.setPaidSum(tradeDTO.getPaidSum());
@@ -172,7 +202,6 @@ public class TradeService {
         /**
          * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
          */
-        List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
         List<TradeProduct> tradeProductList = new ArrayList<>();
 
         double profit = 0;

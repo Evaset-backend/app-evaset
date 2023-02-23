@@ -62,12 +62,7 @@ public class BusinessController {
     /**
      * @return
      */
-    @CheckPermission("VIEW_BUSINESS")
-    @GetMapping("/subscription")
-    public HttpEntity<?> getAllSubscription() {
-        ApiResponse apiResponse = businessService.getAllSubscription();
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+
 
     @CheckPermission("VIEW_BUSINESS")
     @GetMapping("/partners")
@@ -100,13 +95,6 @@ public class BusinessController {
     @PutMapping("/de-active/{businessId}")
     public HttpEntity<?> deActive(@PathVariable UUID businessId) {
         ApiResponse apiResponse = businessService.deActive(businessId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("EDIT_TARIFF")
-    @PutMapping("/confirm-subscription/{subscriptionId}")
-    public HttpEntity<?> confirmSubscription(@PathVariable UUID subscriptionId, @RequestBody String statusTariff) {
-        ApiResponse apiResponse = businessService.confirmSubscription(subscriptionId, statusTariff);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

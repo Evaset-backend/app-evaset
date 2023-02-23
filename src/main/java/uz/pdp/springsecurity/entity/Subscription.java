@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
+import uz.pdp.springsecurity.enums.PayType;
 import uz.pdp.springsecurity.enums.StatusTariff;
 
 import javax.persistence.*;
@@ -30,7 +31,14 @@ public class Subscription extends AbsEntity {
     private Timestamp endDay;
 
     @Enumerated(EnumType.STRING)
-    private StatusTariff StatusTariff;
+    private StatusTariff statusTariff;
+
+    @Enumerated(EnumType.STRING)
+    private PayType payType;
+
+    private boolean activeNewTariff;
 
     private boolean active;
+
+    private boolean delete;
 }

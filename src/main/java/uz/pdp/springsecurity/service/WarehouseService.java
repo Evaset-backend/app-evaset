@@ -8,9 +8,7 @@ import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class WarehouseService {
 
     private final ExchangeProductRepository exchangeProductRepository;
     @Autowired
-    private ProductTypeRepository productTypeRepository;
+    private ProductTypeComboRepository productTypeComboRepository;
     @Autowired
     private ExchangeProductBranchRepository exchangeProductBranchRepository;
     private final FifoCalculationService fifoCalculationService;
@@ -53,6 +51,12 @@ public class WarehouseService {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
+                if (branch.getBusiness().getSaleMinus() && warehouse.getAmount() < 0) {
+                    TradeProduct tradeProduct = new TradeProduct();
+                    tradeProduct.setProduct(product);
+                    double amount = -warehouse.getAmount();
+                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount>quantity?quantity:amount);
+                }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {
                 warehouse = new Warehouse();
@@ -64,6 +68,12 @@ public class WarehouseService {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
+                if (branch.getBusiness().getSaleMinus() && warehouse.getAmount() < 0) {
+                    TradeProduct tradeProduct = new TradeProduct();
+                    tradeProduct.setProductTypePrice(productTypePrice);
+                    double amount = -warehouse.getAmount();
+                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount>quantity?quantity:amount);
+                }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {
                 warehouse = new Warehouse();
@@ -75,6 +85,22 @@ public class WarehouseService {
         warehouseRepository.save(warehouse);
     }
 
+    public Boolean checkBeforeTrade(Branch branch, HashMap<UUID, Double> map) {
+        for (Map.Entry<UUID, Double> entry : map.entrySet()) {
+            Warehouse warehouse = null;
+            if (warehouseRepository.existsByBranchIdAndProductId(branch.getId(), entry.getKey())){
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), entry.getKey());
+                if (optionalWarehouse.isPresent()) warehouse = optionalWarehouse.get();
+            }else if (warehouseRepository.existsByBranchIdAndProductTypePriceId(branch.getId(), entry.getKey())){
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), entry.getKey());
+                if (optionalWarehouse.isPresent()) warehouse = optionalWarehouse.get();
+            }else return false;
+            if (warehouse == null)return false;
+            if (warehouse.getAmount()<entry.getValue()) return false;
+        }
+        return true;
+    }
+
     /**
      * RETURN TRADEPRODUCT BY TRADEPRODUCTDTO AFTER CHECK AMOUNT
      *
@@ -83,23 +109,33 @@ public class WarehouseService {
      * @return
      */
     public TradeProduct createOrEditTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
-        double amount = tradeProduct.getTradedQuantity();
-        if (tradeProductDto.getProductId() != null) {
+        double amount = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
+        if (tradeProductDto.getType().equalsIgnoreCase("single")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() + amount < tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() + amount - tradeProductDto.getTradedQuantity());
+            warehouse.setAmount(warehouse.getAmount() + amount);
             warehouseRepository.save(warehouse);
             tradeProduct.setProduct(warehouse.getProduct());
-        } else {
+        } else if (tradeProductDto.getType().equalsIgnoreCase("many")){
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() + amount< tradeProductDto.getTradedQuantity()) return null;
-            warehouse.setAmount(warehouse.getAmount() + amount - tradeProductDto.getTradedQuantity());
+            warehouse.setAmount(warehouse.getAmount() + amount);
             warehouseRepository.save(warehouse);
             tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
+        }else{
+            Optional<Product> optionalProduct = productRepository.findById(tradeProductDto.getProductId());
+            if (optionalProduct.isEmpty())return null;
+            List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(tradeProductDto.getProductId());
+            for (ProductTypeCombo combo : comboList) {
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), combo.getContentProduct().getId());
+                if (optionalWarehouse.isEmpty())continue;
+                Warehouse warehouse = optionalWarehouse.get();
+                warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                warehouseRepository.save(warehouse);
+            }
+            tradeProduct.setProduct(optionalProduct.get());
         }
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());

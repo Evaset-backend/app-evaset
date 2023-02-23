@@ -24,6 +24,8 @@ public class Product extends AbsEntity {
     private String name;
     private Date dueDate;
     private boolean active = true;
+
+    private double profitPercent;
     private double tax;
     private double buyPrice;
     private double salePrice;
@@ -50,4 +52,7 @@ public class Product extends AbsEntity {
     @ManyToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Branch> branch;
+
+    @Transient
+    private double quantity;
 }

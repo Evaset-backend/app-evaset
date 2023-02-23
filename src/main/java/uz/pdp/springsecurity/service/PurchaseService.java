@@ -129,8 +129,8 @@ public class PurchaseService {
                 purchaseProduct.setPurchase(purchase);
                 purchaseProductRepository.save(purchaseProduct);
                 purchaseProductList.add(purchaseProduct);
+                fifoCalculationService.createPurchaseProduct(purchaseProduct);
                 warehouseService.createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
-                fifoCalculationService.createCalculation(purchaseProduct);
             } else if (purchaseProductDto.isDelete()){
                 if(purchaseProductRepository.existsById(purchaseProductDto.getPurchaseProductId())){
                     PurchaseProduct purchaseProduct = purchaseProductRepository.getById(purchaseProductDto.getPurchaseProductId());
@@ -150,8 +150,8 @@ public class PurchaseService {
 
                 if (amount != 0) {
                     purchaseProduct.setPurchasedQuantity(purchaseProductDto.getPurchasedQuantity());
+                    fifoCalculationService.editPurchaseProduct(purchaseProduct, amount);
                     warehouseService.createOrEditWareHouse(purchaseProduct, amount);
-                    fifoCalculationService.editFifoCalculation(purchaseProduct, amount);
                 }
             }
         }
