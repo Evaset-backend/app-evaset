@@ -662,7 +662,7 @@ public class ReportsService {
             }else if (Objects.equals(date, "LAST_WEEK")) {
                 List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(WEEK_START_DAY.atStartOfDay()),Timestamp.valueOf(WEEK_END_DAY.atStartOfDay()) ,tradeProduct.getProduct().getId());
                 if (allByProductId.isEmpty()){
-                    return new ApiResponse("Traded Product Not Found For Last Day",false);
+                    return new ApiResponse("Traded Product Not Found For Last Week",false);
                 }
                 for (TradeProduct product : allByProductId) {
                     amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
