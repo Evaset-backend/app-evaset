@@ -17,7 +17,7 @@ public class FifoCalculationService {
     @Autowired
     private ProductTypeComboRepository productTypeComboRepository;
 
-    public void createCalculation(PurchaseProduct purchaseProduct) {
+    public void createPurchaseProduct(PurchaseProduct purchaseProduct) {
         FifoCalculation fifoCalculation = new FifoCalculation(
                 purchaseProduct.getPurchase().getBranch(),
                 purchaseProduct.getPurchasedQuantity(),
@@ -34,7 +34,7 @@ public class FifoCalculationService {
         fifoRepository.save(fifoCalculation);
     }
 
-    public void editFifoCalculation(PurchaseProduct purchaseProduct, Double amount) {
+    public void editPurchaseProduct(PurchaseProduct purchaseProduct, Double amount) {
         Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseProductId(purchaseProduct.getId());
         if (optionalFifoCalculation.isEmpty()) return;
         FifoCalculation fifoCalculation = optionalFifoCalculation.get();
@@ -54,14 +54,14 @@ public class FifoCalculationService {
             if (product.getType().equals(Type.SINGLE)) {
                 salePrice = product.getSalePrice();
                 fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
-                profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice);
+                profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice, branch.getBusiness().getSaleMinus());
                 fifoRepository.saveAll(fifoList);
             }else {
                 List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(product.getId());
                 for (ProductTypeCombo combo : comboList) {
                     salePrice = combo.getContentProduct().getSalePrice();
                     fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), combo.getContentProduct().getId());
-                    profit += createOrEditTradeProductHelper(fifoList, quantity * combo.getAmount(), salePrice);
+                    profit += createOrEditTradeProductHelper(fifoList, quantity * combo.getAmount(), salePrice, branch.getBusiness().getSaleMinus());
                     fifoRepository.saveAll(fifoList);
                 }
             }
@@ -69,7 +69,7 @@ public class FifoCalculationService {
             ProductTypePrice productTypePrice = tradeProduct.getProductTypePrice();
             salePrice = productTypePrice.getSalePrice();
             fifoList = fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
-            profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice);
+            profit = createOrEditTradeProductHelper(fifoList, quantity, salePrice, branch.getBusiness().getSaleMinus());
             fifoRepository.saveAll(fifoList);
         }
 
@@ -77,25 +77,32 @@ public class FifoCalculationService {
         return tradeProduct;
     }
 
-    private Double createOrEditTradeProductHelper(List<FifoCalculation> fifoList, Double quantity, Double salePrice) {
+    private Double createOrEditTradeProductHelper(List<FifoCalculation> fifoList, Double quantity, Double salePrice, boolean saleMinus) {
         double profit = 0;
+        double buyPrice = 0;
         for (FifoCalculation fifo : fifoList) {
             if (fifo.getRemainAmount()>quantity){
+                buyPrice = fifo.getBuyPrice();
                 fifo.setRemainAmount(fifo.getRemainAmount() - quantity);
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                profit += quantity * (salePrice - buyPrice);
                 break;
             } else if (fifo.getRemainAmount() < quantity) {
+                buyPrice = fifo.getBuyPrice();
                 double amount = fifo.getRemainAmount();
                 quantity -= amount;
-                profit += amount * (salePrice - fifo.getBuyPrice());
+                profit += amount * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
             }else {
-                profit += quantity * (salePrice - fifo.getBuyPrice());
+                buyPrice = fifo.getBuyPrice();
+                profit += quantity * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
                 break;
             }
+        }
+        if (saleMinus && quantity > 0){
+            profit += quantity * (salePrice - buyPrice);
         }
         return profit;
     }

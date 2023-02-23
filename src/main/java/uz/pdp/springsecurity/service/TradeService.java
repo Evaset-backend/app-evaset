@@ -164,30 +164,33 @@ public class TradeService {
         }
 
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
-        HashMap<UUID, Double> map = new HashMap<>();
-        for (TradeProductDto dto : tradeProductDtoList) {
-            if (dto.getType().equalsIgnoreCase("single")) {
-                UUID productId = dto.getProductId();
-                if(!productRepository.existsById(productId))return new ApiResponse("PRODUCT NOT FOUND", false);
-                map.put(productId, map.getOrDefault(productId, 0d)+ dto.getTradedQuantity());
-            } else if (dto.getType().equalsIgnoreCase("many")) {
-                UUID productId = dto.getProductTypePriceId();
-                if(!productTypePriceRepository.existsById(productId))return new ApiResponse("PRODUCT NOT FOUND", false);
-                map.put(productId, map.getOrDefault(productId, 0d)+ dto.getTradedQuantity());
-            } else if (dto.getType().equalsIgnoreCase("combo")){
-                UUID productId = dto.getProductId();
-                List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
-                if(comboList.isEmpty())return new ApiResponse("PRODUCT NOT FOUND", false);
-                for (ProductTypeCombo combo : comboList) {
-                    UUID contentProduct = combo.getContentProduct().getId();
-                    map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + dto.getTradedQuantity() * combo.getAmount());
+        if (branch.getBusiness().getSaleMinus()) {
+            HashMap<UUID, Double> map = new HashMap<>();
+            for (TradeProductDto dto : tradeProductDtoList) {
+                if (dto.getType().equalsIgnoreCase("single")) {
+                    UUID productId = dto.getProductId();
+                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                } else if (dto.getType().equalsIgnoreCase("many")) {
+                    UUID productId = dto.getProductTypePriceId();
+                    if (!productTypePriceRepository.existsById(productId))
+                        return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                } else if (dto.getType().equalsIgnoreCase("combo")) {
+                    UUID productId = dto.getProductId();
+                    List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
+                    if (comboList.isEmpty()) return new ApiResponse("PRODUCT NOT FOUND", false);
+                    for (ProductTypeCombo combo : comboList) {
+                        UUID contentProduct = combo.getContentProduct().getId();
+                        map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + dto.getTradedQuantity() * combo.getAmount());
+                    }
+                } else {
+                    return new ApiResponse("PRODUCT NOT FOUND", false);
                 }
-            } else {
-                return new ApiResponse("PRODUCT NOT FOUND", false);
             }
-        }
 
-        if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+            if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+        }
 
 
         trade.setPayDate(tradeDTO.getPayDate());
