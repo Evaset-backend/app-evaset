@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.service;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -1148,13 +1149,16 @@ public class ReportsService {
         Map<UUID, Double> productAmount = new HashMap<>();
         List<ProductReportDto> all = new ArrayList<>();
         double amount = 0;
-        Timestamp startTimestamp = new Timestamp(startDate.getTime());
-        Timestamp endTimestamp = new Timestamp(endDate.getTime());
-        Timestamp startTimestamp =null;
+        Timestamp startTimestamp = null;
         Timestamp endTimestamp = null;
-        if (startDate != null && endDate != null){
-             startTimestamp = new Timestamp(startDate.getTime());
-             endTimestamp = new Timestamp(endDate.getTime());
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
+        }
+
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
         }
         switch (date) {
             case ("LAST_DAY"):
@@ -1185,35 +1189,55 @@ public class ReportsService {
                 break;
         }
         if (isByCustomerId) {
-            List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_Customer_Id(startTimestamp, endTimestamp, customerId);
-            for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
-                if (tradeProduct.getProduct() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProduct().getId(), amount);
+            List<Trade> allByCustomerId = tradeRepository.findAllByCreatedAtBetweenAndCustomer_Id(startTimestamp, endTimestamp, customerId);
+            for (Trade trade : allByCustomerId) {
+                List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByTradeId(trade.getId());
+                for (TradeProduct tradeProduct : allTradeCustomerId) {
+                    if (tradeProduct.getProduct() != null) {
+                        List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
+                        double totalAmount = 0;
+                        for (TradeProduct product : allByProductId) {
+                            totalAmount += product.getTradedQuantity();
+                            productAmount.put(product.getProduct().getId(), totalAmount);
+                        }
+                    }
                 }
-            }
-            for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
-                if (tradeProduct.getProductTypePrice() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
+                for (TradeProduct tradeProduct : allTradeCustomerId) {
+                    if (tradeProduct.getProductTypePrice() != null) {
+                        List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
+                        double totalAmount = 0;
+                        for (TradeProduct product : allByProductTypePriceId) {
+                            totalAmount += product.getTradedQuantity();
+                            productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                        }
+                    }
                 }
             }
         } else {
-            List<TradeProduct> allTradeBranch = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(startTimestamp, endTimestamp, branchId);
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if (optionalBranch.isEmpty()) {
+                return null;
+            }
+            Business business = optionalBranch.get().getBusiness();
+            List<TradeProduct> allTradeBranch = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BusinessId(startTimestamp, endTimestamp, business.getId());
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProduct() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProduct().getId(), amount);
+                    List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+                    double totalAmount = 0;
+                    for (TradeProduct product : allByProductId) {
+                        totalAmount += product.getTradedQuantity();
+                        productAmount.put(product.getProduct().getId(), totalAmount);
+                    }
                 }
             }
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProductTypePrice() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
+                    List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceId(tradeProduct.getProductTypePrice().getId());
+                    double totalAmount = 0;
+                    for (TradeProduct product : allByProductTypePriceId) {
+                        totalAmount += product.getTradedQuantity();
+                        productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                    }
                 }
             }
         }
