@@ -129,7 +129,7 @@ public class ReportsService {
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
             productReportDtoList.add(productReportDto);
         }
-        productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount));
+        productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount).reversed());
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
     public ApiResponse allProductAmountByBranch(UUID branchId) {
