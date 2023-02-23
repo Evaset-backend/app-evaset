@@ -12,7 +12,8 @@ import java.util.UUID;
 public interface PurchaseProductRepository extends JpaRepository<PurchaseProduct, UUID> {
     List<PurchaseProduct> findAllByPurchaseId(UUID purchaseId);
     List<PurchaseProduct> findAllByPurchase_BranchId(UUID branchId);
+    List<PurchaseProduct> findAllByCreatedAtBetweenAndProduct_BranchId(Timestamp from, Timestamp to, UUID branch_id);
     List<PurchaseProduct> findAllByPurchase_BranchIdAndPurchase_SupplierId(UUID purchase_branch_id, UUID purchase_supplier_id);
-
+    List<PurchaseProduct> findAllByCreatedAtBetweenAndProduct_BranchIdAndPurchase_SupplierId(Timestamp from, Timestamp to, UUID product_branch_id, UUID purchase_supplier_id);
     List<PurchaseProduct> findAllByCreatedAtBetweenAndPurchase_BranchId(Timestamp startDate, Timestamp endDate, UUID purchase_branch_id);
 }

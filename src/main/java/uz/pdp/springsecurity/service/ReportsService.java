@@ -14,22 +14,16 @@ import java.util.*;
 
 @Service
 public class ReportsService {
-
     @Autowired
     BusinessRepository businessRepository;
-
     @Autowired
     SupplierRepository supplierRepository;
-
     @Autowired
     ProductionRepository productionRepository;
-
     @Autowired
     ProductRepository productRepository;
-
     @Autowired
     WarehouseRepository warehouseRepository;
-
     @Autowired
     BranchRepository branchRepository;
     @Autowired
@@ -40,19 +34,14 @@ public class ReportsService {
     PurchaseProductRepository purchaseProductRepository;
     @Autowired
     OutlayRepository outlayRepository;
-
     @Autowired
     CategoryRepository categoryRepository;
-
     @Autowired
     BrandRepository brandRepository;
-
     @Autowired
     TradeRepository tradeRepository;
-
     @Autowired
     CustomerRepository customerRepository;
-
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(date.getTime());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -276,7 +265,6 @@ public class ReportsService {
         }
         return new ApiResponse("Business Products Amount", true, amounts);
     }
-
     public ApiResponse allProductAmountByBrand(UUID branchId,UUID brandId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -362,86 +350,29 @@ public class ReportsService {
         }
         return new ApiResponse("Found", true, productList);
     }
-    public ApiResponse purchaseReports(UUID branchId) {
-
-            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Branch Not Found");
-        }
-        Branch branch = optionalBranch.get();
-
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchId(branch.getId());
-
-        if (purchaseProductList.isEmpty()) {
-            return new ApiResponse("Purchase Product Not Found");
-        }
-
-        List<PurchaseReportsDto> purchaseReportsDtoList = new ArrayList<>();
-        for (PurchaseProduct purchaseProduct : purchaseProductList) {
-            PurchaseReportsDto purchaseReportsDto = new PurchaseReportsDto();
-            purchaseReportsDto.setPurchaseId(purchaseProduct.getPurchase().getId());
-            purchaseReportsDto.setPurchasedAmount(purchaseProduct.getPurchasedQuantity());
-            purchaseReportsDto.setName(purchaseProduct.getProduct().getName());
-            purchaseReportsDto.setBuyPrice(purchaseProduct.getBuyPrice());
-            purchaseReportsDto.setBarcode(purchaseProduct.getProduct().getBarcode());
-            purchaseReportsDto.setTax(purchaseProduct.getProduct().getTax());
-            purchaseReportsDto.setTotalSum(purchaseProduct.getTotalSum());
-            purchaseReportsDto.setPurchasedDate(purchaseProduct.getCreatedAt());
-            purchaseReportsDto.setSupplier(purchaseProduct.getPurchase().getSupplier().getName());
-            purchaseReportsDto.setDebt(purchaseProduct.getPurchase().getDebtSum());
-            purchaseReportsDtoList.add(purchaseReportsDto);
-        }
-        return new ApiResponse("Found", true, purchaseReportsDtoList);
-    }
-    public ApiResponse purchaseReportsByDates(UUID branchId,Date startDate,Date endDate) {
-
+    public ApiResponse purchaseReports(UUID branchId,UUID supplierId,Date from, Date to) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Branch Not Found");
+            return new ApiResponse("Branch Not Found",false);
         }
         Branch branch = optionalBranch.get();
-        Timestamp from = new Timestamp(startDate.getTime());
-        Timestamp to = new Timestamp(endDate.getTime());
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByCreatedAtBetweenAndPurchase_BranchId(from,to,branch.getId());
-
+        List<PurchaseProduct> purchaseProductList=new ArrayList<>();
+        if (supplierId == null && from ==null && to==null){
+            purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchId(branch.getId());
+        } else if (supplierId != null && from ==null && to==null) {
+            purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchIdAndPurchase_SupplierId(branchId,supplierId);
+        } else if (supplierId != null && from != null && to != null) {
+            Timestamp fromm = new Timestamp(from.getTime());
+            Timestamp too = new Timestamp(to.getTime());
+            purchaseProductList = purchaseProductRepository.findAllByCreatedAtBetweenAndProduct_BranchIdAndPurchase_SupplierId(fromm,too,branchId,supplierId);
+        } else if (supplierId == null && from != null && to != null) {
+            Timestamp fromm = new Timestamp(from.getTime());
+            Timestamp too = new Timestamp(to.getTime());
+            purchaseProductList = purchaseProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(fromm,too,branchId);
+        }
         if (purchaseProductList.isEmpty()) {
-            return new ApiResponse("Purchase Product Not Found");
+            return new ApiResponse("Purchase Product Not Found",false);
         }
-
-        List<PurchaseReportsDto> purchaseReportsDtoList = new ArrayList<>();
-        for (PurchaseProduct purchaseProduct : purchaseProductList) {
-            PurchaseReportsDto purchaseReportsDto = new PurchaseReportsDto();
-            purchaseReportsDto.setPurchaseId(purchaseProduct.getPurchase().getId());
-            purchaseReportsDto.setPurchasedAmount(purchaseProduct.getPurchasedQuantity());
-            purchaseReportsDto.setName(purchaseProduct.getProduct().getName());
-            purchaseReportsDto.setBuyPrice(purchaseProduct.getBuyPrice());
-            purchaseReportsDto.setBarcode(purchaseProduct.getProduct().getBarcode());
-            purchaseReportsDto.setTax(purchaseProduct.getProduct().getTax());
-            purchaseReportsDto.setTotalSum(purchaseProduct.getTotalSum());
-            purchaseReportsDto.setPurchasedDate(purchaseProduct.getCreatedAt());
-            purchaseReportsDto.setSupplier(purchaseProduct.getPurchase().getSupplier().getName());
-            purchaseReportsDto.setDebt(purchaseProduct.getPurchase().getDebtSum());
-            purchaseReportsDtoList.add(purchaseReportsDto);
-        }
-        return new ApiResponse("Found", true, purchaseReportsDtoList);
-    }
-    public ApiResponse purchaseReportsBySupplier(UUID branchId,UUID supplierId) {
-
-        Optional<Supplier> optionalSupplier = supplierRepository.findById(supplierId);
-        if (optionalSupplier.isEmpty()){
-            return new ApiResponse("Not Found Supplier");
-        }
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Not Found Branch");
-        }
-
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchIdAndPurchase_SupplierId(branchId,supplierId);
-
-        if (purchaseProductList.isEmpty()) {
-            return new ApiResponse("Purchase Product Not Found");
-        }
-
         List<PurchaseReportsDto> purchaseReportsDtoList = new ArrayList<>();
         for (PurchaseProduct purchaseProduct : purchaseProductList) {
             PurchaseReportsDto purchaseReportsDto = new PurchaseReportsDto();
@@ -478,43 +409,30 @@ public class ReportsService {
         }
         return new ApiResponse("Found", true, totalDelivery);
     }
-    public ApiResponse outlayReports(UUID branchId){
+    public ApiResponse outlayReports(UUID branchId,UUID categoryId,Date startDate,Date endDate){
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Not Found");
         }
-        List<Outlay> outlayList = outlayRepository.findAllByBranch_Id(branchId);
-        if (outlayList.isEmpty()){
-            return new ApiResponse("Not Found Outlay");
-        }
-        outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
-        return new ApiResponse("Found",true, outlayList);
-    }
-    public ApiResponse outlayReportsByDate(UUID branchId,Date startDate,Date endDate){
-
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Not Found");
-        }
-        Timestamp from = new Timestamp(startDate.getTime());
-        Timestamp to = new Timestamp(endDate.getTime());
-        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(from,to,branchId);
-        if (outlayList.isEmpty()){
-            return new ApiResponse("Not Found Outlay");
-        }
-        outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
-        return new ApiResponse("Found",true, outlayList);
-    }
-    public ApiResponse outlayReportsByCategory(UUID branchId,UUID categoryId){
-
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Not Found");
-        }
-        List<Outlay> outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId,categoryId);
-        if (outlayList.isEmpty()){
-            return new ApiResponse("Not Found Outlay");
+        List<Outlay> outlayList = new ArrayList<>();
+        if (categoryId == null && startDate == null && endDate == null){
+            outlayList = outlayRepository.findAllByBranch_Id(branchId);
+            if (outlayList.isEmpty()){
+                return new ApiResponse("Not Found Outlay");
+            }
+        } else if (categoryId != null && startDate == null && endDate ==null) {
+            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId, categoryId);
+            if (outlayList.isEmpty()){
+                return new ApiResponse("Not Found Outlay");
+            } else if (categoryId != null && startDate != null && endDate != null) {
+                Timestamp from = new Timestamp(startDate.getTime());
+                Timestamp to = new Timestamp(endDate.getTime());
+                outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from,to,branchId,categoryId);
+                if (outlayList.isEmpty()){
+                    return new ApiResponse("Not Found Outlay");
+                }
+            }
         }
         outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
         return new ApiResponse("Found",true, outlayList);
@@ -530,8 +448,6 @@ public class ReportsService {
             return new ApiResponse("Traded Product Not Found",false);
         }
         List<CustomerReportsDto> customerReportsDtoList = new ArrayList<>();
-
-
         if (startDate != null && endDate != null){
             Timestamp to = new Timestamp(startDate.getTime());
             Timestamp from = new Timestamp(endDate.getTime());
@@ -572,7 +488,28 @@ public class ReportsService {
                 customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
                 customerReportsDtoList.add(customerReportsDto);
             }
-        }else {
+        }else if (customerId != null && startDate !=null && endDate != null){
+            Timestamp from = new Timestamp(startDate.getTime());
+            Timestamp to = new Timestamp(endDate.getTime());
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchIdAndTrade_CustomerId(from,to,branchId,customerId);
+            if (tradeProductList.isEmpty()) {
+                return new ApiResponse("Not Found Purchase", false);
+            }
+            for (TradeProduct tradeProduct : tradeProductList) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
+        }else{
             List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
             if (tradeProductList.isEmpty()) {
                 return new ApiResponse("Not Found Purchase", false);
@@ -1105,7 +1042,6 @@ public class ReportsService {
 
         return new ApiResponse("Found",true,tradeList);
     }
-
     public ApiResponse productionReports(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
