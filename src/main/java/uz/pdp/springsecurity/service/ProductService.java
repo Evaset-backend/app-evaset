@@ -199,6 +199,7 @@ public class ProductService {
         product.setBarcode(productDto.getBarcode());
         product.setBuyPrice(productDto.getBuyPrice());
         product.setSalePrice(productDto.getSalePrice());
+        product.setProfitPercent(productDto.getProfitPercent());
 
 
         productRepository.save(product);
@@ -344,16 +345,18 @@ public class ProductService {
         for (Branch branch : branches) {
             Optional<Product> optionalProduct = productRepository.findByIdAndBranchIdAndActiveTrue(id, branch.getId());
             if (optionalProduct.isPresent()) {
-                return getProductHelper(optionalProduct.get());
+                return getProductHelper(branch, optionalProduct.get());
             }
         }
         return new ApiResponse("NOT FOUND", false);
     }
 
-    public ApiResponse getProductHelper(Product product) {
+    public ApiResponse getProductHelper(Branch branch, Product product) {
         ProductGetDto productGetDto = new ProductGetDto(product);
 
         if (product.getType().name().equals(Type.SINGLE.name())) {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
+            product.setQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
             return new ApiResponse("productGetDto", true, productGetDto);
         } else if (product.getType().name().equals(Type.MANY.name())) {
             List<ProductTypePriceGetDto> productTypePriceGetDtoList = new ArrayList<>();
@@ -369,7 +372,8 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
-
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
+                productTypePriceGetDto.setQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
             }
             productGetDto.setProductTypePriceGetDtoList(productTypePriceGetDtoList);

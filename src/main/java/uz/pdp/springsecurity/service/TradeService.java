@@ -164,7 +164,7 @@ public class TradeService {
         }
 
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
-        if (branch.getBusiness().getSaleMinus()) {
+        if (!branch.getBusiness().getSaleMinus()) {
             HashMap<UUID, Double> map = new HashMap<>();
             for (TradeProductDto dto : tradeProductDtoList) {
                 if (dto.getType().equalsIgnoreCase("single")) {
