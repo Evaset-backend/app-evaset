@@ -1147,8 +1147,12 @@ public class ReportsService {
     private List<ProductReportDto> getProductReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate, boolean isByCustomerId) {
         Map<UUID, Double> productAmount = new HashMap<>();
         List<ProductReportDto> all = new ArrayList<>();
-        Timestamp startTimestamp = new Timestamp(startDate.getTime());
-        Timestamp endTimestamp = new Timestamp(endDate.getTime());
+        Timestamp startTimestamp =null;
+        Timestamp endTimestamp = null;
+        if (startDate != null && endDate != null){
+             startTimestamp = new Timestamp(startDate.getTime());
+             endTimestamp = new Timestamp(endDate.getTime());
+        }
         switch (date) {
             case ("LAST_DAY"):
                 startTimestamp = Timestamp.valueOf(START_OF_DAY);
