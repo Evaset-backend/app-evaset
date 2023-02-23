@@ -1147,6 +1147,7 @@ public class ReportsService {
     private List<ProductReportDto> getProductReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate, boolean isByCustomerId) {
         Map<UUID, Double> productAmount = new HashMap<>();
         List<ProductReportDto> all = new ArrayList<>();
+        double amount = 0;
         Timestamp startTimestamp = new Timestamp(startDate.getTime());
         Timestamp endTimestamp = new Timestamp(endDate.getTime());
         switch (date) {
@@ -1180,14 +1181,12 @@ public class ReportsService {
         if (isByCustomerId) {
             List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_Customer_Id(startTimestamp, endTimestamp, customerId);
             for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
                 if (tradeProduct.getProduct() != null) {
                     amount += tradeProduct.getTradedQuantity();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             }
             for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
                 if (tradeProduct.getProductTypePrice() != null) {
                     amount += tradeProduct.getTradedQuantity();
                     productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
@@ -1196,21 +1195,18 @@ public class ReportsService {
         } else {
             List<TradeProduct> allTradeBranch = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(startTimestamp, endTimestamp, branchId);
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProduct() != null) {
                     amount += tradeProduct.getTradedQuantity();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             }
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProductTypePrice() != null) {
                     amount += tradeProduct.getTradedQuantity();
                     productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
                 }
             }
         }
-
         for (Map.Entry<UUID, Double> productAmounts : productAmount.entrySet()) {
             Optional<Product> optionalProduct = productRepository.findById(productAmounts.getKey());
             if (optionalProduct.isPresent()) {
