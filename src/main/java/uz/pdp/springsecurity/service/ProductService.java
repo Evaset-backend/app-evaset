@@ -222,8 +222,10 @@ public class ProductService {
                         return new ApiResponse("not found product type many id", false);
                     }
 
+                    ProductTypeValue productTypeValue = optionalProductTypeValue.get();
                     ProductTypePrice productTypePrice = typePriceOptional.get();
                     productTypePrice.setProduct(saveProduct);
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
                     productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                     productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                     productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
@@ -231,8 +233,11 @@ public class ProductService {
                     productTypePrice.setBarcode(typePricePostDto.getBarcode());
                     productTypePriceList.add(productTypePrice);
                 } else {
+
+                    ProductTypeValue productTypeValue = optionalProductTypeValue.get();
                     ProductTypePrice productTypePrice = new ProductTypePrice();
                     productTypePrice.setProduct(saveProduct);
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
                     productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                     productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                     productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
@@ -612,7 +617,7 @@ public class ProductService {
                         ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                         getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
                         getForPurchaseDto.setType(Type.MANY.name());
-                        getForPurchaseDto.setName(product.getName() + "( " + productTypePrice.getProductTypeValue().getProductType().getName() + "-" + productTypePrice.getProductTypeValue().getName() + " )");
+                        getForPurchaseDto.setName(productTypePrice.getName());
                         getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
                         getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
                         getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
