@@ -1148,7 +1148,6 @@ public class ReportsService {
     private List<ProductReportDto> getProductReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate, boolean isByCustomerId) {
         Map<UUID, Double> productAmount = new HashMap<>();
         List<ProductReportDto> all = new ArrayList<>();
-        double amount = 0;
         Timestamp startTimestamp = null;
         Timestamp endTimestamp = null;
         if (startDate != null && endDate != null) {
@@ -1185,10 +1184,40 @@ public class ReportsService {
                 startTimestamp = Timestamp.valueOf(START_OF_MONTH);
                 endTimestamp = Timestamp.valueOf(END_OF_MONTH);
                 break;
+            case("THIS_MONTH"):
+                startTimestamp = Timestamp.valueOf(THIS_MONTH);
+                endTimestamp = currentDay;
+                break;
+            case ("ALL"):
+                List<Trade> allByCustomerId = tradeRepository.findAllByCustomer_Id(customerId);
+                for (Trade trade : allByCustomerId) {
+                    List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByTradeId(trade.getId());
+                    for (TradeProduct tradeProduct : allTradeCustomerId) {
+                        if (tradeProduct.getProduct() != null) {
+                            List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
+                            double totalAmount = 0;
+                            for (TradeProduct product : allByProductId) {
+                                totalAmount += product.getTradedQuantity();
+                                productAmount.put(product.getProduct().getId(), totalAmount);
+                            }
+                        }
+                    }
+                    for (TradeProduct tradeProduct : allTradeCustomerId) {
+                        if (tradeProduct.getProductTypePrice() != null) {
+                            List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
+                            double totalAmount = 0;
+                            for (TradeProduct product : allByProductTypePriceId) {
+                                totalAmount += product.getTradedQuantity();
+                                productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                            }
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
-        if (isByCustomerId) {
+        if (isByCustomerId && !date.equals("ALL")) {
             List<Trade> allByCustomerId = tradeRepository.findAllByCreatedAtBetweenAndCustomer_Id(startTimestamp, endTimestamp, customerId);
             for (Trade trade : allByCustomerId) {
                 List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByTradeId(trade.getId());
@@ -1213,7 +1242,7 @@ public class ReportsService {
                     }
                 }
             }
-        } else {
+        } else if(!date.equals("ALL")){
             Optional<Branch> optionalBranch = branchRepository.findById(branchId);
             if (optionalBranch.isEmpty()) {
                 return null;
