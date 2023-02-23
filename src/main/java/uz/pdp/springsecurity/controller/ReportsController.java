@@ -155,7 +155,7 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @GetMapping("/products-repost/{branchId}")
+    @GetMapping("/products-report/{branchId}")
     public HttpEntity<?> productsReport(@PathVariable UUID branchId,
                                         @RequestParam(required = false) UUID customerId,
                                         @RequestParam(required = false) String date,
