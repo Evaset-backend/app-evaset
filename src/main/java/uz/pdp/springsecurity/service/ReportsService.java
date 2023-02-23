@@ -707,7 +707,7 @@ public class ReportsService {
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             }
-            else if (Objects.equals(date, "LAST_YEAR")) {
+                else if (Objects.equals(date, "LAST_YEAR")) {
                 List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(Timestamp.valueOf(START_OF_YEAR), Timestamp.valueOf(END_OF_YEAR), tradeProduct.getProduct().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For Last Day",false);
