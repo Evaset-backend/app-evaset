@@ -97,4 +97,11 @@ public class BusinessController {
         ApiResponse apiResponse = businessService.deActive(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_BUSINESS")
+    @GetMapping("/info")
+    public HttpEntity<?> getInfo(@RequestParam String time) {
+        ApiResponse apiResponse = businessService.getInfo(time);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

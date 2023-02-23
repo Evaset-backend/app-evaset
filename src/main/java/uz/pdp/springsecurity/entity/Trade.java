@@ -21,11 +21,11 @@ import java.util.Date;
 @Entity
 public class Trade extends AbsEntity {
 
-    @OneToOne
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Customer customer;
 
-    @OneToOne
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User trader;
 
@@ -34,7 +34,7 @@ public class Trade extends AbsEntity {
     @JoinColumn
     private List<TradeProduct> tradeProductList;*/
 
-    @OneToOne
+    @ManyToOne
     private Branch branch;
 
     @ManyToOne

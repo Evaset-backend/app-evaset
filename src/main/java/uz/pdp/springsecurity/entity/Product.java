@@ -26,7 +26,7 @@ public class Product extends AbsEntity {
     private boolean active = true;
 
     private double profitPercent;
-    private double tax;
+    private double tax = 1;
     private double buyPrice;
     private double salePrice;
     private Date expireDate;
