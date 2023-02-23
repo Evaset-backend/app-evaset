@@ -6,6 +6,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -349,7 +350,9 @@ public class ReportsService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Not Found");
         }
-        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId((Timestamp) startDate, (Timestamp) endDate,branchId);
+        Timestamp from = new Timestamp(startDate.getTime());
+        Timestamp to = new Timestamp(endDate.getTime());
+        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(from,to,branchId);
         if (outlayList.isEmpty()){
             return new ApiResponse("Not Found Outlay");
         }
