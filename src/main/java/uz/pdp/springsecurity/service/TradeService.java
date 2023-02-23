@@ -127,7 +127,7 @@ public class TradeService {
          * SET LATER
          */
         Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-        if (optionalCustomer.isEmpty()) {
+        if (optionalCustomer.isEmpty() && tradeDTO.getDebtSum() > 0) {
             return new ApiResponse("CUSTOMER NOT FOUND", false);
         }
         Customer customer = optionalCustomer.get();
