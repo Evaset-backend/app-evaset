@@ -71,7 +71,8 @@ public class BusinessService {
 
         subscription.setBusiness(business);
         optionalTariff.ifPresent(subscription::setTariff);
-        subscription.setActive(true);
+        subscription.setActive(false);
+        subscription.setStatusTariff(StatusTariff.WAITING);
         subscriptionRepository.save(subscription);
 
 
@@ -136,7 +137,7 @@ public class BusinessService {
         Role admin = optionalAdmin.get();
 
         List<User> userList = userRepository.findAllByRole_IdAndBusiness_Delete(admin.getId(), false);
-        if (userList.isEmpty())return new ApiResponse("NOT FOUND", false);
+        if (userList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, userList);
     }
 
@@ -159,7 +160,7 @@ public class BusinessService {
 
     public ApiResponse deActive(UUID businessId) {
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
-        if (optionalBusiness.isEmpty())new ApiResponse("not found business", false);
+        if (optionalBusiness.isEmpty()) new ApiResponse("not found business", false);
         Business business = optionalBusiness.get();
         business.setActive(!business.isActive());
         businessRepository.save(business);
