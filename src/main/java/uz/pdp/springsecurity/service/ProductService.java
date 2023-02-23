@@ -187,7 +187,7 @@ public class ProductService {
             }
         }
         saveProduct.setBuyPrice(productDto.getBuyPrice());
-        saveProduct.setTax(productDto.getTax());
+        saveProduct.setProfitPercent(productDto.getProfitPercent());
         saveProduct.setSalePrice(productDto.getSalePrice());
         comboRepository.saveAll(productTypeComboList);
         productRepository.save(saveProduct);

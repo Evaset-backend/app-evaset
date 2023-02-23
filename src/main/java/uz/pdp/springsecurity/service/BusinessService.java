@@ -12,6 +12,9 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +52,11 @@ public class BusinessService {
     private final SubscriptionRepository subscriptionRepository;
 
     private final BusinessMapper businessMapper;
+
+    private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
+    private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
+    private final static LocalDateTime THIS_MONTH = LocalDateTime.of(TODAY.getYear(), TODAY.getMonth(), 1, 0, 0, 0);
+    private final static LocalDateTime THIS_YEAR = LocalDateTime.of(TODAY.getYear(), 1, 1, 0, 0, 0);
 
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
@@ -167,4 +175,30 @@ public class BusinessService {
         return new ApiResponse("SUCCESS", true);
     }
 
+    public ApiResponse getInfo(String time) {
+        Timestamp startTime = Timestamp.valueOf(TODAY);
+        if (time.equals("week")) {
+            startTime = Timestamp.valueOf(THIS_WEEK);
+        } else if (time.equals("month")) {
+            startTime = Timestamp.valueOf(THIS_MONTH);
+        } else if (time.equals("year")) {
+            startTime = Timestamp.valueOf(THIS_YEAR);
+        }
+        Integer subscribers = businessRepository.countAllByCreatedAtAfter(startTime);
+
+        List<Subscription> subscriptionList = subscriptionRepository.findAllByCreatedAtAfterAndStatusTariff(startTime, StatusTariff.CONFIRMED);
+        double subscriptionPayment = 0d;
+        for (Subscription subscription : subscriptionList) {
+            subscriptionPayment += subscription.getTariff().getPrice();
+        }
+        Integer waiting = subscriptionRepository.countAllByStatusTariff(StatusTariff.WAITING);
+
+        Integer rejected = subscriptionRepository.countAllByStatusTariff(StatusTariff.REJECTED);
+
+        SuperAdminInfoDto infoDto = new SuperAdminInfoDto(
+                subscribers, rejected, waiting, subscriptionPayment
+        );
+
+        return new ApiResponse(true, infoDto);
+    }
 }
