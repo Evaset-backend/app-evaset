@@ -42,7 +42,9 @@ public class SubscriptionService {
 
     public ApiResponse confirmSubscription(UUID subscriptionId, String statusTariff) {
         Optional<Subscription> optionalSubscription = repository.findById(subscriptionId);
-        if (optionalSubscription.isEmpty()) new ApiResponse("not found subscription", false);
+        if (optionalSubscription.isEmpty()) {
+            return new ApiResponse("not found subscription", false);
+        }
         Subscription subscription = optionalSubscription.get();
         Lifetime lifetime = subscription.getTariff().getLifetime();
         int interval = subscription.getTariff().getInterval();
@@ -97,6 +99,11 @@ public class SubscriptionService {
                     }
                 }
             } else if (subscription.getStatusTariff().equals(StatusTariff.REJECTED)) {
+                if (subscription.getStartDay() == null) {
+                    subscription.setStatusTariff(StatusTariff.WAITING);
+                    repository.save(subscription);
+                    confirmSubscription(subscriptionId, statusTariff);
+                }
                 subscription.setStatusTariff(StatusTariff.CONFIRMED);
                 subscription.setActive(true);
             }
