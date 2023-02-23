@@ -34,16 +34,11 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.allProductByCategory(branchId,categoryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @GetMapping("/amounts/{branchId}")
+    @GetMapping("/amounts-branch/{branchId}")
     public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-//    @GetMapping("/amounts-branch/{branchId}")
-//    public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {
-//        ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
     @GetMapping("/most-sale/{branchId}")
     public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.mostSaleProducts(branchId);
