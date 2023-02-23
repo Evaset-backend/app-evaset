@@ -7,11 +7,13 @@ import uz.pdp.springsecurity.enums.Lifetime;
 import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.mapper.SubscriptionMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.SubscriptionGetDto;
 import uz.pdp.springsecurity.payload.SubscriptionPostDto;
 import uz.pdp.springsecurity.repository.SubscriptionRepository;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -148,5 +150,36 @@ public class SubscriptionService {
             return new ApiResponse("successfully active", true);
         }
         return new ApiResponse("not verified by super admin or while your tariff is active", false);
+    }
+
+    public ApiResponse getAllHistory() {
+        List<Subscription> all = repository.findAll();
+        List<SubscriptionGetDto> getDtoList = new ArrayList<>();
+        ;
+        double totalSum = 0;
+        for (Subscription subscription : all) {
+            if (subscription.getStatusTariff().equals(StatusTariff.CONFIRMED)) {
+                totalSum += subscription.getTariff().getPrice();
+                SubscriptionGetDto subscriptionGetDto = mapper.toDto(subscription);
+                subscriptionGetDto.setTotalSum(totalSum);
+                getDtoList.add(subscriptionGetDto);
+            }
+        }
+        return new ApiResponse("all history", true, getDtoList);
+    }
+
+    public ApiResponse getByBusinessId(UUID id) {
+        List<Subscription> allByBusinessId = repository.findAllByBusiness_Id(id);
+        List<SubscriptionGetDto> all = new ArrayList<>();
+        double totalSum = 0;
+        for (Subscription subscription : allByBusinessId) {
+            if (subscription.getStatusTariff().equals(StatusTariff.CONFIRMED)) {
+                totalSum += subscription.getTariff().getPrice();
+            }
+            SubscriptionGetDto subscriptionGetDto = mapper.toDto(subscription);
+            subscriptionGetDto.setTotalSum(totalSum);
+            all.add(subscriptionGetDto);
+        }
+        return new ApiResponse("all subscription", true, all);
     }
 }

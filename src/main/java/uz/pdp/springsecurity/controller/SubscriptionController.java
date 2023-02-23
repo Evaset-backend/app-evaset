@@ -21,9 +21,9 @@ public class SubscriptionController {
 
     @CheckPermission("CREATE_SUBSCRIPTION")
     @PostMapping
-    public HttpEntity<?> create(@RequestBody SubscriptionPostDto subscriptionPostDto){
-            ApiResponse apiResponse = subscriptionService.create(subscriptionPostDto);
-            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    public HttpEntity<?> create(@RequestBody SubscriptionPostDto subscriptionPostDto) {
+        ApiResponse apiResponse = subscriptionService.create(subscriptionPostDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("VIEW_SUBSCRIPTION")
@@ -44,6 +44,20 @@ public class SubscriptionController {
     @PutMapping("/active/{subscriptionId}")
     public HttpEntity<?> activeSubscription(@PathVariable UUID subscriptionId) {
         ApiResponse apiResponse = subscriptionService.active(subscriptionId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_SUBSCRIPTION")
+    @GetMapping("/getAllHistory")
+    public HttpEntity<?> getAllHistory() {
+        ApiResponse apiResponse = subscriptionService.getAllHistory();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_SUBSCRIPTION")
+    @GetMapping("/getByBusinessId/{id}")
+    public HttpEntity<?> getByBusinessId(@PathVariable UUID id) {
+        ApiResponse apiResponse = subscriptionService.getByBusinessId(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
