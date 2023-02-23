@@ -32,7 +32,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
     void deleteAllByTrader_Id(UUID trader_id);
 
 
-
     List<Trade> findAllByPayDateIsBetweenAndBranch_Id(Date payDate, Date payDate2, UUID branch_id);
 
 
@@ -44,6 +43,11 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     List<Trade> findAllByPayDateBetween(Date startDate, Date endDate);
 
-    List<Trade> findAllByPayDateAndBranchBetween(Date payDate,Date date2, UUID id);
+    List<Trade> findAllByPayDateAndBranchBetween(Date payDate, Date date2, UUID id);
 
+    List<Trade> findAllByCreatedAtAfterAndBranch_Id(Timestamp createdAt, UUID branch_id);
+
+    List<Trade> findAllByCreatedAtAfterAndCustomer_Id(Timestamp createdAt, UUID customer_id);
+
+    List<Trade> findAllByCreatedAtBetweenAndCustomer_Id(Timestamp startTimestamp, Timestamp endTimestamp, UUID customer_id);
 }
