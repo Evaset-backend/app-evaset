@@ -115,7 +115,6 @@ public class BusinessService {
         business.setName(businessEditDto.getName());
         business.setDescription(businessEditDto.getDescription());
         business.setActive(businessEditDto.isActive());
-        business.setDelete(businessEditDto.isDelete());
 
         businessRepository.save(business);
         return new ApiResponse("EDITED", true);
