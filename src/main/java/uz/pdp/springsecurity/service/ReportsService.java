@@ -18,6 +18,9 @@ public class ReportsService {
     BusinessRepository businessRepository;
 
     @Autowired
+    ProductionRepository productionRepository;
+
+    @Autowired
     ProductRepository productRepository;
 
     @Autowired
@@ -353,37 +356,83 @@ public class ReportsService {
         outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
         return new ApiResponse("Found",true, outlayList);
     }
-    public ApiResponse customerReports(UUID branchId) {
+    public ApiResponse customerReports(UUID branchId,UUID customerId,Date startDate, Date endDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Not Found");
         }
-
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
-
-        if (tradeProductList.isEmpty()) {
-            return new ApiResponse("Not Found Purchase", false);
+        List<TradeProduct> tradeProducts = tradeProductRepository.findAllByProduct_BranchId(branchId);
+        if (tradeProducts.isEmpty()){
+            return new ApiResponse("Traded Product Not Found",false);
         }
-
         List<CustomerReportsDto> customerReportsDtoList = new ArrayList<>();
-        for (TradeProduct tradeProduct : tradeProductList) {
-            CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-            customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
-            customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
-            customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
-            customerReportsDto.setProduct(tradeProduct.getProduct().getName());
-            customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
-            customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
-            customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
-            customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-            customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
-            customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
-            customerReportsDtoList.add(customerReportsDto);
-        }
-        customerReportsDtoList.sort(Comparator.comparing(CustomerReportsDto::getTotalSum).reversed());
 
-        return new ApiResponse("Found", true, customerReportsDtoList);
+
+        if (startDate != null && endDate != null){
+            Timestamp to = new Timestamp(startDate.getTime());
+            Timestamp from = new Timestamp(endDate.getTime());
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(from,to,branchId);
+            if (tradeProductList.isEmpty()) {
+                return new ApiResponse("Not Found Purchase", false);
+            }
+            for (TradeProduct tradeProduct : tradeProductList) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
+        } else if (customerId != null) {
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_CustomerId(customerId);
+            if (tradeProductList.isEmpty()) {
+                return new ApiResponse("Not Found Purchase With This Customer", false);
+            }
+            for (TradeProduct tradeProduct : tradeProductList) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
+        }else {
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
+            if (tradeProductList.isEmpty()) {
+                return new ApiResponse("Not Found Purchase", false);
+            }
+            for (TradeProduct tradeProduct : tradeProductList) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
+        }
+            customerReportsDtoList.sort(Comparator.comparing(CustomerReportsDto::getTotalSum).reversed());
+
+            return new ApiResponse("Found", true, customerReportsDtoList);
+
     }
     public ApiResponse mostSaleProducts(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -507,7 +556,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(end,start,tradeProduct.getProduct().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProductId(start,end,tradeProduct.getProduct().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -620,7 +669,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(end,start,tradeProduct.getProduct().getCategory().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(start,end,tradeProduct.getProduct().getCategory().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -731,7 +780,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BrandId(end,start,tradeProduct.getProduct().getBrand().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BrandId(start,end,tradeProduct.getProduct().getBrand().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -842,7 +891,7 @@ public class ReportsService {
             }else if (comingEndDate != null && comingStartDate != null) {
                 Timestamp start = new Timestamp(comingStartDate.getTime());
                 Timestamp end = new Timestamp(comingEndDate.getTime());
-                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(end,start,tradeProduct.getTrade().getCustomer().getId());
+                List<TradeProduct> allByProductId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerId(start,end,tradeProduct.getTrade().getCustomer().getId());
                 if (allByProductId.isEmpty()){
                     return new ApiResponse("Traded Product Not Found For This Date",false);
                 }
@@ -892,6 +941,16 @@ public class ReportsService {
         }
 
         return new ApiResponse("Found",true,tradeList);
+    }
+
+    public ApiResponse productionReports(UUID branchId) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        List<Production> productionList = productionRepository.findAllByBranchId(branchId);
+
+        return new ApiResponse("Found",true,productionList);
     }
 
 }
