@@ -18,6 +18,9 @@ public class ReportsService {
     BusinessRepository businessRepository;
 
     @Autowired
+    SupplierRepository supplierRepository;
+
+    @Autowired
     ProductionRepository productionRepository;
 
     @Autowired
@@ -213,7 +216,7 @@ public class ReportsService {
     }
     public ApiResponse purchaseReports(UUID branchId) {
 
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found");
         }
@@ -249,8 +252,9 @@ public class ReportsService {
             return new ApiResponse("Branch Not Found");
         }
         Branch branch = optionalBranch.get();
-
-        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByCreatedAtBetweenAndPurchase_BranchId((Timestamp) startDate, (Timestamp) endDate,branch.getId());
+        Timestamp from = new Timestamp(startDate.getTime());
+        Timestamp to = new Timestamp(endDate.getTime());
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByCreatedAtBetweenAndPurchase_BranchId(from,to,branch.getId());
 
         if (purchaseProductList.isEmpty()) {
             return new ApiResponse("Purchase Product Not Found");
@@ -273,7 +277,16 @@ public class ReportsService {
         }
         return new ApiResponse("Found", true, purchaseReportsDtoList);
     }
-    public ApiResponse purchaseReportsBySupplier(UUID supplierId,UUID branchId) {
+    public ApiResponse purchaseReportsBySupplier(UUID branchId,UUID supplierId) {
+
+        Optional<Supplier> optionalSupplier = supplierRepository.findById(supplierId);
+        if (optionalSupplier.isEmpty()){
+            return new ApiResponse("Not Found Supplier");
+        }
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Not Found Branch");
+        }
 
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchase_BranchIdAndPurchase_SupplierId(branchId,supplierId);
 
@@ -372,7 +385,7 @@ public class ReportsService {
         if (startDate != null && endDate != null){
             Timestamp to = new Timestamp(startDate.getTime());
             Timestamp from = new Timestamp(endDate.getTime());
-            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(from,to,branchId);
+            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(to,from,branchId);
             if (tradeProductList.isEmpty()) {
                 return new ApiResponse("Not Found Purchase", false);
             }

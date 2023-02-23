@@ -55,7 +55,7 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.productionReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @GetMapping("/purchase/by-date/{branchId}/{supplierId}")
+    @GetMapping("/purchase/by-supplier/{branchId}/{supplierId}")
     public HttpEntity<?> purchaseReportsBySupplier(@PathVariable UUID branchId,
                                                    @PathVariable UUID supplierId) {
         ApiResponse apiResponse = reportsService.purchaseReportsBySupplier(branchId,supplierId);
