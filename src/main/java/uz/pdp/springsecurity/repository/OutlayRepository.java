@@ -25,6 +25,7 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
     List<Outlay> findAllByCreatedAtBetweenAndBranchId(Timestamp startDate, Timestamp endDate, UUID branch_id);
 
     List<Outlay> findAllByBranch_IdAndOutlayCategoryId(UUID branch_id,UUID categoryId);
+    List<Outlay> findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(Timestamp from, Timestamp to, UUID branch_id, UUID outlayCategory_id);
 
     @Query(value = "select * from outlay inner join branches b on b.business_id = ?1",nativeQuery = true)
     List<Outlay> findAllByBusinessId(UUID businessId);
