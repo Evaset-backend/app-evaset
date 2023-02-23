@@ -36,6 +36,9 @@ public class ProductDto {
 
     private double salePrice;
 
+
+    private double profitPercent;
+
     private double tax;
 
     @NotNull(message = "required line")

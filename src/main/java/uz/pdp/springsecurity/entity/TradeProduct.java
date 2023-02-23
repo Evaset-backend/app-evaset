@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.Transient;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
+import uz.pdp.springsecurity.enums.Type;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,6 +34,9 @@ public class TradeProduct extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductTypePrice productTypePrice;
 
+    @Transient
+    private String type;
+
     private double tradedQuantity;
 
 //    private double buyPrice;
@@ -43,4 +47,12 @@ public class TradeProduct extends AbsEntity {
 
     @Transient
     private Double remainQuantity;
+
+    public String getType() {
+        if (productTypePrice != null)
+            return Type.MANY.name();
+        return this.product.getType().name();
+    }
 }
+
+
