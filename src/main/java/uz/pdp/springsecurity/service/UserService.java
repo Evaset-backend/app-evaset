@@ -137,8 +137,11 @@ public class UserService {
         }
         user.setBranches(branches);
 
-        if (!businessRepository.existsById(userDto.getBusinessId()))
+        if (businessRepository.findById(userDto.getBusinessId()).isEmpty()){
             return new ApiResponse("BUSINESS NOT FOUND", false);
+        }
+
+
         user.setBusiness(businessRepository.findById(userDto.getBusinessId()).get());
 
         user.setRole((Role) response.getObject());
