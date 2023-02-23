@@ -27,6 +27,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByCategoryIdAndBranchIdAndActiveTrue(UUID category_id, UUID branch_id);
 
     List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brand_id, UUID branch_id);
+    List<Product> findAllByBrandIdAndBusinessIdAndActiveTrue(UUID brand_id, UUID businessId);
+
 
     List<Product> findAllByBranchIdAndActiveIsTrue(UUID branch_id);
 
@@ -48,4 +50,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBusiness_IdAndActiveTrue(UUID businessId);
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
 
+    List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
 }
