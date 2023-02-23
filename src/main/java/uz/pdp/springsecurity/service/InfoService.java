@@ -82,7 +82,6 @@ public class InfoService {
         }
 
         List<Trade> tradeList = tradeRepository.findAllByBranch_Id(branchId);
-//        if (tradeList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
