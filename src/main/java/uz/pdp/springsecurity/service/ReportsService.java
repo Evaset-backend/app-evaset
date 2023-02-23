@@ -489,46 +489,32 @@ public class ReportsService {
         return new ApiResponse("Found", true, totalDelivery);
     }
 
-    public ApiResponse outlayReports(UUID branchId) {
+    public ApiResponse outlayReports(UUID branchId,UUID categoryId,Date startDate,Date endDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Not Found");
         }
-        List<Outlay> outlayList = outlayRepository.findAllByBranch_Id(branchId);
-        if (outlayList.isEmpty()) {
-            return new ApiResponse("Not Found Outlay");
+        List<Outlay> outlayList = new ArrayList<>();
+        if (categoryId==null && startDate==null && endDate==null){
+            outlayList = outlayRepository.findAllByBranch_Id(branchId);
+            if (outlayList.isEmpty()) {
+                return new ApiResponse("Not Found Outlay");
+            }
+        } else if (categoryId != null && startDate == null && endDate == null) {
+            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId,categoryId);
+            if (outlayList.isEmpty()) {
+                return new ApiResponse("Not Found Outlay");
+            }
+        } else if (categoryId != null && startDate != null && endDate != null) {
+            Timestamp from = new Timestamp(startDate.getTime());
+            Timestamp to = new Timestamp(endDate.getTime());
+            outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from,to,branchId,categoryId);
+            if (outlayList.isEmpty()) {
+                return new ApiResponse("Not Found Outlay");
+            }
         }
-        outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
-        return new ApiResponse("Found", true, outlayList);
-    }
 
-    public ApiResponse outlayReportsByDate(UUID branchId, Date startDate, Date endDate) {
-
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Not Found");
-        }
-        Timestamp from = new Timestamp(startDate.getTime());
-        Timestamp to = new Timestamp(endDate.getTime());
-        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId);
-        if (outlayList.isEmpty()) {
-            return new ApiResponse("Not Found Outlay");
-        }
-        outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
-        return new ApiResponse("Found", true, outlayList);
-    }
-
-    public ApiResponse outlayReportsByCategory(UUID branchId, UUID categoryId) {
-
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Not Found");
-        }
-        List<Outlay> outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId, categoryId);
-        if (outlayList.isEmpty()) {
-            return new ApiResponse("Not Found Outlay");
-        }
         outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
         return new ApiResponse("Found", true, outlayList);
     }

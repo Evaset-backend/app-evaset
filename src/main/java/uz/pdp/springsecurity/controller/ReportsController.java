@@ -96,23 +96,11 @@ public class ReportsController {
     }
 
     @GetMapping("/outlay/{branchId}")
-    public HttpEntity<?> outlayReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.outlayReports(branchId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @GetMapping("/outlay-by-category/{branchId}/{categoryId}")
-    public HttpEntity<?> outlayReportsByCategoryId(@PathVariable UUID branchId,
-                                                   @PathVariable UUID categoryId) {
-        ApiResponse apiResponse = reportsService.outlayReportsByCategory(branchId, categoryId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @GetMapping("/outlay-by-date/{branchId}")
-    public HttpEntity<?> outlayReportsByDate(@PathVariable UUID branchId,
-                                             @RequestParam(required = false) Date startDate,
-                                             @RequestParam(required = false) Date endDate) {
-        ApiResponse apiResponse = reportsService.outlayReportsByDate(branchId, startDate, endDate);
+    public HttpEntity<?> outlayReports(@PathVariable UUID branchId,
+                                       @RequestParam(required = false) UUID categoryId,
+                                       @RequestParam(required = false) Date startDate,
+                                       @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.outlayReports(branchId,categoryId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
