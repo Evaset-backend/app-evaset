@@ -19,8 +19,8 @@ import java.util.UUID;
 public class ProductGetForPurchaseDto {
     //USE OFR SINGLE TYPE OR NULL
     private UUID productId;
-    //USE OFR SINGLE TYPE OR NULL
 
+    //USE OFR SINGLE TYPE OR NULL
     private UUID productTypePriceId;
 
     private String type;

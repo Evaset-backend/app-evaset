@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/trade")
-public class TradeControllerIml {
+public class TradeController {
     @Autowired
     TradeService tradeService;
 
