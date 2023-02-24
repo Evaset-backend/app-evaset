@@ -25,15 +25,15 @@ public class TariffController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_TO_CHOOSE_A_TARIFF")
+
     @GetMapping("/getToChooseATariff")
     public HttpEntity<?> getToChooseATariff() {
         ApiResponse apiResponse = service.getToChooseATariff();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_BY_TARIFF")
-    @GetMapping("/{id}")
+
+    @GetMapping("/getById/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
