@@ -123,16 +123,6 @@ public class TradeService {
 
     public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
 
-        /**
-         * SET LATER
-         */
-        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-        if (optionalCustomer.isEmpty() && tradeDTO.getDebtSum() > 0) {
-            return new ApiResponse("CUSTOMER NOT FOUND", false);
-        }
-        Customer customer = optionalCustomer.get();
-        trade.setCustomer(customer);
-
         Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
         if (optionalUser.isEmpty()) {
             return new ApiResponse("TRADER NOT FOUND", false);
@@ -158,8 +148,14 @@ public class TradeService {
         }
         trade.setPayMethod(optionalPaymentMethod.get());
 
+        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
         double debtSum = trade.getDebtSum();
         if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
+            if (optionalCustomer.isEmpty()) {
+                return new ApiResponse("CUSTOMER NOT FOUND", false);
+            }
+            Customer customer = optionalCustomer.get();
+            trade.setCustomer(customer);
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
