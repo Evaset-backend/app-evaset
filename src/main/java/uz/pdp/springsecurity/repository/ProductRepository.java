@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
+    List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID business_id);
+
     List<Product> findAllByCategoryIdAndActiveTrue(UUID categoryId);
     Optional<Product> findByBarcodeAndBranchIdAndActiveTrue(String barcode, UUID branch_id);
 
