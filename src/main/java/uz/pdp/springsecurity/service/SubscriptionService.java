@@ -57,7 +57,7 @@ public class SubscriptionService {
         }
 
         if (statusTariff.equalsIgnoreCase(StatusTariff.CONFIRMED.name())) {
-            Optional<Subscription> optional = repository.findByBusinessIdAndDeleteIsFalse(subscription.getBusiness().getId());
+            Optional<Subscription> optional = repository.findByBusinessIdAndActiveTrue(subscription.getBusiness().getId());
             if (!subscription.getStatusTariff().equals(StatusTariff.REJECTED) && subscription.getStatusTariff().equals(StatusTariff.WAITING)) {
                 if (subscription.isActiveNewTariff()) {
                     if (optional.isPresent()) {
