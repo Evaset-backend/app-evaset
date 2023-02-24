@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.service;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -399,11 +400,19 @@ public class ReportsService {
         for (TradeProduct tradeProduct : tradeProductList) {
             List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
             double amount = 0;
-            for (TradeProduct product : allByProductId) {
-                amount += product.getTradedQuantity();
-                productAmount.put(product.getProduct().getId(), amount);
+            if (tradeProduct.getProduct() != null) {
+                for (TradeProduct product : allByProductId) {
+                    amount += product.getTradedQuantity();
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else {
+                for (TradeProduct product : allByProductId) {
+                    amount += product.getTradedQuantity();
+                    productAmount.put(product.getProductTypePrice().getId(), amount);
+                }
             }
         }
+
         List<MostSaleProductsDto> mostSaleProductsDtoList = new ArrayList<>();
         for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
             MostSaleProductsDto mostSaleProductsDto = new MostSaleProductsDto();
@@ -500,27 +509,27 @@ public class ReportsService {
         return new ApiResponse("Found", true, totalDelivery);
     }
 
-    public ApiResponse outlayReports(UUID branchId,UUID categoryId,Date startDate,Date endDate) {
+    public ApiResponse outlayReports(UUID branchId, UUID categoryId, Date startDate, Date endDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Not Found",false);
         }
         List<Outlay> outlayList = new ArrayList<>();
-        if (categoryId==null && startDate==null && endDate==null){
+        if (categoryId == null && startDate == null && endDate == null) {
             outlayList = outlayRepository.findAllByBranch_Id(branchId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay",false);
             }
         } else if (categoryId != null && startDate == null && endDate == null) {
-            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId,categoryId);
+            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId, categoryId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay",false);
             }
         } else if (categoryId != null && startDate != null && endDate != null) {
             Timestamp from = new Timestamp(startDate.getTime());
             Timestamp to = new Timestamp(endDate.getTime());
-            outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from,to,branchId,categoryId);
+            outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from, to, branchId, categoryId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay",false);
             }
@@ -1153,11 +1162,16 @@ public class ReportsService {
     private List<ProductReportDto> getProductReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate, boolean isByCustomerId) {
         Map<UUID, Double> productAmount = new HashMap<>();
         List<ProductReportDto> all = new ArrayList<>();
-        Timestamp startTimestamp =null;
+        Timestamp startTimestamp = null;
         Timestamp endTimestamp = null;
-        if (startDate != null && endDate != null){
-             startTimestamp = new Timestamp(startDate.getTime());
-             endTimestamp = new Timestamp(endDate.getTime());
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
+        }
+
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
         }
         switch (date) {
             case ("LAST_DAY"):
@@ -1184,39 +1198,89 @@ public class ReportsService {
                 startTimestamp = Timestamp.valueOf(START_OF_MONTH);
                 endTimestamp = Timestamp.valueOf(END_OF_MONTH);
                 break;
+            case ("THIS_MONTH"):
+                startTimestamp = Timestamp.valueOf(THIS_MONTH);
+                endTimestamp = currentDay;
+                break;
+            case ("ALL"):
+                List<Trade> allByCustomerId = tradeRepository.findAllByCustomer_Id(customerId);
+                for (Trade trade : allByCustomerId) {
+                    List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByTradeId(trade.getId());
+                    for (TradeProduct tradeProduct : allTradeCustomerId) {
+                        if (tradeProduct.getProduct() != null) {
+                            List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
+                            double totalAmount = 0;
+                            for (TradeProduct product : allByProductId) {
+                                totalAmount += product.getTradedQuantity();
+                                productAmount.put(product.getProduct().getId(), totalAmount);
+                            }
+                        }
+                    }
+                    for (TradeProduct tradeProduct : allTradeCustomerId) {
+                        if (tradeProduct.getProductTypePrice() != null) {
+                            List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
+                            double totalAmount = 0;
+                            for (TradeProduct product : allByProductTypePriceId) {
+                                totalAmount += product.getTradedQuantity();
+                                productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                            }
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
-        if (isByCustomerId) {
-            List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_Customer_Id(startTimestamp, endTimestamp, customerId);
-            for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
-                if (tradeProduct.getProduct() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProduct().getId(), amount);
+        if (isByCustomerId && !date.equals("ALL")) {
+            List<Trade> allByCustomerId = tradeRepository.findAllByCreatedAtBetweenAndCustomer_Id(startTimestamp, endTimestamp, customerId);
+            for (Trade trade : allByCustomerId) {
+                List<TradeProduct> allTradeCustomerId = tradeProductRepository.findAllByTradeId(trade.getId());
+                for (TradeProduct tradeProduct : allTradeCustomerId) {
+                    if (tradeProduct.getProduct() != null) {
+                        List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
+                        double totalAmount = 0;
+                        for (TradeProduct product : allByProductId) {
+                            totalAmount += product.getTradedQuantity();
+                            productAmount.put(product.getProduct().getId(), totalAmount);
+                        }
+                    }
+                }
+                for (TradeProduct tradeProduct : allTradeCustomerId) {
+                    if (tradeProduct.getProductTypePrice() != null) {
+                        List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
+                        double totalAmount = 0;
+                        for (TradeProduct product : allByProductTypePriceId) {
+                            totalAmount += product.getTradedQuantity();
+                            productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                        }
+                    }
                 }
             }
-            for (TradeProduct tradeProduct : allTradeCustomerId) {
-                double amount = 0;
-                if (tradeProduct.getProductTypePrice() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
-                }
+        } else if (!date.equals("ALL")) {
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if (optionalBranch.isEmpty()) {
+                return null;
             }
-        } else {
-            List<TradeProduct> allTradeBranch = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BranchId(startTimestamp, endTimestamp, branchId);
+            Business business = optionalBranch.get().getBusiness();
+            List<TradeProduct> allTradeBranch = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BusinessId(startTimestamp, endTimestamp, business.getId());
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProduct() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProduct().getId(), amount);
+                    List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+                    double totalAmount = 0;
+                    for (TradeProduct product : allByProductId) {
+                        totalAmount += product.getTradedQuantity();
+                        productAmount.put(product.getProduct().getId(), totalAmount);
+                    }
                 }
             }
             for (TradeProduct tradeProduct : allTradeBranch) {
-                double amount = 0;
                 if (tradeProduct.getProductTypePrice() != null) {
-                    amount += tradeProduct.getTradedQuantity();
-                    productAmount.put(tradeProduct.getProductTypePrice().getId(), amount);
+                    List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceId(tradeProduct.getProductTypePrice().getId());
+                    double totalAmount = 0;
+                    for (TradeProduct product : allByProductTypePriceId) {
+                        totalAmount += product.getTradedQuantity();
+                        productAmount.put(product.getProductTypePrice().getId(), totalAmount);
+                    }
                 }
             }
         }
