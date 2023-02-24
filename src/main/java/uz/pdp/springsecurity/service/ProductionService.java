@@ -34,11 +34,15 @@ public class ProductionService {
         if (productionDto.getProductId() != null) {
             Optional<Product> optional = productRepository.findById(productionDto.getProductId());
             if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
-            production.setProduct(optional.get());
+            Product product = optional.get();
+            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            production.setProduct(product);
         } else {
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productionDto.getProductTypePriceId());
             if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
-            production.setProductTypePrice(optional.get());
+            ProductTypePrice productTypePrice = optional.get();
+            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            production.setProductTypePrice(productTypePrice);
         }
         production.setQuantity(productionDto.getQuantity());
         production.setDate(productionDto.getDate());
