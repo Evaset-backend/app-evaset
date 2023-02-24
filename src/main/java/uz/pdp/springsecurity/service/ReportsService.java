@@ -194,24 +194,45 @@ public class ReportsService {
         List<TradeProduct> tradeProductList =new ArrayList<>();
         if (payMethodId == null && customerId == null && startDate == null && endDate == null){
             tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         } else if (payMethodId != null && customerId == null && startDate == null && endDate == null) {
             tradeProductList = tradeProductRepository.findAllByTrade_PayMethodIdAndTrade_BranchId(payMethodId,branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         }else if (payMethodId != null && customerId == null && startDate != null && endDate != null) {
             Timestamp from = new Timestamp(startDate.getTime());
             Timestamp to = new Timestamp(endDate.getTime());
             tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_PayMethodIdAndTrade_BranchId(from,to,payMethodId,branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         }else if (customerId != null && payMethodId == null && startDate != null && endDate != null) {
             Timestamp from = new Timestamp(startDate.getTime());
             Timestamp to = new Timestamp(endDate.getTime());
             tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_CustomerIdAndTrade_BranchId(from,to,customerId,branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         } else if (customerId == null && payMethodId == null && startDate != null && endDate != null) {
             Timestamp from = new Timestamp(startDate.getTime());
             Timestamp to = new Timestamp(endDate.getTime());
             tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from,to,branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         } else if (payMethodId == null && customerId != null && startDate == null && endDate == null) {
             tradeProductList = tradeProductRepository.findAllByTrade_CustomerIdAndTrade_BranchId(customerId,branchId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         } else if (customerId != null && payMethodId != null && startDate == null && endDate == null) {
             tradeProductList = tradeProductRepository.findAllByTrade_CustomerIdAndTrade_BranchIdAndTrade_PayMethodId(customerId,branchId,payMethodId);
+            if (tradeProductList.isEmpty()){
+                return new ApiResponse("Trade Not Found",false);
+            }
         }
 
         List<TradeReportsDto> tradeReportsDtoList = new ArrayList<>();
