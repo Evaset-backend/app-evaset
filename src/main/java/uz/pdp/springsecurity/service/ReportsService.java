@@ -1160,8 +1160,6 @@ public class ReportsService {
         return new ApiResponse("Found", true, productionList);
     }
 
-
-
     public ApiResponse productsReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
