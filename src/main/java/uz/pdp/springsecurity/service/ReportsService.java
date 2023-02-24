@@ -334,11 +334,19 @@ public class ReportsService {
         for (TradeProduct tradeProduct : tradeProductList) {
             List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
             double amount = 0;
-            for (TradeProduct product : allByProductId) {
-                amount += product.getTradedQuantity();
-                productAmount.put(product.getProduct().getId(), amount);
+            if (tradeProduct.getProduct() != null) {
+                for (TradeProduct product : allByProductId) {
+                    amount += product.getTradedQuantity();
+                    productAmount.put(product.getProduct().getId(), amount);
+                }
+            } else {
+                for (TradeProduct product : allByProductId) {
+                    amount += product.getTradedQuantity();
+                    productAmount.put(product.getProductTypePrice().getId(), amount);
+                }
             }
         }
+
         List<MostSaleProductsDto> mostSaleProductsDtoList = new ArrayList<>();
         for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
             MostSaleProductsDto mostSaleProductsDto = new MostSaleProductsDto();
@@ -490,27 +498,27 @@ public class ReportsService {
         return new ApiResponse("Found", true, totalDelivery);
     }
 
-    public ApiResponse outlayReports(UUID branchId,UUID categoryId,Date startDate,Date endDate) {
+    public ApiResponse outlayReports(UUID branchId, UUID categoryId, Date startDate, Date endDate) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Not Found");
         }
         List<Outlay> outlayList = new ArrayList<>();
-        if (categoryId==null && startDate==null && endDate==null){
+        if (categoryId == null && startDate == null && endDate == null) {
             outlayList = outlayRepository.findAllByBranch_Id(branchId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay");
             }
         } else if (categoryId != null && startDate == null && endDate == null) {
-            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId,categoryId);
+            outlayList = outlayRepository.findAllByBranch_IdAndOutlayCategoryId(branchId, categoryId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay");
             }
         } else if (categoryId != null && startDate != null && endDate != null) {
             Timestamp from = new Timestamp(startDate.getTime());
             Timestamp to = new Timestamp(endDate.getTime());
-            outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from,to,branchId,categoryId);
+            outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(from, to, branchId, categoryId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay");
             }
@@ -1170,7 +1178,7 @@ public class ReportsService {
                 startTimestamp = Timestamp.valueOf(START_OF_MONTH);
                 endTimestamp = Timestamp.valueOf(END_OF_MONTH);
                 break;
-            case("THIS_MONTH"):
+            case ("THIS_MONTH"):
                 startTimestamp = Timestamp.valueOf(THIS_MONTH);
                 endTimestamp = currentDay;
                 break;
@@ -1228,7 +1236,7 @@ public class ReportsService {
                     }
                 }
             }
-        } else if(!date.equals("ALL")){
+        } else if (!date.equals("ALL")) {
             Optional<Branch> optionalBranch = branchRepository.findById(branchId);
             if (optionalBranch.isEmpty()) {
                 return null;
