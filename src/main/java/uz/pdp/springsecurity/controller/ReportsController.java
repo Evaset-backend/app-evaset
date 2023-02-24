@@ -58,8 +58,12 @@ public class ReportsController {
     }
 
     @GetMapping("/most-sale/{branchId}")
-    public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.mostSaleProducts(branchId);
+    public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId,
+                                          @RequestParam(required = false) UUID categoryId,
+                                          @RequestParam(required = false) UUID brandId,
+                                          @RequestParam(required = false) Date startDate,
+                                          @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.mostSaleProducts(branchId,categoryId,brandId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
