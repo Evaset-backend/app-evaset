@@ -113,8 +113,9 @@ public class OutlayService {
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
         List<Outlay> allByBusinessId = outlayRepository.findAllByBusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        allByBusinessId.sort(Comparator.comparing(Outlay::getTotalSum).reversed());
+        if (allByBusinessId.isEmpty()){
+            return new ApiResponse("NOT FOUND", false);
+        }
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
