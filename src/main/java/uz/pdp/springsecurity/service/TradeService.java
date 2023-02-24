@@ -148,15 +148,17 @@ public class TradeService {
         }
         trade.setPayMethod(optionalPaymentMethod.get());
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-        double debtSum = trade.getDebtSum();
-        if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
-            if (optionalCustomer.isEmpty()) {
-                return new ApiResponse("CUSTOMER NOT FOUND", false);
+        if (tradeDTO.getCustomerId()!=null) {
+            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+            double debtSum = trade.getDebtSum();
+            if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
+                if (optionalCustomer.isEmpty()) {
+                    return new ApiResponse("CUSTOMER NOT FOUND", false);
+                }
+                Customer customer = optionalCustomer.get();
+                trade.setCustomer(customer);
+                customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
             }
-            Customer customer = optionalCustomer.get();
-            trade.setCustomer(customer);
-            customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
