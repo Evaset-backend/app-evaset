@@ -25,7 +25,6 @@ public class BusinessController {
      * @param businessDto
      * @return ApiResponse(success - > true message - > ADDED)
      */
-    @CheckPermission("ADD_BUSINESS")
     @PostMapping
     public HttpEntity<?> add(@RequestBody BusinessDto businessDto) {
         ApiResponse apiResponse = businessService.add(businessDto);
