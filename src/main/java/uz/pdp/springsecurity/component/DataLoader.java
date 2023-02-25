@@ -587,12 +587,12 @@ public class DataLoader implements CommandLineRunner {
             ));
 
             payMethodRepository.save(new PaymentMethod(
-                    "UzCard",
+                    "PlastikKarta",
                     business
             ));
 
             payMethodRepository.save(new PaymentMethod(
-                    "Humo",
+                    "BankOrqali",
                     business
             ));
         }

@@ -19,6 +19,7 @@ public class InfoService {
     private final BusinessRepository businessRepository;
     private final PurchaseRepository purchaseRepository;
     private final TradeRepository tradeRepository;
+    private final PaymentRepository paymentRepository;
     @Autowired
     OutlayRepository outlayRepository;
     @Autowired
@@ -37,7 +38,8 @@ public class InfoService {
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
                 tradeRepository.findAllByBranch_BusinessId(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
-                tradeProductRepository.findAllByProduct_BusinessId(businessId)
+                tradeProductRepository.findAllByProduct_BusinessId(businessId),
+                paymentRepository.findAllByPayMethod_BusinessId(businessId)
         );
     }
 
@@ -52,11 +54,12 @@ public class InfoService {
                 purchaseRepository.findAllByBranch_Id(branchId),
                 tradeRepository.findAllByBranch_Id(branchId),
                 outlayRepository.findAllByBranch_Id(branchId),
-                tradeProductRepository.findAllByProduct_BranchId(branchId)
+                tradeProductRepository.findAllByProduct_BranchId(branchId),
+                paymentRepository.findAllByTrade_BranchId(branchId)
         );
     }
 
-    private ApiResponse getInfoHelper(List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<TradeProduct> tradeProductList) {
+    private ApiResponse getInfoHelper(List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<TradeProduct> tradeProductList, List<Payment> paymentList) {
 
 
         double allPurchase = 0;
@@ -71,16 +74,12 @@ public class InfoService {
 
         double allTrade = 0;
         double allTradeDebt = 0;
-        HashMap<String, Double> byPayMethods = new HashMap<>();
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
-            String type = trade.getPayMethod().getType();
-            byPayMethods.put(type, byPayMethods.getOrDefault(type, 0d) + trade.getPaidSum());
         }
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
-        infoDto.setByPayMethods(byPayMethods);
 
         double totalProfit = 0;
         for (TradeProduct tradeProduct : tradeProductList) {
@@ -93,6 +92,13 @@ public class InfoService {
             totalOutlay += outlay.getTotalSum();
         }
         infoDto.setMyOutlay(totalOutlay);
+
+        HashMap<String, Double> byPayMethods = new HashMap<>();
+        for (Payment payment : paymentList) {
+            String type = payment.getPayMethod().getType();
+            byPayMethods.put(type, byPayMethods.getOrDefault(type, 0d) + payment.getPaidSum());
+        }
+        infoDto.setByPayMethods(byPayMethods);
 
         return new ApiResponse("FOUND", true, infoDto);
     }
