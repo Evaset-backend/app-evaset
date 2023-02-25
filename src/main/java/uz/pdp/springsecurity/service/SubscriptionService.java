@@ -96,6 +96,20 @@ public class SubscriptionService {
                         subscription.setStartDay(activeTariffEndDay);
                         subscription.setStatusTariff(StatusTariff.CONFIRMED);
                         subscription.setActive(false);
+                    }else {
+                        if (lifetime.equals(Lifetime.MONTH)) {
+                            LocalDate date = LocalDate.now().plusMonths(interval);
+                            Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        } else if (lifetime.equals(Lifetime.YEAR)) {
+                            LocalDate date = LocalDate.now().plusYears(interval);
+                            Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        }
+                        subscription.setStartDay(new Timestamp(System.currentTimeMillis()));
+                        subscription.setStatusTariff(StatusTariff.CONFIRMED);
+                        subscription.setActiveNewTariff(false);
+                        subscription.setActive(true);
                     }
                 }
             } else if (subscription.getStatusTariff().equals(StatusTariff.REJECTED)) {

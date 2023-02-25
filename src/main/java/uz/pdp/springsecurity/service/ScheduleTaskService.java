@@ -26,7 +26,7 @@ public class ScheduleTaskService {
     private final static LocalDateTime END_TODAY = LocalDateTime.of(TODAY.getYear(), TODAY.getMonth(), TODAY.getDayOfMonth(), 23, 59, 59);
 
 
-    @Scheduled(cron = "0 0/44 23 * * *")
+    @Scheduled(cron = "0 0/46 10 * * *")
     public void execute() {
 
         List<Subscription> subscriptions = subscriptionRepository
