@@ -91,6 +91,10 @@ public class UserService {
                 userRepository.save(user);
                 return new ApiResponse("ADDED", true);
             }
+
+
+            userRepository.save(user);
+            return new ApiResponse("ADDED", true);
         }
         return new ApiResponse("You have opened a sufficient branch according to the employee", false);
     }
@@ -130,6 +134,8 @@ public class UserService {
                 return new ApiResponse("BRANCH NOT FOUND", false);
             }
         }
+        List<Branch> sortedList = new ArrayList<>(branches);
+        sortedList.sort(Comparator.comparing(Branch::getCreatedAt));
         user.setBranches(branches);
 
         if (businessRepository.findById(userDto.getBusinessId()).isEmpty()) {
