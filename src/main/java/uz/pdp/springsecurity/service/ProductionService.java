@@ -47,6 +47,12 @@ public class ProductionService {
 
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
+        production.setQuantity(productionDto.getQuantity());
+        production.setDate(productionDto.getDate());
+        production.setCostEachOne(productionDto.isCostEachOne());
+        production.setContentPrice(productionDto.getContentPrice());
+        production.setCost(productionDto.getCost());
+        production.setTotalPrice(productionDto.getTotalPrice());
 
         if (productionDto.getProductId() != null) {
             Optional<Product> optional = productRepository.findById(productionDto.getProductId());
@@ -61,12 +67,6 @@ public class ProductionService {
             productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
             production.setProductTypePrice(productTypePrice);
         }
-        production.setQuantity(productionDto.getQuantity());
-        production.setDate(productionDto.getDate());
-        production.setCostEachOne(productionDto.isCostEachOne());
-        production.setContentPrice(productionDto.getContentPrice());
-        production.setCost(productionDto.getCost());
-        production.setTotalPrice(productionDto.getTotalPrice());
 
         productionRepository.save(production);
         List<ContentProduct>contentProductList = new ArrayList<>();
@@ -77,16 +77,17 @@ public class ProductionService {
             contentProduct.setProduction(production);
             ContentProduct savedContentProduct = warehouseService.createContentProduct(contentProduct, contentProductDto);
             if (savedContentProduct == null) continue;
-            fifoCalculationService.createContentProduct(branch, savedContentProduct);
-            contentPrice += savedContentProduct.getTotalPrice();
             savedContentProduct.setQuantity(contentProductDto.getQuantity());
             savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+            fifoCalculationService.createContentProduct(branch, savedContentProduct);
+            contentPrice += savedContentProduct.getTotalPrice();
             contentProductList.add(savedContentProduct);
         }
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
         production.setTotalPrice(production.getCost() + contentPrice);
+        productionRepository.save(production);
         warehouseService.createOrEditWareHouse(production);
         return new ApiResponse("SUCCESS", true);
     }
