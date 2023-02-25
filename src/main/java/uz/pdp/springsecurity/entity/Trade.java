@@ -8,11 +8,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -39,6 +37,10 @@ public class Trade extends AbsEntity {
 
     @ManyToOne
     private PaymentStatus paymentStatus;
+
+    /**
+     *  DO NOT USE THIS FIELD/ USE PAYMENT ENTITY
+     */
 
     @ManyToOne
     private PaymentMethod payMethod;
