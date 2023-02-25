@@ -53,6 +53,9 @@ public class ReportsService {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    PaymentRepository paymentRepository;
+
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(date.getTime());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -246,7 +249,8 @@ public class ReportsService {
             tradeReportsDto.setBarcode(tradeProduct.getProduct().getBarcode());
             tradeReportsDto.setTradedDate(tradeProduct.getTrade().getPayDate());
             tradeReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
-            tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+            //todo
+            //tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
             tradeReportsDto.setAmount(tradeProduct.getTradedQuantity());
             tradeReportsDto.setDiscount(tradeProduct.getTrade().getCustomer().getCustomerGroup().getPercent());
             tradeReportsDto.setTotalSum(tradeProduct.getTotalSalePrice());
@@ -602,7 +606,8 @@ public class ReportsService {
                 customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
                 customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
                 customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                //todo
+                //customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
                 customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
                 customerReportsDtoList.add(customerReportsDto);
             }
@@ -621,7 +626,8 @@ public class ReportsService {
                 customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
                 customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
                 customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                //todo
+                //customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
                 customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
                 customerReportsDtoList.add(customerReportsDto);
             }
@@ -640,7 +646,8 @@ public class ReportsService {
                 customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
                 customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
                 customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                //todo
+                //customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
                 customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
                 customerReportsDtoList.add(customerReportsDto);
             }
@@ -1203,8 +1210,6 @@ public class ReportsService {
 
         return new ApiResponse("Found", true, productionList);
     }
-
-
 
     public ApiResponse productsReport(UUID customerId, UUID branchId, String date, Date startDate, Date endDate) {
 

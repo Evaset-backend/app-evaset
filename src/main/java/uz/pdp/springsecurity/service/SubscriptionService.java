@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.Subscription;
 import uz.pdp.springsecurity.enums.Lifetime;
 import uz.pdp.springsecurity.enums.StatusTariff;
@@ -9,6 +10,7 @@ import uz.pdp.springsecurity.mapper.SubscriptionMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SubscriptionGetDto;
 import uz.pdp.springsecurity.payload.SubscriptionPostDto;
+import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.SubscriptionRepository;
 
 import java.sql.Timestamp;
@@ -27,6 +29,14 @@ public class SubscriptionService {
     private final SubscriptionMapper mapper;
 
     public ApiResponse create(SubscriptionPostDto subscriptionPostDto) {
+        UUID businessId = subscriptionPostDto.getBusinessId();
+
+        List<Subscription> allSubscription = repository.findAllByBusiness_IdAndDeleteIsFalse(businessId);
+        int size = allSubscription.size();
+        if (size >= 2) {
+            return new ApiResponse("subscription exceeded the limit", false);
+        }
+
         //business va tariff id xatosiz berilishi kerak chunki tekshirilib ketmad
         Subscription subscription = mapper.toEntity(subscriptionPostDto);
         subscription.setActive(false);
@@ -96,6 +106,20 @@ public class SubscriptionService {
                         subscription.setStartDay(activeTariffEndDay);
                         subscription.setStatusTariff(StatusTariff.CONFIRMED);
                         subscription.setActive(false);
+                    } else {
+                        if (lifetime.equals(Lifetime.MONTH)) {
+                            LocalDate date = LocalDate.now().plusMonths(interval);
+                            Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        } else if (lifetime.equals(Lifetime.YEAR)) {
+                            LocalDate date = LocalDate.now().plusYears(interval);
+                            Timestamp timestamp = Timestamp.valueOf(date.atStartOfDay());
+                            subscription.setEndDay(timestamp);
+                        }
+                        subscription.setStartDay(new Timestamp(System.currentTimeMillis()));
+                        subscription.setStatusTariff(StatusTariff.CONFIRMED);
+                        subscription.setActiveNewTariff(false);
+                        subscription.setActive(true);
                     }
                 }
             } else if (subscription.getStatusTariff().equals(StatusTariff.REJECTED)) {

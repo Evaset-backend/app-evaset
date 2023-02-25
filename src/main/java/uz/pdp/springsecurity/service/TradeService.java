@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
@@ -68,8 +69,11 @@ public class TradeService {
 
     @Autowired
     WarehouseRepository warehouseRepository;
+
+    private final PaymentMapper paymentMapper;
     private final SubscriptionRepository subscriptionRepository;
     private final ProductTypeComboRepository productTypeComboRepository;
+    private final PaymentRepository paymentRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -123,16 +127,6 @@ public class TradeService {
 
     public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
 
-        /**
-         * SET LATER
-         */
-        Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-        if (optionalCustomer.isEmpty() && tradeDTO.getDebtSum() > 0) {
-            return new ApiResponse("CUSTOMER NOT FOUND", false);
-        }
-        Customer customer = optionalCustomer.get();
-        trade.setCustomer(customer);
-
         Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
         if (optionalUser.isEmpty()) {
             return new ApiResponse("TRADER NOT FOUND", false);
@@ -152,14 +146,17 @@ public class TradeService {
         }
         trade.setPaymentStatus(optionalPaymentStatus.get());
 
-        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(tradeDTO.getPayMethodId());
-        if (optionalPaymentMethod.isEmpty()) {
-            return new ApiResponse("PAYMAENTMETHOD NOT FOUND", false);
+        if (tradeDTO.getPaymentDtoList().isEmpty()) {
+            return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
         }
-        trade.setPayMethod(optionalPaymentMethod.get());
 
         double debtSum = trade.getDebtSum();
         if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
+            if (tradeDTO.getCustomerId() == null) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Customer customer = optionalCustomer.get();
+            trade.setCustomer(customer);
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
         }
 
@@ -192,12 +189,28 @@ public class TradeService {
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
 
-
         trade.setPayDate(tradeDTO.getPayDate());
         trade.setTotalSum(tradeDTO.getTotalSum());
         trade.setPaidSum(tradeDTO.getPaidSum());
         trade.setDebtSum(tradeDTO.getDebtSum());
         tradeRepository.save(trade);
+
+        List<Payment> paymentList = new ArrayList<>();
+        for (PaymentDto paymentDto : tradeDTO.getPaymentDtoList()) {
+            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentDto.getPaymentMethodId());
+            if (optionalPaymentMethod.isEmpty()) return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
+            paymentList.add(new Payment(
+                    trade,
+                    optionalPaymentMethod.get(),
+                    paymentDto.getPaidSum()
+            ));
+        }
+
+        if (paymentList.isEmpty()) {
+            return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
+        }
+        paymentRepository.saveAll(paymentList);
+        trade.setPayMethod(paymentList.get(0).getPayMethod());
 
         /**
          * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
@@ -265,9 +278,12 @@ public class TradeService {
 
             tradeProduct.setRemainQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
         }
+        List<Payment> paymentList = paymentRepository.findAllByTradeId(trade.getId());
+        List<PaymentDto> paymentDtoList = paymentMapper.toDtoList(paymentList);
         TradeGetOneDto tradeGetOneDto = new TradeGetOneDto();
         tradeGetOneDto.setTrade(trade);
         tradeGetOneDto.setTradeProductList(allByTradeId);
+        tradeGetOneDto.setPaymentDtoList(paymentDtoList);
         return new ApiResponse(true, tradeGetOneDto);
     }
 
@@ -319,7 +335,11 @@ public class TradeService {
     }
 
     public ApiResponse getByPayMethod(UUID payMethod_id) {
-        List<Trade> allByPaymentMethod_id = tradeRepository.findAllByPayMethod_Id(payMethod_id);
+        List<Trade> allByPaymentMethod_id = new ArrayList<>();
+        List<Payment> paymentList = paymentRepository.findAllByPayMethodId(payMethod_id);
+        for (Payment payment : paymentList) {
+            allByPaymentMethod_id.add(payment.getTrade());
+        }
         if (allByPaymentMethod_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByPaymentMethod_id);

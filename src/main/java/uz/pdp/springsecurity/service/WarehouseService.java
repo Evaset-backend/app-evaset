@@ -147,7 +147,6 @@ public class WarehouseService {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(contentProduct.getProduction().getBranch().getId(), contentProductDto.getProductId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() < contentProductDto.getQuantity()) return null;
             warehouse.setAmount(warehouse.getAmount() - contentProductDto.getQuantity());
             warehouseRepository.save(warehouse);
             contentProduct.setProduct(warehouse.getProduct());
@@ -155,7 +154,6 @@ public class WarehouseService {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(contentProduct.getProduction().getBranch().getId(), contentProductDto.getProductTypePriceId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
-            if (warehouse.getAmount() < contentProductDto.getQuantity()) return null;
             warehouse.setAmount(warehouse.getAmount() - contentProductDto.getQuantity());
             warehouseRepository.save(warehouse);
             contentProduct.setProductTypePrice(warehouse.getProductTypePrice());

@@ -3,16 +3,10 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ContentProductDto;
-import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
-import uz.pdp.springsecurity.payload.ProductionDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +17,42 @@ public class ProductionService {
     private final ProductTypePriceRepository productTypePriceRepository;
     private final BranchRepository branchRepository;
     private final WarehouseService warehouseService;
+    private final FifoCalculationService fifoCalculationService;
 
     public ApiResponse add(ProductionDto productionDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(productionDto.getBranchId());
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
 
+        Branch branch = optionalBranch.get();
         Production production = new Production();
-        production.setBranch(optionalBranch.get());
+        production.setBranch(branch);
+
+        List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
+        if (!branch.getBusiness().getSaleMinus()) {
+            HashMap<UUID, Double> map = new HashMap<>();
+            for (ContentProductDto dto : contentProductDtoList) {
+                if (dto.getProductId() != null) {
+                    UUID productId = dto.getProductId();
+                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
+                } else if (dto.getProductTypePriceId() != null) {
+                    UUID productId = dto.getProductTypePriceId();
+                    if (!productTypePriceRepository.existsById(productId))
+                        return new ApiResponse("PRODUCT NOT FOUND", false);
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
+                } else {
+                    return new ApiResponse("PRODUCT NOT FOUND", false);
+                }
+            }
+
+            if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+        }
+        production.setQuantity(productionDto.getQuantity());
+        production.setDate(productionDto.getDate());
+        production.setCostEachOne(productionDto.isCostEachOne());
+        production.setContentPrice(productionDto.getContentPrice());
+        production.setCost(productionDto.getCost());
+        production.setTotalPrice(productionDto.getTotalPrice());
 
         if (productionDto.getProductId() != null) {
             Optional<Product> optional = productRepository.findById(productionDto.getProductId());
@@ -44,18 +67,11 @@ public class ProductionService {
             productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
             production.setProductTypePrice(productTypePrice);
         }
-        production.setQuantity(productionDto.getQuantity());
-        production.setDate(productionDto.getDate());
-        production.setCostEachOne(productionDto.isCostEachOne());
-        production.setContentPrice(productionDto.getContentPrice());
-        production.setCost(productionDto.getCost());
-        production.setTotalPrice(productionDto.getTotalPrice());
 
         productionRepository.save(production);
-
-        List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
         List<ContentProduct>contentProductList = new ArrayList<>();
 
+        double contentPrice = 0d;
         for (ContentProductDto contentProductDto : contentProductDtoList) {
             ContentProduct contentProduct = new ContentProduct();
             contentProduct.setProduction(production);
@@ -63,10 +79,15 @@ public class ProductionService {
             if (savedContentProduct == null) continue;
             savedContentProduct.setQuantity(contentProductDto.getQuantity());
             savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+            fifoCalculationService.createContentProduct(branch, savedContentProduct);
+            contentPrice += savedContentProduct.getTotalPrice();
             contentProductList.add(savedContentProduct);
         }
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
+        production.setContentPrice(contentPrice);
+        production.setTotalPrice(production.getCost() + contentPrice);
+        productionRepository.save(production);
         warehouseService.createOrEditWareHouse(production);
         return new ApiResponse("SUCCESS", true);
     }

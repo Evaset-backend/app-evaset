@@ -20,8 +20,7 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByCustomer_Id(UUID customer_id);
 
     List<Trade> findAllByPaymentStatus_Id(UUID paymentStatus_id);
-
-    List<Trade> findAllByPayMethod_Id(UUID payMethod_id);
+//    List<Trade> findAllByPayMethod_Id(UUID payMethod_id);
 
     List<Trade> findAllByAddress_Id(UUID address_id);
 

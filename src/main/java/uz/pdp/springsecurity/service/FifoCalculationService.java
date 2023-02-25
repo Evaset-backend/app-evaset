@@ -34,6 +34,23 @@ public class FifoCalculationService {
         fifoRepository.save(fifoCalculation);
     }
 
+    public void createProduction(Production production) {
+        FifoCalculation fifoCalculation = new FifoCalculation(
+                production.getBranch(),
+                production.getQuantity(),
+                production.getQuantity(),
+                production.getTotalPrice() / production.getQuantity(),
+                production.getDate(),
+                production
+        );
+        if (production.getProduct()!=null){
+            fifoCalculation.setProduct(production.getProduct());
+        }else {
+            fifoCalculation.setProductTypePrice(production.getProductTypePrice());
+        }
+        fifoRepository.save(fifoCalculation);
+    }
+
     public void editPurchaseProduct(PurchaseProduct purchaseProduct, Double amount) {
         Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseProductId(purchaseProduct.getId());
         if (optionalFifoCalculation.isEmpty()) return;
@@ -80,21 +97,25 @@ public class FifoCalculationService {
     private Double createOrEditTradeProductHelper(List<FifoCalculation> fifoList, Double quantity, Double salePrice, boolean saleMinus) {
         double profit = 0;
         double buyPrice = 0;
+        double totalBuyPrice = 0;
         for (FifoCalculation fifo : fifoList) {
             if (fifo.getRemainAmount()>quantity){
                 buyPrice = fifo.getBuyPrice();
                 fifo.setRemainAmount(fifo.getRemainAmount() - quantity);
+                totalBuyPrice += quantity * buyPrice;
                 profit += quantity * (salePrice - buyPrice);
                 break;
             } else if (fifo.getRemainAmount() < quantity) {
                 buyPrice = fifo.getBuyPrice();
                 double amount = fifo.getRemainAmount();
                 quantity -= amount;
+                totalBuyPrice += amount * buyPrice;
                 profit += amount * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
             }else {
                 buyPrice = fifo.getBuyPrice();
+                totalBuyPrice += quantity * buyPrice;
                 profit += quantity * (salePrice - buyPrice);
                 fifo.setRemainAmount(0);
                 fifo.setActive(false);
@@ -105,6 +126,51 @@ public class FifoCalculationService {
             profit += quantity * (salePrice - buyPrice);
         }
         return profit;
+    }
+
+    public ContentProduct createContentProduct(Branch branch, ContentProduct contentProduct) {
+        List<FifoCalculation> fifoList = null;
+        if (contentProduct.getProduct() != null) {
+            Product product = contentProduct.getProduct();
+            fifoList = fifoRepository.findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), product.getId());
+            fifoRepository.saveAll(fifoList);
+        } else {
+            ProductTypePrice productTypePrice = contentProduct.getProductTypePrice();
+            fifoList = fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
+            fifoRepository.saveAll(fifoList);
+        }
+        contentProduct.setTotalPrice(createContentProductHelper(fifoList, contentProduct.getQuantity(), branch.getBusiness().getSaleMinus()));
+        return contentProduct;
+    }
+
+    private Double createContentProductHelper(List<FifoCalculation> fifoList, Double quantity, boolean saleMinus) {
+        double buyPrice = 0;
+        double totalBuyPrice = 0;
+        for (FifoCalculation fifo : fifoList) {
+            if (fifo.getRemainAmount()>quantity){
+                buyPrice = fifo.getBuyPrice();
+                fifo.setRemainAmount(fifo.getRemainAmount() - quantity);
+                totalBuyPrice += quantity * buyPrice;
+                break;
+            } else if (fifo.getRemainAmount() < quantity) {
+                buyPrice = fifo.getBuyPrice();
+                double amount = fifo.getRemainAmount();
+                quantity -= amount;
+                totalBuyPrice += amount * buyPrice;
+                fifo.setRemainAmount(0);
+                fifo.setActive(false);
+            }else {
+                buyPrice = fifo.getBuyPrice();
+                totalBuyPrice += quantity * buyPrice;
+                fifo.setRemainAmount(0);
+                fifo.setActive(false);
+                break;
+            }
+        }
+        if (saleMinus && quantity > 0){
+            totalBuyPrice += quantity * buyPrice;
+        }
+        return totalBuyPrice;
     }
 
     public void returnedTrade(Branch branch, TradeProduct tradeProduct, double quantity) {

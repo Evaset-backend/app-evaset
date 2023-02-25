@@ -104,7 +104,7 @@ public class BusinessService {
         }
         userDto.setBusinessId(business.getId());
 
-        userService.add(userDto);
+        userService.add(userDto, true);
 
         return new ApiResponse("ADDED", true);
     }
