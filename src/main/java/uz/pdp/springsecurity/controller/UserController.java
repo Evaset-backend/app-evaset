@@ -31,7 +31,7 @@ public class UserController {
     @CheckPermission("ADD_USER")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody UserDto userDto) {
-        ApiResponse apiResponse = userService.add(userDto);
+        ApiResponse apiResponse = userService.add(userDto, false);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
