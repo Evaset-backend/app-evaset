@@ -52,6 +52,7 @@ public class BusinessService {
     private final SubscriptionRepository subscriptionRepository;
 
     private final BusinessMapper businessMapper;
+    private final PayMethodRepository payMethodRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -75,6 +76,20 @@ public class BusinessService {
                 business,
                 true));
 
+        payMethodRepository.save(new PaymentMethod(
+                "Naqd",
+                business
+        ));
+
+        payMethodRepository.save(new PaymentMethod(
+                "PlastikKarta",
+                business
+        ));
+
+        payMethodRepository.save(new PaymentMethod(
+                "BankOrqali",
+                business
+        ));
         Subscription subscription = new Subscription();
 
         subscription.setBusiness(business);
