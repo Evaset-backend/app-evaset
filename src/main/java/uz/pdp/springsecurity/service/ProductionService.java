@@ -26,7 +26,6 @@ public class ProductionService {
         Branch branch = optionalBranch.get();
         Production production = new Production();
         production.setBranch(branch);
-        production.setQuantity(productionDto.getQuantity());
 
         List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
         if (!branch.getBusiness().getSaleMinus()) {
@@ -38,9 +37,8 @@ public class ProductionService {
                     map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
                 } else if (dto.getProductTypePriceId() != null) {
                     UUID productId = dto.getProductTypePriceId();
-                    if (!productTypePriceRepository.existsById(productId)) {
+                    if (!productTypePriceRepository.existsById(productId))
                         return new ApiResponse("PRODUCT NOT FOUND", false);
-                    }
                     map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
                 } else {
                     return new ApiResponse("PRODUCT NOT FOUND", false);
@@ -56,20 +54,7 @@ public class ProductionService {
         production.setCost(productionDto.getCost());
         production.setTotalPrice(productionDto.getTotalPrice());
 
-        if (productionDto.getProductId() != null) {
-            Optional<Product> optional = productRepository.findById(productionDto.getProductId());
-            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
-            Product product = optional.get();
-            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
-            production.setProduct(product);
-        } else {
-            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productionDto.getProductTypePriceId());
-            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
-            ProductTypePrice productTypePrice = optional.get();
-            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
-            production.setProductTypePrice(productTypePrice);
-        }
-        
+        productionRepository.save(production);
         List<ContentProduct>contentProductList = new ArrayList<>();
 
         double contentPrice = 0d;
@@ -80,15 +65,33 @@ public class ProductionService {
             if (savedContentProduct == null) continue;
             savedContentProduct.setQuantity(contentProductDto.getQuantity());
             savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
-            fifoCalculationService.createContentProduct(branch, savedContentProduct);
-            contentPrice += savedContentProduct.getTotalPrice();
+            ContentProduct contentProductFifo = fifoCalculationService.createContentProduct(branch, savedContentProduct);
+            contentPrice += contentProductFifo.getTotalPrice();
             contentProductList.add(savedContentProduct);
         }
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
-        production.setTotalPrice(production.getCost() + contentPrice);
+        double cost = production.isCostEachOne()?production.getQuantity():1;
+        production.setTotalPrice(cost * production.getCost() + contentPrice);
+
+        if (productionDto.getProductId() != null) {
+            Optional<Product> optional = productRepository.findById(productionDto.getProductId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT", false);
+            Product product = optional.get();
+            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            production.setProduct(product);
+            productRepository.save(product);
+        } else {
+            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productionDto.getProductTypePriceId());
+            if (optional.isEmpty())return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
+            ProductTypePrice productTypePrice = optional.get();
+            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            production.setProductTypePrice(productTypePrice);
+            productTypePriceRepository.save(productTypePrice);
+        }
         productionRepository.save(production);
+        fifoCalculationService.createProduction(production);
         warehouseService.createOrEditWareHouse(production);
         return new ApiResponse("SUCCESS", true);
     }
