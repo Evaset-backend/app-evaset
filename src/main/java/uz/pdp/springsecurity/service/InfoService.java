@@ -38,7 +38,6 @@ public class InfoService {
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
                 tradeRepository.findAllByBranch_BusinessId(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
-                tradeProductRepository.findAllByProduct_BusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId)
         );
     }
@@ -54,12 +53,11 @@ public class InfoService {
                 purchaseRepository.findAllByBranch_Id(branchId),
                 tradeRepository.findAllByBranch_Id(branchId),
                 outlayRepository.findAllByBranch_Id(branchId),
-                tradeProductRepository.findAllByProduct_BranchId(branchId),
                 paymentRepository.findAllByTrade_BranchId(branchId)
         );
     }
 
-    private ApiResponse getInfoHelper(List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<TradeProduct> tradeProductList, List<Payment> paymentList) {
+    private ApiResponse getInfoHelper(List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<Payment> paymentList) {
 
 
         double allPurchase = 0;
@@ -74,17 +72,14 @@ public class InfoService {
 
         double allTrade = 0;
         double allTradeDebt = 0;
+        double totalProfit = 0;
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
+            totalProfit += trade.getTotalProfit();
         }
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
-
-        double totalProfit = 0;
-        for (TradeProduct tradeProduct : tradeProductList) {
-            totalProfit += (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getSalePrice()) - (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getBuyPrice());
-        }
         infoDto.setTotalProfit(totalProfit);
 
         double totalOutlay = 0;
