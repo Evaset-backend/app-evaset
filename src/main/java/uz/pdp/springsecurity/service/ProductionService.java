@@ -26,6 +26,7 @@ public class ProductionService {
         Branch branch = optionalBranch.get();
         Production production = new Production();
         production.setBranch(branch);
+        production.setQuantity(productionDto.getQuantity());
 
         List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
         if (!branch.getBusiness().getSaleMinus()) {
@@ -37,8 +38,9 @@ public class ProductionService {
                     map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
                 } else if (dto.getProductTypePriceId() != null) {
                     UUID productId = dto.getProductTypePriceId();
-                    if (!productTypePriceRepository.existsById(productId))
+                    if (!productTypePriceRepository.existsById(productId)) {
                         return new ApiResponse("PRODUCT NOT FOUND", false);
+                    }
                     map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
                 } else {
                     return new ApiResponse("PRODUCT NOT FOUND", false);
@@ -61,7 +63,7 @@ public class ProductionService {
             productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
             production.setProductTypePrice(productTypePrice);
         }
-        production.setQuantity(productionDto.getQuantity());
+
         production.setDate(productionDto.getDate());
         production.setCostEachOne(productionDto.isCostEachOne());
         production.setContentPrice(productionDto.getContentPrice());
