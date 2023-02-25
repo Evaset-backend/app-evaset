@@ -86,7 +86,7 @@ public class ProductionService {
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
-        production.setTotalPrice(production.getContentPrice() + contentPrice);
+        production.setTotalPrice(production.getCost() + contentPrice);
         warehouseService.createOrEditWareHouse(production);
         return new ApiResponse("SUCCESS", true);
     }
