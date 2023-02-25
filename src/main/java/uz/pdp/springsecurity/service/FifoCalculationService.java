@@ -128,7 +128,7 @@ public class FifoCalculationService {
         return profit;
     }
 
-    public ContentProduct createProduction(Branch branch, ContentProduct contentProduct, double quantity) {
+    public ContentProduct createContentProduct(Branch branch, ContentProduct contentProduct) {
         List<FifoCalculation> fifoList = null;
         if (contentProduct.getProduct() != null) {
             Product product = contentProduct.getProduct();
@@ -139,11 +139,11 @@ public class FifoCalculationService {
             fifoList = fifoRepository.findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(branch.getId(), productTypePrice.getId());
             fifoRepository.saveAll(fifoList);
         }
-        contentProduct.setTotalPrice(createProductionHelper(fifoList, quantity, branch.getBusiness().getSaleMinus()));
+        contentProduct.setTotalPrice(createContentProductHelper(fifoList, contentProduct.getQuantity(), branch.getBusiness().getSaleMinus()));
         return contentProduct;
     }
 
-    private Double createProductionHelper(List<FifoCalculation> fifoList, Double quantity, boolean saleMinus) {
+    private Double createContentProductHelper(List<FifoCalculation> fifoList, Double quantity, boolean saleMinus) {
         double buyPrice = 0;
         double totalBuyPrice = 0;
         for (FifoCalculation fifo : fifoList) {

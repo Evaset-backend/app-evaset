@@ -17,6 +17,7 @@ public class ProductionService {
     private final ProductTypePriceRepository productTypePriceRepository;
     private final BranchRepository branchRepository;
     private final WarehouseService warehouseService;
+    private final FifoCalculationService fifoCalculationService;
 
     public ApiResponse add(ProductionDto productionDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(productionDto.getBranchId());
@@ -70,17 +71,22 @@ public class ProductionService {
         productionRepository.save(production);
         List<ContentProduct>contentProductList = new ArrayList<>();
 
+        double contentPrice = 0d;
         for (ContentProductDto contentProductDto : contentProductDtoList) {
             ContentProduct contentProduct = new ContentProduct();
             contentProduct.setProduction(production);
             ContentProduct savedContentProduct = warehouseService.createContentProduct(contentProduct, contentProductDto);
             if (savedContentProduct == null) continue;
+            fifoCalculationService.createContentProduct(branch, savedContentProduct);
+            contentPrice += savedContentProduct.getTotalPrice();
             savedContentProduct.setQuantity(contentProductDto.getQuantity());
             savedContentProduct.setTotalPrice(contentProductDto.getTotalPrice());
             contentProductList.add(savedContentProduct);
         }
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
+        production.setContentPrice(contentPrice);
+        production.setTotalPrice(production.getContentPrice() + contentPrice);
         warehouseService.createOrEditWareHouse(production);
         return new ApiResponse("SUCCESS", true);
     }
