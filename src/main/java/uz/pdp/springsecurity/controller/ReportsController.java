@@ -50,13 +50,11 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.allProductByCategory(branchId, categoryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/amounts-branch/{branchId}")
     public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.allProductAmountByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/most-sale/{branchId}")
     public HttpEntity<?> mostSaleProducts(@PathVariable UUID branchId,
                                           @RequestParam(required = false) UUID categoryId,
@@ -66,13 +64,11 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.mostSaleProducts(branchId,categoryId,brandId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/most-un-sale/{branchId}")
     public HttpEntity<?> mostUnSaleProducts(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.mostUnSaleProducts(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/purchase/{branchId}")
     public HttpEntity<?> purchaseReports(@PathVariable UUID branchId,
                                          @RequestParam(required = false) UUID supplierId,
@@ -81,26 +77,22 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.purchaseReports(branchId,supplierId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
      @GetMapping("/production/by-date/{branchId}")
     public HttpEntity<?> productionReports(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.productionReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/name/{branchId}/{name}")
     public HttpEntity<?> findByName(@PathVariable UUID branchId,
                                     @PathVariable String name) {
         ApiResponse apiResponse = reportsService.findByName(branchId, name);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/delivery/{branchId}")
     public HttpEntity<?> deliveryPriceGet(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.deliveryPriceGet(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/outlay/{branchId}")
     public HttpEntity<?> outlayReports(@PathVariable UUID branchId,
                                        @RequestParam(required = false) UUID categoryId,
@@ -109,7 +101,6 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.outlayReports(branchId,categoryId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/customer/{branchId}")
     public HttpEntity<?> customerReports(@PathVariable UUID branchId,
                                          @RequestParam(required = false) UUID customerId,
@@ -118,7 +109,6 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.customerReports(branchId, customerId, startDate, endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @GetMapping("/benefit-by-branch/{branchId}")
     public HttpEntity<?> benefitByBranchReports(@PathVariable UUID branchId,
                                                 @RequestParam(required = false) String date,

@@ -94,6 +94,7 @@ public class UserService {
             if (userDto.getPhotoId() != null) {
                 user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
             }
+
             userRepository.save(user);
             return new ApiResponse("ADDED", true);
         }
@@ -135,6 +136,8 @@ public class UserService {
                 return new ApiResponse("BRANCH NOT FOUND", false);
             }
         }
+        List<Branch> sortedList = new ArrayList<>(branches);
+        sortedList.sort(Comparator.comparing(Branch::getCreatedAt));
         user.setBranches(branches);
 
         if (businessRepository.findById(userDto.getBusinessId()).isEmpty()){
