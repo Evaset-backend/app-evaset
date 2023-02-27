@@ -164,5 +164,4 @@ public enum Permissions {
     GET_TO_CHOOSE_A_TARIFF,
 
     VIEW_REPORT
-
 }
