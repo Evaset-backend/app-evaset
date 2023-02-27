@@ -199,6 +199,7 @@ public class BusinessService {
         } else if (time.equals("year")) {
             startTime = Timestamp.valueOf(THIS_YEAR);
         }
+
         Integer subscribers = businessRepository.countAllByCreatedAtAfter(startTime);
 
         List<Subscription> subscriptionList = subscriptionRepository.findAllByCreatedAtAfterAndStatusTariff(startTime, StatusTariff.CONFIRMED);
