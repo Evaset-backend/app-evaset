@@ -311,7 +311,8 @@ public class DataLoader implements CommandLineRunner {
                     DELETE_CONTENT,
 
                     CREATE_PRODUCTION,
-                    GET_PRODUCTION
+                    GET_PRODUCTION,
+                    VIEW_REPORT
             ),
                     business));
             Role manager = roleRepository.save(new Role(
@@ -440,7 +441,8 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_CONTENT,
 
                             CREATE_PRODUCTION,
-                            GET_PRODUCTION
+                            GET_PRODUCTION,
+                            VIEW_REPORT
 
                     ),
                     business

@@ -1,19 +1,18 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.util.Times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
 import uz.pdp.springsecurity.repository.*;
 
-import java.sql.Time;
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -31,26 +30,28 @@ public class InfoService {
     TradeProductRepository tradeProductRepository;
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
 
+    private final static Date date = new Date(System.currentTimeMillis());
+    private final static Timestamp currentDay = new Timestamp(date.getTime());
+    private final static Timestamp enDate = new Timestamp(date.getTime());
+    private final static LocalDateTime dateTime = enDate.toLocalDateTime();
+    private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
     private final static LocalDate localDate = LocalDate.now();
+    private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
+    private final static LocalDate TEMP_START_OF_YEAR = LocalDate.of(localDate.getYear() - 1, 1, 1);
+    private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR = LocalDate.of(localDate.getYear(), 1, 1);
     private final static LocalDate TEMP_START_OF_DAY = localDate.minusDays(1);
-    private final static LocalDateTime START_OF_DAY = TEMP_START_OF_DAY.atStartOfDay();
     private final static LocalDate TEMP_END_OF_DAY = LocalDate.of(localDate.getYear(), localDate.getMonth(), localDate.getDayOfMonth());
-    private final static LocalDate WEEK_START_DAY = localDate.minusDays(7 + localDate.getDayOfWeek().getValue() - 1);
-    private final static LocalDate WEEK_END_DAY = localDate.minusDays(7 + localDate.getDayOfWeek().getValue() - 7);
-    private final static LocalDateTime END_OF_DAY = TEMP_END_OF_DAY.atStartOfDay();
+    private final static LocalDate TEMP_END_OF_YEAR = LocalDate.of(localDate.getYear() - 1, 12, 31);
     private final static LocalDate TEMP_START_OF_MONTH_ONE = LocalDate.of(localDate.getYear(), localDate.getMonth().getValue(), 1);
     private final static LocalDate TEMP_START_OF_MONTH = TEMP_START_OF_MONTH_ONE.minusMonths(1);
-    private final static LocalDateTime START_OF_MONTH = TEMP_START_OF_MONTH.atStartOfDay();
     private final static LocalDate TEMP_END_OF_MONTH = LocalDate.of(localDate.getYear(), TEMP_START_OF_MONTH.getMonth(), TEMP_START_OF_MONTH.lengthOfMonth());
-    private final static LocalDate TEMP_START_OF_YEAR = LocalDate.of(localDate.getYear() - 1, 1, 1);
-    private final static LocalDate TEMP_END_OF_YEAR = LocalDate.of(localDate.getYear() - 1, 12, 31);
-    private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR = LocalDate.of(localDate.getYear(), 1, 1);
-    private final static LocalDateTime START_OF_YEAR_FOR_THIS = TEMP_FOR_THIS_START_OF_YEAR.atStartOfDay();
-    private final static LocalDateTime END_OF_MONTH = TEMP_END_OF_MONTH.atStartOfDay();
-    private final static LocalDateTime END_OF_YEAR = TEMP_END_OF_YEAR.atStartOfDay();
     private final static LocalDateTime START_OF_YEAR = TEMP_START_OF_YEAR.atStartOfDay();
-    private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
-    private final static LocalDateTime LAST_MONTH = localDate.minusMonths(1).atStartOfDay();
+    private final static LocalDateTime START_OF_YEAR_FOR_THIS = TEMP_FOR_THIS_START_OF_YEAR.atStartOfDay();
+    private final static LocalDateTime END_OF_YEAR = TEMP_END_OF_YEAR.atStartOfDay();
+    private final static LocalDateTime START_OF_MONTH = TEMP_START_OF_MONTH.atStartOfDay();
+    private final static LocalDateTime END_OF_MONTH = TEMP_END_OF_MONTH.atStartOfDay();
+    private final static LocalDateTime START_OF_DAY = TEMP_START_OF_DAY.atStartOfDay();
+    private final static LocalDateTime END_OF_DAY = TEMP_END_OF_DAY.atStartOfDay();
 
     public ApiResponse getInfoByBusiness(UUID businessId) {
 
@@ -78,30 +79,34 @@ public class InfoService {
         Timestamp from = Timestamp.valueOf(TODAY);
         Timestamp to = new Timestamp(System.currentTimeMillis());
         if (startDate != null && endDate != null) {
-            from = Timestamp.valueOf(String.valueOf(startDate.getTime()));
-            to = Timestamp.valueOf(String.valueOf(endDate.getTime()));
+            from = new Timestamp(startDate.getTime());
+            to = new Timestamp(endDate.getTime());
         }
         if (Objects.equals(date, "LAST_DAY") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(START_OF_DAY);
             to = Timestamp.valueOf(END_OF_DAY);
         } else if (Objects.equals(date, "LAST_WEEK") && startDate == null && endDate == null) {
-            from = Timestamp.valueOf(WEEK_START_DAY.atStartOfDay());
-            to = Timestamp.valueOf(WEEK_END_DAY.atStartOfDay());
+            from = Timestamp.valueOf(LocalDateTime.now().minusDays(7));
+            to = Timestamp.valueOf(LocalDateTime.now());
         } else if (Objects.equals(date, "LAST_THIRTY_DAY") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(LAST_MONTH);
-            to = Timestamp.valueOf(localDate.atStartOfDay());
+            to = Timestamp.valueOf(LocalDateTime.now());
         } else if (Objects.equals(date, "LAST_MONTH") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(START_OF_MONTH);
             to = Timestamp.valueOf(END_OF_MONTH);
         } else if (Objects.equals(date, "THIS_MONTH") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(THIS_MONTH);
-            to = Timestamp.valueOf(localDate.atStartOfDay());
+            to = Timestamp.valueOf(LocalDateTime.now());
         } else if (Objects.equals(date, "LAST_YEAR") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(START_OF_YEAR);
             to = Timestamp.valueOf(END_OF_YEAR);
         } else if (Objects.equals(date, "THIS_YEAR") && startDate == null && endDate == null) {
             from = Timestamp.valueOf(START_OF_YEAR_FOR_THIS);
-            to = Timestamp.valueOf(localDate.atStartOfDay());
+            to = Timestamp.valueOf(LocalDateTime.now());
+        } else if (startDate != null && endDate != null && date == null) {
+            from = new Timestamp(startDate.getTime());
+            to = new Timestamp(endDate.getTime());
+
         }
 
         if (Objects.equals(date, "ALL") && startDate == null && endDate == null) {
@@ -113,8 +118,6 @@ public class InfoService {
                     paymentRepository.findAllByTrade_BranchId(branchId)
             );
         }
-        System.out.println(from);
-        System.out.println(to);
 
         return getInfoHelper(
                 purchaseRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
@@ -168,5 +171,25 @@ public class InfoService {
         infoDto.setByPayMethods(byPayMethods);
 
         return new ApiResponse("FOUND", true, infoDto);
+    }
+
+    public ApiResponse getInfoByOutlayAndTrade(UUID branchId) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+
+            return new ApiResponse("Branch Not Found",false);
+        }
+        LocalDate one = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        LocalDate two  = LocalDate.now().minusMonths(1).withDayOfMonth(1).plusDays(4);
+        LocalDate tree  = two.plusDays(5);
+        LocalDate four  = tree.plusDays(5);
+        LocalDate five  = four.plusDays(5);
+        LocalDate six  = five.plusDays(5);
+        LocalDate seven  = LocalDate.of(six.getYear(),six.getMonth(), six.lengthOfMonth());
+
+        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(one.atStartOfDay()),Timestamp.valueOf(two.atStartOfDay()),branchId);
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
+
+        return new ApiResponse("Found",true);
     }
 }

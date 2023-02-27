@@ -116,6 +116,7 @@ public enum Manager {
     GET_EXCEL,
     POST_EXCEL,
 
-    GET_BUSINESS_ALL_AMOUNT
+    GET_BUSINESS_ALL_AMOUNT,
+    VIEW_REPORT
 
 }
