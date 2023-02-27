@@ -83,16 +83,15 @@ public class BusinessService {
                 "Naqd",
                 business
         ));
-
         payMethodRepository.save(new PaymentMethod(
                 "PlastikKarta",
                 business
         ));
-
         payMethodRepository.save(new PaymentMethod(
                 "BankOrqali",
                 business
         ));
+
         Subscription subscription = new Subscription();
 
         subscription.setBusiness(business);
@@ -206,14 +205,16 @@ public class BusinessService {
     }
 
     public ApiResponse getInfo(String time) {
+        // "day" ni doim qabul qiladi
         Timestamp startTime = Timestamp.valueOf(TODAY);
-        if (time.equals("week")) {
+        if (time.equals("THIS_WEEK")) {
             startTime = Timestamp.valueOf(THIS_WEEK);
-        } else if (time.equals("month")) {
+        } else if (time.equals("THIS_MONTH")) {
             startTime = Timestamp.valueOf(THIS_MONTH);
-        } else if (time.equals("year")) {
+        } else if (time.equals("THIS_YEAR")) {
             startTime = Timestamp.valueOf(THIS_YEAR);
         }
+
         Integer subscribers = businessRepository.countAllByCreatedAtAfter(startTime);
 
         List<Subscription> subscriptionList = subscriptionRepository.findAllByCreatedAtAfterAndStatusTariff(startTime, StatusTariff.CONFIRMED);
@@ -221,6 +222,7 @@ public class BusinessService {
         for (Subscription subscription : subscriptionList) {
             subscriptionPayment += subscription.getTariff().getPrice();
         }
+
         Integer waiting = subscriptionRepository.countAllByStatusTariff(StatusTariff.WAITING);
 
         Integer rejected = subscriptionRepository.countAllByStatusTariff(StatusTariff.REJECTED);

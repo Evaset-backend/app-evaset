@@ -16,10 +16,8 @@ public class ProductDto {
     @NotNull(message = "required line")
     private String name;
 
-    @NotNull(message = "required line")
     private Double minQuantity;
 
-    @NotNull(message = "required line")
     private String barcode;
 
     private UUID brandId;
@@ -48,10 +46,12 @@ public class ProductDto {
 
     private Date dueDate;
 
+    @NotNull(message = "required line")
     private UUID businessId;
 
     // types { SINGLE, MANY, COMBO }
 
+    @NotNull(message = "required line")
     private String type;
 
     //  fields for MANY types
