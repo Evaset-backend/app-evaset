@@ -8,7 +8,7 @@ import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.service.InfoService;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 @RestController
@@ -28,9 +28,17 @@ public class InfoController {
     @GetMapping("/get-info-by-branch/{branchId}")
     public HttpEntity<?> getInfoByBranch(@PathVariable UUID branchId,
                                          @RequestParam(required = false) String date,
-                                         @RequestParam(required = false) Date startDate,
-                                         @RequestParam(required = false) Date endDate) {
+                                         @RequestParam(required = false) java.util.Date startDate,
+                                         @RequestParam(required = false) java.util.Date endDate) {
         ApiResponse apiResponse = infoService.getInfoByBranch(branchId,date,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+    @CheckPermission("VIEW_INFO")
+    @GetMapping("/get-info-by-outlay-trade/{branchId}")
+    public HttpEntity<?> getInfoByOutlayTrade(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = infoService.getInfoByOutlayAndTrade(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+
 }
