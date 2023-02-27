@@ -92,9 +92,6 @@ public class UserService {
                 return new ApiResponse("ADDED", true);
             }
 
-
-            userRepository.save(user);
-            return new ApiResponse("ADDED", true);
         }
         return new ApiResponse("You have opened a sufficient branch according to the employee", false);
     }
