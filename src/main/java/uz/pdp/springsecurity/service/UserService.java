@@ -44,6 +44,7 @@ public class UserService {
         }
         Business business = optionalBusiness.get();
 
+
         List<User> allUser = userRepository.findAllByBusiness_Id(businessId);
         int size = allUser.size();
 
@@ -52,49 +53,47 @@ public class UserService {
             if (optionalSubscription.isEmpty()) {
                 return new ApiResponse("tariff aktiv emas", false);
             }
+
             Subscription subscription = optionalSubscription.get();
             if (subscription.getTariff().getEmployeeAmount() >= size || subscription.getTariff().getEmployeeAmount() == 0) {
+                boolean b = userRepository.existsByUsername(userDto.getUsername());
+                if (b) return new ApiResponse("USER ALREADY EXISTS", false);
 
-            }else {
-                return new ApiResponse("You have opened a sufficient branch according to the employee", false);
+                ApiResponse response = roleService.get(userDto.getRoleId());
+                if (!response.isSuccess())
+                    return response;
+
+                User user = new User();
+                user.setFirstName(userDto.getFirstName());
+                user.setLastName(userDto.getLastName());
+                user.setUsername(userDto.getUsername());
+                user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+                user.setRole((Role) response.getObject());
+
+                HashSet<Branch> branches = new HashSet<>();
+                for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
+                    UUID branchId = iterator.next();
+                    Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+                    if (optionalBranch.isPresent()) {
+                        branches.add(optionalBranch.get());
+                    } else {
+                        return new ApiResponse("BRANCH NOT FOUND", false);
+                    }
+                }
+
+                user.setBranches(branches);
+                user.setBusiness(business);
+                user.setEnabled(userDto.getEnabled());
+
+                if (userDto.getPhotoId() != null) {
+                    user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
+                }
+                userRepository.save(user);
+                return new ApiResponse("ADDED", true);
             }
+            return new ApiResponse("ADDED", true);
         }
-
-        boolean b = userRepository.existsByUsername(userDto.getUsername());
-        if (b) return new ApiResponse("USER ALREADY EXISTS", false);
-
-        ApiResponse response = roleService.get(userDto.getRoleId());
-        if (!response.isSuccess())
-            return response;
-
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole((Role) response.getObject());
-
-        HashSet<Branch> branches = new HashSet<>();
-        for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
-            UUID branchId = iterator.next();
-            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-            if (optionalBranch.isPresent()) {
-                branches.add(optionalBranch.get());
-            } else {
-                return new ApiResponse("BRANCH NOT FOUND", false);
-            }
-        }
-
-        user.setBranches(branches);
-        user.setBusiness(business);
-        user.setEnabled(userDto.getEnabled());
-
-        if (userDto.getPhotoId() != null) {
-            user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
-        }
-
-        userRepository.save(user);
-        return new ApiResponse("ADDED", true);
+        return new ApiResponse("You have opened a sufficient branch according to the employee", false);
     }
 
     public ApiResponse edit(UUID id, UserDto userDto) {
