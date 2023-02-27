@@ -65,7 +65,7 @@ public class ProductController {
      * @return ApiResponse(success - > true object - > value)
      */
 
-    @CheckPermission("VIEW_PRODUCT_ADMIN")
+    @CheckPermission("VIEW_PRODUCT")
     @GetMapping
     public HttpEntity<?> get(@CurrentUser User user) {
         ApiResponse apiResponse = productService.getAll(user);

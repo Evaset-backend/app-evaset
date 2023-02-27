@@ -1,8 +1,6 @@
 package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import uz.pdp.springsecurity.entity.Product;
 
 import java.util.List;
@@ -10,6 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
+    boolean existsByBarcodeAndBusinessIdAndActiveTrue(String barcode, UUID businessId);
+    boolean existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(String barcode, UUID businessId, UUID productId);
 
     List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID business_id);
 
@@ -40,9 +40,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findAllByNameAndBusinessId(String name, UUID business_id);
 
-
-    @Query(value = "select * from product p inner join branches b on p.branch_id = b.id where b.business_id = ?1 AND b.id = ?2 AND p.active =true", nativeQuery = true)
-    List<Product> findAllByBusinessIdAndBranchIdAndActiveTrue(@Param("businessId") UUID businessId, @Param("branchId") UUID branchId);//tekshirib korish kere
 
     Optional<Product> findByIdAndBranch_IdAndActiveTrue(UUID productExchangeId, UUID id);
 

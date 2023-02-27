@@ -293,12 +293,9 @@ public class DataLoader implements CommandLineRunner {
                     DELETE_TAX,
                     EDIT_TAX,
                     VIEW_TAX,
-                    VIEW_TAX_ADMIN,
                     ADD_PRODUCT_TYPE,
                     GET_PRODUCT_TYPE,
 
-                    GET_BY_PRODUCT_TYPE,
-                    GET_PRODUCT_TYPE_PRODUCT_ID,
                     UPDATE_PRODUCT_TYPE,
                     DELETE_PRODUCT_TYPE,
 
@@ -307,8 +304,6 @@ public class DataLoader implements CommandLineRunner {
 
                     VIEW_INFO,
 
-                    GET_TO_CHOOSE_A_TARIFF,
-                    GET_BY_TARIFF,
 
                     CREATE_CONTENT,
                     EDIT_CONTENT,
@@ -324,7 +319,6 @@ public class DataLoader implements CommandLineRunner {
                     Constants.MANAGER,
                     Arrays.asList(
                             GET_TARIFF,
-                            GET_BY_TARIFF,
 
                             ADD_ADDRESS,
                             EDIT_ADDRESS,
@@ -400,7 +394,6 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_TAX,
                             EDIT_TAX,
                             VIEW_TAX,
-                            VIEW_TAX_ADMIN,
 
                             ADD_CUSTOMER_GROUP,
                             DELETE_CUSTOMER_GROUP,
@@ -431,10 +424,8 @@ public class DataLoader implements CommandLineRunner {
 
                             ADD_PRODUCT_TYPE,
                             GET_PRODUCT_TYPE,
-                            GET_BY_PRODUCT_TYPE,
                             UPDATE_PRODUCT_TYPE,
                             DELETE_PRODUCT_TYPE,
-                            GET_PRODUCT_TYPE_PRODUCT_ID,
 
                             GET_EXCEL,
                             POST_EXCEL,
@@ -443,8 +434,6 @@ public class DataLoader implements CommandLineRunner {
 
                             GET_BUSINESS_ALL_AMOUNT,
 
-                            GET_TO_CHOOSE_A_TARIFF,
-                            GET_BY_TARIFF,
 
                             CREATE_CONTENT,
                             EDIT_CONTENT,
@@ -489,8 +478,6 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_PAY_STATUS,
                             EDIT_MY_PROFILE,
                             VIEW_PRODUCT,
-                            GET_TO_CHOOSE_A_TARIFF,
-                            GET_BY_TARIFF,
 
                             CREATE_CONTENT,
                             EDIT_CONTENT,

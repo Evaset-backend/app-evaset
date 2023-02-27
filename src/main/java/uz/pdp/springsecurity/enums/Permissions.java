@@ -116,6 +116,7 @@ public enum Permissions {
     VIEW_PURCHASE_ADMIN,
     DELETE_PURCHASE,
 
+
     ADD_EXCHANGE,
     EDIT_EXCHANGE,
     VIEW_EXCHANGE,
@@ -134,12 +135,9 @@ public enum Permissions {
     DELETE_TAX,
     EDIT_TAX,
     VIEW_TAX,
-    VIEW_TAX_ADMIN,
+
     ADD_PRODUCT_TYPE,
     GET_PRODUCT_TYPE,
-
-    GET_BY_PRODUCT_TYPE,
-    GET_PRODUCT_TYPE_PRODUCT_ID,
     UPDATE_PRODUCT_TYPE,
     DELETE_PRODUCT_TYPE,
 
@@ -149,7 +147,6 @@ public enum Permissions {
     VIEW_INFO,
 
     GET_TARIFF,
-    GET_BY_TARIFF,
     CREATE_TARIFF,
     EDIT_TARIFF,
     DELETE_TARIFF,
@@ -163,7 +160,9 @@ public enum Permissions {
     GET_PRODUCTION,
 
     GET_BUSINESS_ALL_AMOUNT,
+
     GET_TO_CHOOSE_A_TARIFF,
 
     VIEW_REPORT
+
 }
