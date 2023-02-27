@@ -29,6 +29,7 @@ public class InfoService {
     BranchRepository branchRepository;
     @Autowired
     TradeProductRepository tradeProductRepository;
+    private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
 
     private final static LocalDate localDate = LocalDate.now();
     private final static LocalDate TEMP_START_OF_DAY = localDate.minusDays(1);
@@ -74,8 +75,8 @@ public class InfoService {
             return new ApiResponse("Branch Not Found", false);
         }
 
-        Timestamp from = null;
-        Timestamp to = null;
+        Timestamp from = Timestamp.valueOf(TODAY);
+        Timestamp to = new Timestamp(System.currentTimeMillis());
         if (startDate != null && endDate != null) {
             from = Timestamp.valueOf(String.valueOf(startDate.getTime()));
             to = Timestamp.valueOf(String.valueOf(endDate.getTime()));

@@ -30,6 +30,8 @@ public class Product extends AbsEntity {
     private double buyPrice;
     private double salePrice;
     private Date expireDate;
+
+    @Column(nullable = false)
     private String barcode;
     private double minQuantity;
     //    @Column(unique = true, nullable = false)

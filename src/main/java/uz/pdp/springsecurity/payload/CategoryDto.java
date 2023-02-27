@@ -14,6 +14,7 @@ public class CategoryDto {
     private UUID id;
     @NotNull(message = "required line")
     private String name;
+    @NotNull(message = "required line")
     private UUID businessId;
     private String description;
     private UUID parentCategory;
