@@ -52,6 +52,7 @@ public class BusinessService {
     private final SubscriptionRepository subscriptionRepository;
 
     private final BusinessMapper businessMapper;
+    private final PayMethodRepository payMethodRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -74,6 +75,19 @@ public class BusinessService {
                 "UZB",
                 business,
                 true));
+
+        payMethodRepository.save(new PaymentMethod(
+                "Naqd",
+                business
+        ));
+        payMethodRepository.save(new PaymentMethod(
+                "PlastikKarta",
+                business
+        ));
+        payMethodRepository.save(new PaymentMethod(
+                "BankOrqali",
+                business
+        ));
 
         Subscription subscription = new Subscription();
 
@@ -176,6 +190,7 @@ public class BusinessService {
     }
 
     public ApiResponse getInfo(String time) {
+        // "day" ni doim qabul qiladi
         Timestamp startTime = Timestamp.valueOf(TODAY);
         if (time.equals("week")) {
             startTime = Timestamp.valueOf(THIS_WEEK);
@@ -184,6 +199,7 @@ public class BusinessService {
         } else if (time.equals("year")) {
             startTime = Timestamp.valueOf(THIS_YEAR);
         }
+
         Integer subscribers = businessRepository.countAllByCreatedAtAfter(startTime);
 
         List<Subscription> subscriptionList = subscriptionRepository.findAllByCreatedAtAfterAndStatusTariff(startTime, StatusTariff.CONFIRMED);

@@ -112,7 +112,7 @@ public class OutlayService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Outlay> allByBusinessId = outlayRepository.findAllByBusinessId(businessId);
+        List<Outlay> allByBusinessId = outlayRepository.findAllByBranch_BusinessId(businessId);
         if (allByBusinessId.isEmpty()){
             return new ApiResponse("NOT FOUND", false);
         }
