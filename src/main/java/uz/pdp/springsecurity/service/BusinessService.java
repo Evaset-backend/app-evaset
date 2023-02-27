@@ -135,6 +135,7 @@ public class BusinessService {
             notification.setObjectId(business.getId());
             notificationRepository.save(notification);
         }
+
         return new ApiResponse("ADDED", true);
     }
 

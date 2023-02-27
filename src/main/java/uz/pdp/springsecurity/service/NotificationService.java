@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Notification;
 import uz.pdp.springsecurity.mapper.NotificationMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.NotificationGetByIdDto;
 import uz.pdp.springsecurity.repository.NotificationRepository;
 
 import java.util.*;
@@ -18,14 +19,14 @@ public class NotificationService {
     private final NotificationMapper mapper;
 
     public ApiResponse getAll() {
-        List<Notification> notificationList = new ArrayList<>();
         List<Notification> allByReadIsFalse = repository.findAllByReadIsFalse();
         List<Notification> allByReadIsTrue = repository.findAllByReadIsTrue();
 
         allByReadIsFalse.sort(Comparator.comparing(Notification::getCreatedAt));
         allByReadIsTrue.sort(Comparator.comparing(Notification::getCreatedAt));
 
-        notificationList.addAll(notificationList);
+        List<Notification> notificationList = new ArrayList<>(allByReadIsFalse);
+        notificationList.addAll(allByReadIsTrue);
 
         return new ApiResponse("all notification", true, mapper.toDtoGetAll(notificationList));
     }
@@ -38,16 +39,19 @@ public class NotificationService {
 
         Notification notification = byId.get();
         notification.setRead(true);
+        repository.save(notification);
+        NotificationGetByIdDto notificationGetByIdDto = mapper.toDtoGetById(notification);
+        notificationGetByIdDto.setType(notification.getType().name());
 
-        return new ApiResponse("found", true, mapper.toDtoGetById(notification));
+        return new ApiResponse("found", true, notificationGetByIdDto);
     }
 
     public ApiResponse delete() {
         List<Notification> allByReadIsTrue = repository.findAllByReadIsTrue();
-        if (!allByReadIsTrue.isEmpty()){
+        if (!allByReadIsTrue.isEmpty()) {
             repository.deleteAll(allByReadIsTrue);
         }
 
-        return new ApiResponse("deleted",true);
+        return new ApiResponse("deleted", true);
     }
 }
