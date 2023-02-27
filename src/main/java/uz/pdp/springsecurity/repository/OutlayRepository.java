@@ -31,7 +31,7 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
     List<Outlay> findAllByBusinessId(UUID businessId);
 
 
-    List<Outlay> findAllByBranch_Business_Id(UUID businessId);
+    List<Outlay> findAllByBranch_BusinessId(UUID businessId);
     List<Outlay> findAllByDateBetweenAndBranchId(Date firstDate, Date secondDate,UUID uuid);
 
 }
