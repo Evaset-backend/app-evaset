@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
@@ -53,6 +54,8 @@ public class BusinessService {
 
     private final BusinessMapper businessMapper;
     private final PayMethodRepository payMethodRepository;
+
+    private final NotificationRepository notificationRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -120,6 +123,18 @@ public class BusinessService {
 
         userService.add(userDto, true);
 
+        Optional<User> superadmin = userRepository.findByUsername("superadmin");
+
+        if (superadmin.isPresent()) {
+            Notification notification = new Notification();
+            notification.setRead(false);
+            notification.setName("Yangi bizness qo'shildi!");
+            notification.setMessage("Yangi User va bizness qo'shildi biznes tarifini aktivlashtishingiz mumkin!");
+            notification.setUserTo(superadmin.get());
+            notification.setType(NotificationType.NEW_BUSINESS);
+            notification.setObjectId(business.getId());
+            notificationRepository.save(notification);
+        }
         return new ApiResponse("ADDED", true);
     }
 
