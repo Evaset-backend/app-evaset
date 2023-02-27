@@ -7,6 +7,9 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.NotificationType;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @Data
@@ -16,10 +19,16 @@ import java.util.UUID;
 public class Notification extends AbsEntity {
     private String name;
     private String message;
+    @Enumerated(value = EnumType.STRING)
     private NotificationType type;
+
     private UUID objectId;
+    @ManyToOne
     private User userFrom;
+
+    @ManyToOne
     private User userTo;
+
     private boolean delivery;
     private boolean read;
 }

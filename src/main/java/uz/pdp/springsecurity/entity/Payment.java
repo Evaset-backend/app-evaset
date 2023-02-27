@@ -21,11 +21,9 @@ import javax.persistence.ManyToOne;
 public class Payment extends AbsEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Trade trade;
 
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private PaymentMethod payMethod;
 
     private Double paidSum;
