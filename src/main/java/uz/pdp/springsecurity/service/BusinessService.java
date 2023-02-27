@@ -80,16 +80,15 @@ public class BusinessService {
                 "Naqd",
                 business
         ));
-
         payMethodRepository.save(new PaymentMethod(
                 "PlastikKarta",
                 business
         ));
-
         payMethodRepository.save(new PaymentMethod(
                 "BankOrqali",
                 business
         ));
+
         Subscription subscription = new Subscription();
 
         subscription.setBusiness(business);
@@ -191,6 +190,7 @@ public class BusinessService {
     }
 
     public ApiResponse getInfo(String time) {
+        // "day" ni doim qabul qiladi
         Timestamp startTime = Timestamp.valueOf(TODAY);
         if (time.equals("week")) {
             startTime = Timestamp.valueOf(THIS_WEEK);

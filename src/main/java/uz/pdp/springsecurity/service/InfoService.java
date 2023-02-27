@@ -37,7 +37,7 @@ public class InfoService {
         return getInfoHelper(
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
                 tradeRepository.findAllByBranch_BusinessId(businessId),
-                outlayRepository.findAllByBusinessId(businessId),
+                outlayRepository.findAllByBranch_Business_Id(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId)
         );
     }
