@@ -39,6 +39,10 @@ public class InfoController {
         ApiResponse apiResponse = infoService.getInfoByOutlayAndTrade(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
+    @CheckPermission("VIEW_INFO")
+    @GetMapping("/get-info-by-outlay-trade-business/{businessId}")
+    public HttpEntity<?> getInfoByOutlayTradeByBusiness(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = infoService.getInfoByOutlayTradeByBusiness(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

@@ -15,6 +15,7 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     List<Trade> findAllByBranch_Id(UUID branch_id);
     List<Trade> findAllByCreatedAtBetweenAndBranchId(Timestamp start, Timestamp end, UUID branch_id);
+    List<Trade> findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp start, Timestamp end, UUID businessId);
 
     List<Trade> findAllByBranch_BusinessId(UUID businessId);
 

@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
-import uz.pdp.springsecurity.payload.OutlayTrade;
+import uz.pdp.springsecurity.payload.InfoOutlayDto;
 import uz.pdp.springsecurity.repository.*;
 
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -159,9 +158,7 @@ public class InfoService {
 
         double totalOutlay = 0;
         for (Outlay outlay : outlayList) {
-            if (outlay != null) {
             totalOutlay += outlay.getTotalSum();
-            }
         }
         infoDto.setMyOutlay(totalOutlay);
 
@@ -184,20 +181,89 @@ public class InfoService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found",false);
         }
-        LocalDate one = LocalDate.now().minusMonths(1);
-        LocalDate two  = LocalDate.now().minusMonths(1).withDayOfMonth(1).plusDays(4);
-        LocalDate tree  = two.plusDays(5);
-        LocalDate four  = tree.plusDays(5);
-        LocalDate five  = four.plusDays(5);
-        LocalDate six  = five.plusDays(5);
-        LocalDate seven  = LocalDate.of(six.getYear(),six.getMonth(), six.lengthOfMonth());
-        List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(one.atStartOfDay()),Timestamp.valueOf(two.atStartOfDay()),branchId);
 
-        OutlayTrade outlayTrade=new OutlayTrade();
+        LocalDateTime now = LocalDateTime.now();
+        HashMap<Integer, Double> outlayMap = new HashMap();
+        HashMap<Integer, Double> tradeMap = new HashMap<>();
+        List<Timestamp> timestampList = new ArrayList<>();
+        timestampList.add(Timestamp.valueOf(now));
+        for (int i = 0; i < 6; i++) {
+            Timestamp from = Timestamp.valueOf(now.minusDays(5 * (i + 1)));
+            Timestamp to = Timestamp.valueOf(now.minusDays(5 * i));
+            List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId);
+            List<Trade> tradeList = tradeRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId);
+            double totalOutlay = 0;
+            double totalTrade = 0;
 
+            if (!outlayList.isEmpty()) {
+                for (Outlay outlay : outlayList) {
+                    if (outlay != null) {
+                        totalOutlay += outlay.getTotalSum();
+                    }
+                }
+            }
+            if (!tradeList.isEmpty()) {
+                for (Trade trade : tradeList) {
+                    if (trade != null) {
+                        totalTrade += trade.getTotalSum();
+                    }
+                }
+            }
+            outlayMap.put(6 - i, totalOutlay);
+            tradeMap.put(6 - i, totalTrade);
+            timestampList.add(from);
+        }
 
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
+        InfoOutlayDto infoDto = new InfoOutlayDto(
+                outlayMap,
+                tradeMap,
+                timestampList
+        );
+        return new ApiResponse(true, infoDto);
+    }
 
-        return new ApiResponse("Found",true);
+    public ApiResponse getInfoByOutlayTradeByBusiness(UUID businessId) {
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        LocalDateTime now = LocalDateTime.now();
+        HashMap<Integer, Double> outlayMap = new HashMap();
+        HashMap<Integer, Double> tradeMap = new HashMap<>();
+        List<Timestamp> timestampList = new ArrayList<>();
+        timestampList.add(Timestamp.valueOf(now));
+        for (int i = 0; i < 6; i++) {
+            Timestamp from = Timestamp.valueOf(now.minusDays(5 * (i + 1)));
+            Timestamp to = Timestamp.valueOf(now.minusDays(5 * i));
+            List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId);
+            List<Trade> tradeList = tradeRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId);
+            double totalOutlay = 0;
+            double totalTrade = 0;
+
+            if (!outlayList.isEmpty()) {
+                for (Outlay outlay : outlayList) {
+                    if (outlay != null) {
+                        totalOutlay += outlay.getTotalSum();
+                    }
+                }
+            }
+            if (!tradeList.isEmpty()) {
+                for (Trade trade : tradeList) {
+                    if (trade != null) {
+                        totalTrade += trade.getTotalSum();
+                    }
+                }
+            }
+            outlayMap.put(6 - i, totalOutlay);
+            tradeMap.put(6 - i, totalTrade);
+            timestampList.add(from);
+        }
+
+        InfoOutlayDto infoDto = new InfoOutlayDto(
+                outlayMap,
+                tradeMap,
+                timestampList
+        );
+        return new ApiResponse(true, infoDto);
     }
 }
