@@ -457,19 +457,7 @@ public class ReportsService {
         return new ApiResponse("Found", true, mostSaleProductsDtoList);
     }
 
-    public ApiResponse findByName(UUID branchId, String name) {
 
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Not Found");
-        }
-        Business business = optionalBranch.get().getBusiness();
-        List<Product> productList = productRepository.findAllByNameAndBusinessId(name, business.getId());
-        if (productList.isEmpty()) {
-            return new ApiResponse("Not Found", false);
-        }
-        return new ApiResponse("Found", true, productList);
-    }
 
     public ApiResponse purchaseReports(UUID branchId,UUID supplierId,Date startDate, Date endDate) {
 
@@ -1167,28 +1155,6 @@ public class ReportsService {
         }
         profitByCategoryDtoList.sort(Comparator.comparing(ProfitByCategoryDto::getProfit).reversed());
         return new ApiResponse("Found", true, profitByCategoryDtoList);
-    }
-
-    public ApiResponse benefitAndLostByOneDateReports(UUID branchId) {
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Branch Not Found", false);
-        }
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long aLong = timestamp.getTime();
-        long bLong = timestamp.getTime() - 86400000;
-        Date startDate = new Date(aLong);
-        Date endDate = new Date(bLong);
-        List<Trade> tradeList = tradeRepository.findAllByPayDateBetween(endDate, startDate);
-        for (Trade trade : tradeList) {
-            List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTradeId(trade.getId());
-            List<ProfitByCategoryDto> profitByCategoryDtoList = new ArrayList<>();
-            for (TradeProduct tradeProduct : tradeProductList) {
-
-            }
-        }
-
-        return new ApiResponse("Found", true, tradeList);
     }
 
     public ApiResponse productionReports(UUID branchId) {
