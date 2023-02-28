@@ -164,9 +164,9 @@ public class ReportsService {
         for (Product product : productList) {
             productReportDto = new ProductReportDto();
             productReportDto.setName(product.getName());
-            productReportDto.setBrand(product.getBrand().getName());
+            if (product.getBrand() != null)productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            productReportDto.setCategory(product.getCategory().getName());
+            if (product.getBrand() != null)productReportDto.setCategory(product.getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -293,9 +293,9 @@ public class ReportsService {
         for (Product product : productList) {
             productReportDto = new ProductReportDto();
             productReportDto.setName(product.getName());
-            productReportDto.setBrand(product.getBrand().getName());
+            if (product.getBrand() != null)productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            productReportDto.setCategory(product.getCategory().getName());
+            if (product.getCategory() != null)productReportDto.setCategory(product.getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -350,9 +350,9 @@ public class ReportsService {
         for (Product product : productList) {
             productReportDto = new ProductReportDto();
             productReportDto.setName(product.getName());
-            productReportDto.setBrand(product.getBrand().getName());
+            if (product.getBrand() != null)productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            productReportDto.setCategory(product.getCategory().getName());
+            if (product.getCategory() != null)productReportDto.setCategory(product.getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
