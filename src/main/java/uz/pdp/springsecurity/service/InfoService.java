@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
+import uz.pdp.springsecurity.payload.OutlayTrade;
 import uz.pdp.springsecurity.repository.*;
 
 
@@ -176,7 +177,6 @@ public class InfoService {
     public ApiResponse getInfoByOutlayAndTrade(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
-
             return new ApiResponse("Branch Not Found",false);
         }
         LocalDate one = LocalDate.now().minusMonths(1).withDayOfMonth(1);
@@ -186,8 +186,11 @@ public class InfoService {
         LocalDate five  = four.plusDays(5);
         LocalDate six  = five.plusDays(5);
         LocalDate seven  = LocalDate.of(six.getYear(),six.getMonth(), six.lengthOfMonth());
-
         List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(one.atStartOfDay()),Timestamp.valueOf(two.atStartOfDay()),branchId);
+        OutlayTrade outlayTrade=new OutlayTrade();
+        for (Outlay outlay : outlayList) {
+            outlayTrade.setOutLayOne(outlay.getTotalSum());
+        }
         List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
 
         return new ApiResponse("Found",true);
