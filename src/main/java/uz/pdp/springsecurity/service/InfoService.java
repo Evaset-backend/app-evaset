@@ -23,6 +23,7 @@ public class InfoService {
     private final PurchaseRepository purchaseRepository;
     private final TradeRepository tradeRepository;
     private final PaymentRepository paymentRepository;
+    private final PayMethodRepository payMethodRepository;
     @Autowired
     OutlayRepository outlayRepository;
     @Autowired
@@ -61,11 +62,10 @@ public class InfoService {
             return new ApiResponse("Business Not Found", false);
         }
 
-        return getInfoHelper(
+        return getInfoHelper(businessId,
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
                 tradeRepository.findAllByBranch_BusinessId(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
-                tradeProductRepository.findAllByProduct_BusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId)
         );
     }
@@ -109,28 +109,29 @@ public class InfoService {
             to = new Timestamp(endDate.getTime());
 
         }
+        UUID businessId = optionalBranch.get().getBusiness().getId();
 
         if (Objects.equals(date, "ALL") && startDate == null && endDate == null) {
             return getInfoHelper(
+                    businessId,
                     purchaseRepository.findAllByBranch_Id(branchId),
                     tradeRepository.findAllByBranch_Id(branchId),
                     outlayRepository.findAllByBranch_Id(branchId),
-                    tradeProductRepository.findAllByProduct_BranchId(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId)
             );
         }
 
         return getInfoHelper(
+                businessId,
                 purchaseRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 tradeRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
-                tradeProductRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId),
                 paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId)
         );
 
     }
 
-    private ApiResponse getInfoHelper(List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<TradeProduct> tradeProductList, List<Payment> paymentList) {
+    private ApiResponse getInfoHelper(UUID businessId, List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<Payment> paymentList) {
 
 
         double allPurchase = 0;
@@ -145,18 +146,16 @@ public class InfoService {
 
         double allTrade = 0;
         double allTradeDebt = 0;
+        double totalProfit = 0;
         for (Trade trade : tradeList) {
             allTrade += trade.getTotalSum();
             allTradeDebt += trade.getDebtSum();
+            totalProfit += trade.getTotalProfit();
         }
         infoDto.setMyTrade(allTrade);
         infoDto.setTradersDebt(allTradeDebt);
-
-        double totalProfit = 0;
-        for (TradeProduct tradeProduct : tradeProductList) {
-            totalProfit += (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getSalePrice()) - (tradeProduct.getTradedQuantity()*tradeProduct.getProduct().getBuyPrice());
-        }
         infoDto.setTotalProfit(totalProfit);
+
 
         double totalOutlay = 0;
         for (Outlay outlay : outlayList) {
@@ -165,6 +164,10 @@ public class InfoService {
         infoDto.setMyOutlay(totalOutlay);
 
         HashMap<String, Double> byPayMethods = new HashMap<>();
+        List<PaymentMethod> paymentMethodList = payMethodRepository.findAllByBusiness_Id(businessId);
+        for (PaymentMethod paymentMethod : paymentMethodList) {
+            byPayMethods.put(paymentMethod.getType(), 0d);
+        }
         for (Payment payment : paymentList) {
             String type = payment.getPayMethod().getType();
             byPayMethods.put(type, byPayMethods.getOrDefault(type, 0d) + payment.getPaidSum());
