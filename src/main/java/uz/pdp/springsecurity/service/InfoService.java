@@ -188,9 +188,8 @@ public class InfoService {
         LocalDate seven  = LocalDate.of(six.getYear(),six.getMonth(), six.lengthOfMonth());
         List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(one.atStartOfDay()),Timestamp.valueOf(two.atStartOfDay()),branchId);
         OutlayTrade outlayTrade=new OutlayTrade();
-        for (Outlay outlay : outlayList) {
-            outlayTrade.setOutLayOne(outlay.getTotalSum());
-        }
+
+
         List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
 
         return new ApiResponse("Found",true);
