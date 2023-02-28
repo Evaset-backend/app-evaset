@@ -89,20 +89,6 @@ public class ProductService {
     }
     public ApiResponse createOrEditProduct(Product product, ProductDto productDto, boolean isUpdate){
 
-        /*if (productDto.getType().equalsIgnoreCase("single")) {
-            if (productDto.getBarcode() != null || !productDto.getBarcode().isBlank()) {
-                if (isUpdate) {
-                    if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId()))
-                        return new ApiResponse("product with the barcode is already exist");
-                }else {
-                    if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
-                        return new ApiResponse("product with the barcode is already exist");
-                }
-            }
-        }else {
-
-        }*/
-
         UUID measurementId = productDto.getMeasurementId();
         List<UUID> branchId = productDto.getBranchId();
 
@@ -318,16 +304,6 @@ public class ProductService {
         for (Branch branch : branches) {
             List<Product> all = productRepository.findAllByBranchIdAndActiveIsTrue(branch.getId());
             if (!all.isEmpty()) {
-                for (Product product : all) {
-                    Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(businessId);
-                    if (!currency.getName().equalsIgnoreCase("SO'M")) {
-                        CurrentCource cource = currentCourceRepository.getByCurrencyId(currency.getId());
-                        product.setSalePrice(product.getSalePrice() / cource.getCurrentCourse());
-                        product.setBuyPrice(product.getBuyPrice() / cource.getCurrentCourse());
-                    } else {
-                        break;
-                    }
-                }
                 productList.addAll(all);
             }
         }
@@ -409,13 +385,6 @@ public class ProductService {
         }
         return new ApiResponse("NOT FOUND", false);
     }
-
-    /**
-     * todo
-     * @param barcode
-     * @param user
-     * @return
-     */
     public ApiResponse getByBarcode(String barcode, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productAllByBarcode = new ArrayList<>();
@@ -423,12 +392,6 @@ public class ProductService {
             Optional<Product> optionalProduct = productRepository.findAllByBarcodeAndBranchIdAndActiveTrue(barcode, branch.getId());
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
-                Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(product.getBrand().getBusiness().getId());
-                if (!currency.getName().equalsIgnoreCase("SO'M")) {
-                    CurrentCource cource = currentCourceRepository.getByCurrencyId(currency.getId());
-                    product.setSalePrice(product.getSalePrice() / cource.getCurrentCourse());
-                    product.setBuyPrice(product.getBuyPrice() / cource.getCurrentCourse());
-                }
                 productAllByBarcode.add(product);
             }
         }
@@ -463,28 +426,12 @@ public class ProductService {
         return new ApiResponse("FOUND", true, viewDtos);
     }
 
-    /**
-     *
-     * @param category_id
-     * @param user
-     * @return
-     */
     public ApiResponse getByCategory(UUID category_id, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
         for (Branch branch : branches) {
             List<Product> all = productRepository.findAllByCategoryIdAndBranchIdAndActiveTrue(category_id, branch.getId());
             if (!all.isEmpty()) {
-                for (Product product : all) {
-                    Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(product.getBrand().getBusiness().getId());
-                    if (!currency.getName().equalsIgnoreCase("SO'M")) {
-                        CurrentCource cource = currentCourceRepository.getByCurrencyId(currency.getId());
-                        product.setSalePrice(product.getSalePrice() / cource.getCurrentCourse());
-                        product.setBuyPrice(product.getBuyPrice() / cource.getCurrentCourse());
-                    } else {
-                        break;
-                    }
-                }
                 productList.addAll(all);
             }
         }
@@ -517,29 +464,12 @@ public class ProductService {
         }
         return new ApiResponse("FOUND", true, viewDtos);
     }
-
-    /**
-     *
-     * @param brand_id
-     * @param user
-     * @return
-     */
     public ApiResponse getByBrand(UUID brand_id, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
         for (Branch branch : branches) {
             List<Product> all = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brand_id, branch.getId());
             if (!all.isEmpty()) {
-                for (Product product : all) {
-                    Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(product.getBrand().getBusiness().getId());
-                    if (!currency.getName().equalsIgnoreCase("SO'M")) {
-                        CurrentCource cource = currentCourceRepository.getByCurrencyId(currency.getId());
-                        product.setSalePrice(product.getSalePrice() / cource.getCurrentCourse());
-                        product.setBuyPrice(product.getBuyPrice() / cource.getCurrentCourse());
-                    } else {
-                        break;
-                    }
-                }
                 productList.addAll(all);
             }
         }
