@@ -89,13 +89,6 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @CheckPermission("VIEW_REPORT")
-    @GetMapping("/name/{branchId}/{name}")
-    public HttpEntity<?> findByName(@PathVariable UUID branchId,
-                                    @PathVariable String name) {
-        ApiResponse apiResponse = reportsService.findByName(branchId, name);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-    @CheckPermission("VIEW_REPORT")
     @GetMapping("/delivery/{branchId}")
     public HttpEntity<?> deliveryPriceGet(@PathVariable UUID branchId) {
         ApiResponse apiResponse = reportsService.deliveryPriceGet(branchId);
@@ -153,12 +146,6 @@ public class ReportsController {
                                                   @RequestParam(required = false) Date startDate,
                                                   @RequestParam(required = false) Date endDate) {
         ApiResponse apiResponse = reportsService.benefitAndLostByCustomerReports(branchId, date, startDate, endDate);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-    @CheckPermission("VIEW_REPORT")
-    @GetMapping("/benefit-by-one-date/{branchId}")
-    public HttpEntity<?> benefitByDateReports(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.benefitAndLostByOneDateReports(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @CheckPermission("VIEW_REPORT")
