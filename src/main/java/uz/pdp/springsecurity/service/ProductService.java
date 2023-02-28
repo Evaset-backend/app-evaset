@@ -368,7 +368,7 @@ public class ProductService {
                 productTypePriceGetDto.setProfitPercent(productTypePrice.getProfitPercent());
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
-                productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getId());
+                productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getProductTypeValue().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
                 productTypePriceGetDto.setQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
@@ -410,7 +410,12 @@ public class ProductService {
         return new ApiResponse("NOT FOUND", false);
     }
 
-
+    /**
+     * todo
+     * @param barcode
+     * @param user
+     * @return
+     */
     public ApiResponse getByBarcode(String barcode, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productAllByBarcode = new ArrayList<>();
@@ -434,7 +439,8 @@ public class ProductService {
             ProductViewDto productViewDto = new ProductViewDto();
             productViewDto.setProductId(product.getId());
             productViewDto.setProductName(product.getName());
-            productViewDto.setBrandName(product.getBrand().getName());
+            if (product.getBrand() != null)
+                productViewDto.setBrandName(product.getBrand().getName());
             productViewDto.setBuyPrice(product.getBuyPrice());
             productViewDto.setSalePrice(product.getSalePrice());
             productViewDto.setMinQuantity(product.getMinQuantity());
@@ -457,6 +463,12 @@ public class ProductService {
         return new ApiResponse("FOUND", true, viewDtos);
     }
 
+    /**
+     *
+     * @param category_id
+     * @param user
+     * @return
+     */
     public ApiResponse getByCategory(UUID category_id, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
@@ -482,13 +494,13 @@ public class ProductService {
             ProductViewDto productViewDto = new ProductViewDto();
             productViewDto.setProductId(product.getId());
             productViewDto.setProductName(product.getName());
-            productViewDto.setBrandName(product.getBrand().getName());
+            if (product.getBrand() != null)
+                productViewDto.setBrandName(product.getBrand().getName());
             productViewDto.setBuyPrice(product.getBuyPrice());
             productViewDto.setSalePrice(product.getSalePrice());
             productViewDto.setMinQuantity(product.getMinQuantity());
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
-
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
             if (optionalWarehouse.isPresent()) {
                 Warehouse warehouse = optionalWarehouse.get();
@@ -506,6 +518,12 @@ public class ProductService {
         return new ApiResponse("FOUND", true, viewDtos);
     }
 
+    /**
+     *
+     * @param brand_id
+     * @param user
+     * @return
+     */
     public ApiResponse getByBrand(UUID brand_id, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
@@ -531,7 +549,8 @@ public class ProductService {
             ProductViewDto productViewDto = new ProductViewDto();
             productViewDto.setProductId(product.getId());
             productViewDto.setProductName(product.getName());
-            productViewDto.setBrandName(product.getBrand().getName());
+            if (product.getBrand() != null)
+                productViewDto.setBrandName(product.getBrand().getName());
             productViewDto.setBuyPrice(product.getBuyPrice());
             productViewDto.setSalePrice(product.getSalePrice());
             productViewDto.setMinQuantity(product.getMinQuantity());
@@ -582,7 +601,8 @@ public class ProductService {
             for (Product product : productList) {
                 productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
-                productViewDto.setBrandName(product.getBrand().getName());
+                if (product.getBrand() != null)
+                    productViewDto.setBrandName(product.getBrand().getName());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
@@ -668,7 +688,8 @@ public class ProductService {
                 ProductViewDto productViewDto = new ProductViewDto();
                 productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
-                productViewDto.setBrandName(product.getBrand().getName());
+                if (product.getBrand() != null)
+                    productViewDto.setBrandName(product.getBrand().getName());
                 productViewDto.setBarcode(product.getBarcode());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
@@ -713,17 +734,17 @@ public class ProductService {
                 ProductViewDto productViewDto = new ProductViewDto();
                 productViewDto.setProductId(product.getId());
                 productViewDto.setProductName(product.getName());
-                productViewDto.setBrandName(product.getBrand().getName());
+                if (product.getBrand() != null)
+                    productViewDto.setBrandName(product.getBrand().getName());
                 productViewDto.setBarcode(product.getBarcode());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
-                Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
-                attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
-                Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
-                optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
+                if (product.getPhoto() != null)
+                    productViewDto.setPhotoId(product.getPhoto().getId());
+                if (product.getMeasurement() != null) productViewDto.setMeasurementId(product.getMeasurement().getName());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchId, product.getId());
                 optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
                 productViewDtoList.add(productViewDto);
