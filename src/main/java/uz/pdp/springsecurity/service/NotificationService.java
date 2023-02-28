@@ -31,6 +31,10 @@ public class NotificationService {
         List<Notification> notificationList = new ArrayList<>(allByReadIsFalse);
         notificationList.addAll(allByReadIsTrue);
 
+        if (notificationList.isEmpty()) {
+            return new ApiResponse("notification empty", false);
+        }
+
         return new ApiResponse("all notification", true, mapper.toDtoGetAll(notificationList));
     }
 
