@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-    List<Notification> findAllByReadIsFalse();
-    List<Notification> findAllByReadIsTrue();
+    List<Notification> findAllByReadIsFalseAndUserToId(UUID userTo_id);
+    List<Notification> findAllByReadIsTrueAndUserToId(UUID userTo_id);
 }

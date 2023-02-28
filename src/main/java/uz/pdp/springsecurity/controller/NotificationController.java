@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.pdp.springsecurity.annotations.CurrentUser;
+import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.service.NotificationService;
 
@@ -18,8 +20,8 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = notificationService.getAll();
+    public HttpEntity<?> getAll(@CurrentUser User user) {
+        ApiResponse apiResponse = notificationService.getAll(user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -30,8 +32,8 @@ public class NotificationController {
     }
 
     @DeleteMapping
-    public HttpEntity<?> deleteAll() {
-        ApiResponse apiResponse = notificationService.delete();
+    public HttpEntity<?> deleteAll(@CurrentUser User user) {
+        ApiResponse apiResponse = notificationService.delete(user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
