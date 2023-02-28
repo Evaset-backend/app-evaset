@@ -627,8 +627,7 @@ public class ProductService {
                 productViewDto.setBranch(product.getBranch());
                 productViewDto.setExpiredDate(product.getExpireDate());
                 if (product.getPhoto() != null) {
-                    Optional<Attachment> attachmentOptional = attachmentRepository.findById(product.getPhoto().getId());
-                    attachmentOptional.ifPresent(attachment -> productViewDto.setPhotoId(attachment.getId()));
+                    productViewDto.setPhotoId(product.getPhoto().getId());
                 }
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
