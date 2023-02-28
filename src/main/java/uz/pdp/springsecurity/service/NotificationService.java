@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Notification;
+import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.mapper.NotificationMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.NotificationGetByIdDto;
@@ -18,9 +19,11 @@ public class NotificationService {
 
     private final NotificationMapper mapper;
 
-    public ApiResponse getAll() {
-        List<Notification> allByReadIsFalse = repository.findAllByReadIsFalse();
-        List<Notification> allByReadIsTrue = repository.findAllByReadIsTrue();
+    public ApiResponse getAll(User user) {
+        UUID userId = user.getId();
+
+        List<Notification> allByReadIsFalse = repository.findAllByReadIsFalseAndUserToId(userId);
+        List<Notification> allByReadIsTrue = repository.findAllByReadIsTrueAndUserToId(userId);
 
         allByReadIsFalse.sort(Comparator.comparing(Notification::getCreatedAt));
         allByReadIsTrue.sort(Comparator.comparing(Notification::getCreatedAt));
@@ -46,8 +49,8 @@ public class NotificationService {
         return new ApiResponse("found", true, notificationGetByIdDto);
     }
 
-    public ApiResponse delete() {
-        List<Notification> allByReadIsTrue = repository.findAllByReadIsTrue();
+    public ApiResponse delete(User user) {
+        List<Notification> allByReadIsTrue = repository.findAllByReadIsTrueAndUserToId(user.getId());
         if (!allByReadIsTrue.isEmpty()) {
             repository.deleteAll(allByReadIsTrue);
         }
