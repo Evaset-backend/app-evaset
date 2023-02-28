@@ -159,7 +159,9 @@ public class InfoService {
 
         double totalOutlay = 0;
         for (Outlay outlay : outlayList) {
+            if (outlay != null) {
             totalOutlay += outlay.getTotalSum();
+            }
         }
         infoDto.setMyOutlay(totalOutlay);
 
@@ -182,7 +184,7 @@ public class InfoService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch Not Found",false);
         }
-        LocalDate one = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        LocalDate one = LocalDate.now().minusMonths(1);
         LocalDate two  = LocalDate.now().minusMonths(1).withDayOfMonth(1).plusDays(4);
         LocalDate tree  = two.plusDays(5);
         LocalDate four  = tree.plusDays(5);
@@ -190,6 +192,7 @@ public class InfoService {
         LocalDate six  = five.plusDays(5);
         LocalDate seven  = LocalDate.of(six.getYear(),six.getMonth(), six.lengthOfMonth());
         List<Outlay> outlayList = outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(one.atStartOfDay()),Timestamp.valueOf(two.atStartOfDay()),branchId);
+
         OutlayTrade outlayTrade=new OutlayTrade();
 
 
