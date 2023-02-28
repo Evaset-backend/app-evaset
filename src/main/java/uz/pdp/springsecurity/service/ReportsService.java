@@ -250,8 +250,7 @@ public class ReportsService {
             tradeReportsDto.setTradedDate(tradeProduct.getTrade().getPayDate());
 
             if (tradeProduct.getTrade().getCustomer() != null)tradeReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
-            //todo
-            //tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+            tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
             tradeReportsDto.setAmount(tradeProduct.getTradedQuantity());
             if (tradeProduct.getTrade().getCustomer() != null)tradeReportsDto.setDiscount(tradeProduct.getTrade().getCustomer().getCustomerGroup().getPercent());
             tradeReportsDto.setTotalSum(tradeProduct.getTotalSalePrice());
