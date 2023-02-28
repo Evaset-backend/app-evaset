@@ -13,5 +13,6 @@ public interface NotificationMapper {
 
     List<NotificationGetAllDto> toDtoGetAll(List<Notification> notificationList);
 
+
     NotificationGetByIdDto toDtoGetById(Notification notification);
 }

@@ -62,7 +62,7 @@ public class BusinessService {
     private final static LocalDateTime THIS_MONTH = LocalDateTime.of(TODAY.getYear(), TODAY.getMonth(), 1, 0, 0, 0);
     private final static LocalDateTime THIS_YEAR = LocalDateTime.of(TODAY.getYear(), 1, 1, 0, 0, 0);
 
-    public ApiResponse add(BusinessDto businessDto) {
+    public ApiResponse  add(BusinessDto businessDto) {
         if (businessRepository.existsByName(businessDto.getName()))
             return new ApiResponse("A BUSINESS WITH THAT NAME ALREADY EXISTS", false);
         Business business = new Business();
