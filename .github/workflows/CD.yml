@@ -16,7 +16,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-          cd /var/www/app-evaset
+          cd /var/optimit
           git pull
           pm2 restart 0
         
