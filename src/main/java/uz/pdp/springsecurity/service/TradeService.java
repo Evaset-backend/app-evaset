@@ -158,6 +158,7 @@ public class TradeService {
             Customer customer = optionalCustomer.get();
             trade.setCustomer(customer);
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
+            customerRepository.save(customer);
         }
 
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
@@ -250,7 +251,7 @@ public class TradeService {
                     if (difference > 0) {
                         fifoCalculationService.createOrEditTradeProduct(branch, savedTradeProduct, difference);
                     } else if (difference < 0) {
-                        fifoCalculationService.returnedTrade(branch, savedTradeProduct, difference);
+                        fifoCalculationService.returnedTrade(branch, savedTradeProduct, - difference);
                     }
                     tradeProductList.add(savedTradeProduct);
                     profit += savedTradeProduct.getProfit();

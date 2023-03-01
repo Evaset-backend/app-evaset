@@ -76,101 +76,86 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
-        Tariff tariff = null;
-        Tariff saveTariff = null;
-        if (tariffRepositoryAll.isEmpty()) {
-            tariff = new Tariff(
-                    "test tariff",
-                    "test uchun",
-                    0,
-                    0,
-                    0,
-                    0,
-                    Lifetime.MONTH,
-                    0,
-                    1,
-                    100,
-                    0,
-                    true,
-                    false
-            );
-            tariffRepository.save(tariff);
-        }
-
-        List<Business> allBusiness = businessRepository.findAll();
-        Business business = null;
-        if (allBusiness.isEmpty()) {
-            business = new Business();
-            business.setDescription("Test Uchun");
-            business.setName("Application");
-            business.setActive(true);
-            business.setDelete(false);
-            business = businessRepository.save(business);
-        }
-
-        List<Measurement> measurementList = measurementRepository.findAllByBusiness_Id(business.getId());
-        if (measurementList.isEmpty()) {
-            measurementRepository.save(
-                    new Measurement("dona",
-                            business)
-            );
-        }
-
-        if (business != null) {
-            Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
-            if (subscriptionOptional.isEmpty()) {
-                Timestamp startDay = new Timestamp(System.currentTimeMillis());
-                LocalDate date = LocalDate.now().plusMonths(1);
-                Timestamp endDay = Timestamp.valueOf(date.atStartOfDay());
-
-                Subscription subscription = new Subscription(
-                        business,
-                        tariff,
-                        startDay,
-                        endDay,
-                        StatusTariff.CONFIRMED,
-                        PayType.OFFLINE,
-                        true,
+//------------------------------------------------------------------------------------------//
+        if (initMode.equals("always")) {
+            List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
+            Tariff tariff = null;
+            if (tariffRepositoryAll.isEmpty()) {
+                tariff = new Tariff(
+                        "test tariff",
+                        "test uchun",
+                        0,
+                        0,
+                        0,
+                        0,
+                        Lifetime.MONTH,
+                        0,
+                        1,
+                        100,
+                        0,
                         true,
                         false
                 );
-                subscriptionRepository.save(subscription);
+                tariffRepository.save(tariff);
             }
-        }
+
+            List<Business> allBusiness = businessRepository.findAll();
+            Business business = null;
+            if (allBusiness.isEmpty()) {
+                business = new Business();
+                business.setDescription("Test Uchun");
+                business.setName("Application");
+                business.setActive(true);
+                business.setDelete(false);
+                business = businessRepository.save(business);
+            }
+
+            if (business != null) {
+                List<Measurement> measurementList = measurementRepository.findAllByBusiness_Id(business.getId());
+                if (measurementList.isEmpty()) {
+                    measurementRepository.save(
+                            new Measurement("dona",
+                                    business)
+                    );
+                }
+            }
+
+            if (business != null) {
+                Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+                if (subscriptionOptional.isEmpty()) {
+                    Timestamp startDay = new Timestamp(System.currentTimeMillis());
+                    LocalDate date = LocalDate.now().plusMonths(1);
+                    Timestamp endDay = Timestamp.valueOf(date.atStartOfDay());
+
+                    Subscription subscription = new Subscription(
+                            business,
+                            tariff,
+                            startDay,
+                            endDay,
+                            StatusTariff.CONFIRMED,
+                            PayType.OFFLINE,
+                            true,
+                            true,
+                            false
+                    );
+                    subscriptionRepository.save(subscription);
+                }
+            }
 //------------------------------------------------------------------------------------------//
-        List<Address> addresses = addressRepository.findAll();
-        Address address = null;
-        if (addresses.isEmpty()) {
-            address = new Address(
-                    "Tashkent",
-                    "Shayxontuxur",
-                    "Gulobod",
-                    "1"
-            );
-            addressRepository.save(address);
-        }
+            List<Address> addresses = addressRepository.findAll();
+            Address address = null;
+            if (addresses.isEmpty()) {
+                address = new Address(
+                        "Tashkent",
+                        "Shayxontuxur",
+                        "Gulobod",
+                        "1"
+                );
+                addressRepository.save(address);
+            }
 //------------------------------------------------------------------------------------------//
 
-        List<Branch> allBranch = branchRepository.findAll();
-        Branch branch = null;
-        if (allBranch.isEmpty()) {
-            branch = new Branch(
-                    "Test Filial",
-                    address,
-                    business,
-                    1
-            );
-            branchRepository.save(branch);
-        }
-
-
-//------------------------------------------------------------------------------------------//
-
-        if (initMode.equals("always")) {
             Permissions[] permissions = Permissions.values();
-            SuperAdmin[] superAdmins = SuperAdmin.values();
 
             Role superAdmin = roleRepository.save(new Role(
                     Constants.SUPERADMIN,
@@ -179,7 +164,10 @@ public class DataLoader implements CommandLineRunner {
             ));
 
 
-            Role admin = roleRepository.save(new Role(Constants.ADMIN, Arrays.asList(
+            Role admin = roleRepository.save(
+                new Role(
+                Constants.ADMIN,
+                Arrays.asList(
                     ADD_ADDRESS,
                     EDIT_ADDRESS,
                     VIEW_ADDRESS,
@@ -325,140 +313,137 @@ public class DataLoader implements CommandLineRunner {
                     CREATE_PRODUCTION,
                     GET_PRODUCTION,
                     VIEW_REPORT
-            ),
-                    business));
-            Role manager = roleRepository.save(new Role(
-                    Constants.MANAGER,
-                    Arrays.asList(
-                            GET_TARIFF,
-
-                            ADD_ADDRESS,
-                            EDIT_ADDRESS,
-                            VIEW_ADDRESS,
-                            DELETE_ADDRESS,
-
-                            UPLOAD_MEDIA,
-                            DOWNLOAD_MEDIA,
-                            VIEW_MEDIA_INFO,
-                            DELETE_MEDIA,
-
-                            ADD_BRAND,
-                            EDIT_BRAND,
-                            VIEW_BRAND,
-                            DELETE_BRAND,
-
-                            ADD_CATEGORY,
-                            EDIT_CATEGORY,
-                            VIEW_CATEGORY,
-                            DELETE_CATEGORY,
-                            ADD_CHILD_CATEGORY,
-
-                            ADD_CURRENCY,
-                            EDIT_CURRENCY,
-                            VIEW_CURRENCY,
-                            DELETE_CURRENCY,
-
-                            ADD_CUSTOMER,
-                            EDIT_CUSTOMER,
-                            VIEW_CUSTOMER,
-                            DELETE_CUSTOMER,
-
-                            ADD_MEASUREMENT,
-                            EDIT_MEASUREMENT,
-                            VIEW_MEASUREMENT,
-                            DELETE_MEASUREMENT,
-
-                            ADD_OUTLAY,
-                            EDIT_OUTLAY,
-                            VIEW_OUTLAY,
-                            DELETE_OUTLAY,
-
-                            ADD_PRODUCT,
-                            EDIT_PRODUCT,
-                            VIEW_PRODUCT,
-                            DELETE_PRODUCT,
-                            VIEW_PRODUCT_ADMIN,
-
-                            ADD_ROLE,
-                            EDIT_ROLE,
-                            VIEW_ROLE,
-                            DELETE_ROLE,
-
-                            ADD_SUPPLIER,
-                            EDIT_SUPPLIER,
-                            VIEW_SUPPLIER,
-                            DELETE_SUPPLIER,
-
-                            ADD_USER,
-                            EDIT_USER,
-                            VIEW_USER,
-                            DELETE_USER,
-                            EDIT_MY_PROFILE,
-
-                            ADD_TRADE,
-                            EDIT_TRADE,
-                            VIEW_TRADE,
-                            DELETE_TRADE,
-                            DELETE_MY_TRADE,
-                            VIEW_MY_TRADE,
-
-                            ADD_TAX,
-                            DELETE_TAX,
-                            EDIT_TAX,
-                            VIEW_TAX,
-
-                            ADD_CUSTOMER_GROUP,
-                            DELETE_CUSTOMER_GROUP,
-                            EDIT_CUSTOMER_GROUP,
-                            VIEW_CUSTOMER_GROUP,
-
-                            ADD_PAY_METHOD,
-                            EDIT_PAY_METHOD,
-                            VIEW_PAY_METHOD,
-                            DELETE_PAY_METHOD,
-
-                            ADD_PAY_STATUS,
-                            EDIT_PAY_STATUS,
-                            VIEW_PAY_STATUS,
-                            DELETE_PAY_STATUS,
-
-                            ADD_PURCHASE,
-                            EDIT_PURCHASE,
-                            VIEW_PURCHASE,
-                            DELETE_PURCHASE,
-
-                            ADD_EXCHANGE,
-                            EDIT_EXCHANGE,
-                            VIEW_EXCHANGE,
-                            DELETE_EXCHANGE,
-
-                            VIEW_BENEFIT_AND_LOST,
-
-                            ADD_PRODUCT_TYPE,
-                            GET_PRODUCT_TYPE,
-                            UPDATE_PRODUCT_TYPE,
-                            DELETE_PRODUCT_TYPE,
-
-                            GET_EXCEL,
-                            POST_EXCEL,
-
-                            VIEW_INFO,
-
-                            GET_BUSINESS_ALL_AMOUNT,
-
-
-                            CREATE_CONTENT,
-                            EDIT_CONTENT,
-                            GET_CONTENT,
-                            DELETE_CONTENT,
-
-                            CREATE_PRODUCTION,
-                            GET_PRODUCTION,
-                            VIEW_REPORT
-
                     ),
-                    business
-            ));
+                business));
+            Role manager = roleRepository.save(new Role(
+                Constants.MANAGER,
+                    Arrays.asList(
+                        GET_TARIFF,
+
+                        ADD_ADDRESS,
+                        EDIT_ADDRESS,
+                        VIEW_ADDRESS,
+                        DELETE_ADDRESS,
+
+                        UPLOAD_MEDIA,
+                        DOWNLOAD_MEDIA,
+                        VIEW_MEDIA_INFO,
+                        DELETE_MEDIA,
+
+                        ADD_BRAND,
+                        EDIT_BRAND,
+                        VIEW_BRAND,
+                        DELETE_BRAND,
+
+                        ADD_CATEGORY,
+                        EDIT_CATEGORY,
+                        VIEW_CATEGORY,
+                        DELETE_CATEGORY,
+                        ADD_CHILD_CATEGORY,
+
+                        ADD_CURRENCY,
+                        EDIT_CURRENCY,
+                        VIEW_CURRENCY,
+                        DELETE_CURRENCY,
+
+                        ADD_CUSTOMER,
+                        EDIT_CUSTOMER,
+                        VIEW_CUSTOMER,
+                        DELETE_CUSTOMER,
+
+                        ADD_MEASUREMENT,
+                        EDIT_MEASUREMENT,
+                        VIEW_MEASUREMENT,
+                        DELETE_MEASUREMENT,
+
+                        ADD_OUTLAY,
+                        EDIT_OUTLAY,
+                        VIEW_OUTLAY,
+                        DELETE_OUTLAY,
+
+                        ADD_PRODUCT,
+                        EDIT_PRODUCT,
+                        VIEW_PRODUCT,
+                        DELETE_PRODUCT,
+                        VIEW_PRODUCT_ADMIN,
+
+                        ADD_ROLE,
+                        EDIT_ROLE,
+                        VIEW_ROLE,
+                        DELETE_ROLE,
+
+                        ADD_SUPPLIER,
+                        EDIT_SUPPLIER,
+                        VIEW_SUPPLIER,
+                        DELETE_SUPPLIER,
+
+                        ADD_USER,
+                        EDIT_USER,
+                        VIEW_USER,
+                        DELETE_USER,
+                        EDIT_MY_PROFILE,
+
+                        ADD_TRADE,
+                        EDIT_TRADE,
+                        VIEW_TRADE,
+                        DELETE_TRADE,
+                        DELETE_MY_TRADE,
+                        VIEW_MY_TRADE,
+
+                        ADD_TAX,
+                        DELETE_TAX,
+                        EDIT_TAX,
+                        VIEW_TAX,
+
+                        ADD_CUSTOMER_GROUP,
+                        DELETE_CUSTOMER_GROUP,
+                        EDIT_CUSTOMER_GROUP,
+                        VIEW_CUSTOMER_GROUP,
+
+                        ADD_PAY_METHOD,
+                        EDIT_PAY_METHOD,
+                        VIEW_PAY_METHOD,
+                        DELETE_PAY_METHOD,
+
+                        ADD_PAY_STATUS,
+                        EDIT_PAY_STATUS,
+                        VIEW_PAY_STATUS,
+                        DELETE_PAY_STATUS,
+
+                        ADD_PURCHASE,
+                        EDIT_PURCHASE,
+                        VIEW_PURCHASE,
+                        DELETE_PURCHASE,
+
+                        ADD_EXCHANGE,
+                        EDIT_EXCHANGE,
+                        VIEW_EXCHANGE,
+                        DELETE_EXCHANGE,
+
+                        VIEW_BENEFIT_AND_LOST,
+
+                        ADD_PRODUCT_TYPE,
+                        GET_PRODUCT_TYPE,
+                        UPDATE_PRODUCT_TYPE,
+                        DELETE_PRODUCT_TYPE,
+
+                        GET_EXCEL,
+                        POST_EXCEL,
+
+                        VIEW_INFO,
+
+                        GET_BUSINESS_ALL_AMOUNT,
+
+
+                        CREATE_CONTENT,
+                        EDIT_CONTENT,
+                        GET_CONTENT,
+                        DELETE_CONTENT,
+
+                        CREATE_PRODUCTION,
+                        GET_PRODUCTION,
+                        VIEW_REPORT),
+                    business));
 
             Role employee = roleRepository.save(new Role(
                     Constants.EMPLOYEE,
@@ -503,8 +488,58 @@ public class DataLoader implements CommandLineRunner {
                     business
             ));
 
+            List<PaymentMethod> all1 = payMethodRepository.findAll();
+            if (all1.isEmpty()) {
+                payMethodRepository.save(new PaymentMethod(
+                        "Naqd",
+                        business
+                ));
+
+                payMethodRepository.save(new PaymentMethod(
+                        "PlastikKarta",
+                        business
+                ));
+
+                payMethodRepository.save(new PaymentMethod(
+                        "BankOrqali",
+                        business
+                ));
+            }
+
+            List<Currency> currencyList = currencyRepository.findAll();
+            Currency currencyUSA = new Currency();
+            if (currencyList.isEmpty()) {
+//            currencyUSA = currencyRepository.save(new Currency(
+//                    "DOLLAR",
+//                    "USA",
+//                    business,
+//                    true
+//            ));
+
+                Currency currencyUZB = currencyRepository.save(new Currency(
+                        "SO'M",
+                        "UZB",
+                        business,
+                        true
+                ));
+            }
+
             Set<Branch> branches = new HashSet<>();
-            branches.add(branch);
+            if (business != null) {
+                List<Branch> allBranch = branchRepository.findAllByBusiness_Id(business.getId());
+                Branch branch = null;
+                if (allBranch.isEmpty()) {
+                    branch = new Branch(
+                            "Test Filial",
+                            address,
+                            business,
+                            1
+                    );
+                    branchRepository.save(branch);
+                    branches.add(branch);
+                }
+            }
+
             userRepository.save(new User(
                     "Admin",
                     "Admin",
@@ -548,80 +583,35 @@ public class DataLoader implements CommandLineRunner {
                     branches
             ));
 
+            List<PaymentStatus> all = paymentStatusRepository.findAll();
+            if (all.isEmpty()) {
+                paymentStatusRepository.save(new PaymentStatus(
+                        TOLANGAN.name()
+                ));
+
+                paymentStatusRepository.save(new PaymentStatus(
+                        QISMAN_TOLANGAN.name()
+                ));
+
+                paymentStatusRepository.save(new PaymentStatus(
+                        TOLANMAGAN.name()
+                ));
+            }
+
+            List<ExchangeStatus> exchangeStatusRepositoryAll = exchangeStatusRepository.findAll();
+            if (exchangeStatusRepositoryAll.isEmpty()) {
+                exchangeStatusRepository.save(new ExchangeStatus(
+                        BUYURTMA_QILINGAN.name()
+                ));
+
+                exchangeStatusRepository.save(new ExchangeStatus(
+                        KUTILMOQDA.name()
+                ));
+
+                exchangeStatusRepository.save(new ExchangeStatus(
+                        QABUL_QILINGAN.name()
+                ));
+            }
         }
-
-
-        List<PaymentStatus> all = paymentStatusRepository.findAll();
-        if (all.isEmpty()) {
-            paymentStatusRepository.save(new PaymentStatus(
-                    TOLANGAN.name()
-            ));
-
-            paymentStatusRepository.save(new PaymentStatus(
-                    QISMAN_TOLANGAN.name()
-            ));
-
-            paymentStatusRepository.save(new PaymentStatus(
-                    TOLANMAGAN.name()
-            ));
-        }
-        List<ExchangeStatus> exchangeStatusRepositoryAll = exchangeStatusRepository.findAll();
-        if (exchangeStatusRepositoryAll.isEmpty()) {
-            exchangeStatusRepository.save(new ExchangeStatus(
-                    BUYURTMA_QILINGAN.name()
-            ));
-
-            exchangeStatusRepository.save(new ExchangeStatus(
-                    KUTILMOQDA.name()
-            ));
-
-            exchangeStatusRepository.save(new ExchangeStatus(
-                    QABUL_QILINGAN.name()
-            ));
-        }
-
-        List<PaymentMethod> all1 = payMethodRepository.findAll();
-        if (all1.isEmpty()) {
-            payMethodRepository.save(new PaymentMethod(
-                    "Naqd",
-                    business
-            ));
-
-            payMethodRepository.save(new PaymentMethod(
-                    "PlastikKarta",
-                    business
-            ));
-
-            payMethodRepository.save(new PaymentMethod(
-                    "BankOrqali",
-                    business
-            ));
-        }
-
-
-        List<Currency> currencyList = currencyRepository.findAll();
-        Currency currencyUSA = new Currency();
-        if (currencyList.isEmpty()) {
-//            currencyUSA = currencyRepository.save(new Currency(
-//                    "DOLLAR",
-//                    "USA",
-//                    business,
-//                    true
-//            ));
-
-            Currency currencyUZB = currencyRepository.save(new Currency(
-                    "SO'M",
-                    "UZB",
-                    business,
-                    true
-            ));
-        }
-
-//        List<CurrentCource> currentCourceList = currentCourceRepository.findAll();
-//        if (currentCourceList.isEmpty()){
-//            currentCourceRepository.save(new CurrentCource(110.0,currencyUSA,true));
-//        }
-
     }
-
 }
