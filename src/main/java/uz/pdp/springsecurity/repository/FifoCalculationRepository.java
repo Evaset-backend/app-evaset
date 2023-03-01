@@ -10,14 +10,18 @@ import java.util.UUID;
 public interface FifoCalculationRepository extends JpaRepository<FifoCalculation, UUID> {
     List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
     // asc and desc
-    List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByDateDescCreatedAtDesc(UUID branchId, UUID productId);
-    List<FifoCalculation> findAllByBranchIdAndProductIdOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
+//    List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByDateDescCreatedAtDesc(UUID branchId, UUID productId);
 
-//    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productTypePriceId);
+
+    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateAscCreatedAtAsc(UUID branchId, UUID productTypePriceId);
     // asc and desc
-    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateDescCreatedAtDesc(UUID branchId, UUID productTypePriceId);
 
-    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdOrderByDateAscCreatedAtAsc(UUID branchId, UUID productId);
+//    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDateDescCreatedAtDesc(UUID branchId, UUID productTypePriceId);
+
+
+    List<FifoCalculation> findAllByBranchIdAndProductIdOrderByDateDescCreatedAtDesc(UUID branchId, UUID productId);
+
+    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdOrderByDateDescCreatedAtDesc(UUID branchId, UUID productId);
 
     Optional<FifoCalculation> findByPurchaseProductId(UUID purchaseProductId);
 }

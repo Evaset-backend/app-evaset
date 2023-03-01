@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.component;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +21,7 @@ import static uz.pdp.springsecurity.enums.Permissions.*;
 import static uz.pdp.springsecurity.enums.StatusName.*;
 
 @Component
+@RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
@@ -67,6 +69,8 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     SubscriptionRepository subscriptionRepository;
 
+    private final MeasurementRepository measurementRepository;
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
@@ -104,6 +108,14 @@ public class DataLoader implements CommandLineRunner {
             business.setActive(true);
             business.setDelete(false);
             business = businessRepository.save(business);
+        }
+
+        List<Measurement> measurementList = measurementRepository.findAllByBusiness_Id(business.getId());
+        if (measurementList.isEmpty()) {
+            measurementRepository.save(
+                    new Measurement("dona",
+                            business)
+            );
         }
 
         if (business != null) {
