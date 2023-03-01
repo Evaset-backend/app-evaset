@@ -189,6 +189,7 @@ public class UserService {
         user.setFirstName(profileDto.getFirstName());
         user.setLastName(profileDto.getLastName());
         user.setUsername(profileDto.getUsername());
+
         user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
 
         Optional<Attachment> optionalPhoto = attachmentRepository.findById(profileDto.getPhotoId());

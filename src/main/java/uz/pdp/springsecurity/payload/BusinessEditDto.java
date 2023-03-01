@@ -18,4 +18,8 @@ public class BusinessEditDto {
     private boolean isActive;
 
     private boolean isDelete;
+
+    //toDo nastroyka boshlanganida saleminus qib ketish esdan chqmasin a
+
+//    private boolean saleMinus;
 }
