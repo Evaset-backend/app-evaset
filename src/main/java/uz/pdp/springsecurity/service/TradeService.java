@@ -171,22 +171,30 @@ public class TradeService {
         if (!branch.getBusiness().getSaleMinus()) {
             HashMap<UUID, Double> map = new HashMap<>();
             for (TradeProductDto dto : tradeProductDtoList) {
+                double tradedQuantity = dto.getTradedQuantity();
+                if (dto.getTradeProductId() != null){
+                    Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(dto.getTradeProductId());
+                    if (optionalTradeProduct.isPresent()){
+                        tradedQuantity -= optionalTradeProduct.get().getTradedQuantity();
+                        if (tradedQuantity < 0) tradedQuantity = 0d;
+                    }
+                }
                 if (dto.getType().equalsIgnoreCase("single")) {
                     UUID productId = dto.getProductId();
                     if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
-                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                    map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
                 } else if (dto.getType().equalsIgnoreCase("many")) {
                     UUID productId = dto.getProductTypePriceId();
                     if (!productTypePriceRepository.existsById(productId))
                         return new ApiResponse("PRODUCT NOT FOUND", false);
-                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getTradedQuantity());
+                    map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
                 } else if (dto.getType().equalsIgnoreCase("combo")) {
                     UUID productId = dto.getProductId();
                     List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
                     if (comboList.isEmpty()) return new ApiResponse("PRODUCT NOT FOUND", false);
                     for (ProductTypeCombo combo : comboList) {
                         UUID contentProduct = combo.getContentProduct().getId();
-                        map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + dto.getTradedQuantity() * combo.getAmount());
+                        map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + tradedQuantity * combo.getAmount());
                     }
                 } else {
                     return new ApiResponse("PRODUCT NOT FOUND", false);
