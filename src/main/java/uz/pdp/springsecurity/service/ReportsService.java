@@ -742,7 +742,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_WEEK")) {
@@ -751,7 +751,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_MONTH")) {
@@ -760,7 +760,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_MONTH")) {
@@ -769,7 +769,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_THIRTY_DAY")) {
@@ -778,7 +778,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_YEAR")) {
@@ -787,7 +787,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_YEAR")) {
@@ -796,7 +796,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else if (comingEndDate != null && comingStartDate != null) {
@@ -807,7 +807,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             } else {
@@ -816,7 +816,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(tradeProduct.getProduct().getId(), amount);
                 }
             }
@@ -851,7 +851,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_WEEK")) {
@@ -860,7 +860,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_MONTH")) {
@@ -869,7 +869,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_MONTH")) {
@@ -878,7 +878,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_THIRTY_DAY")) {
@@ -887,7 +887,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_YEAR")) {
@@ -896,7 +896,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_YEAR")) {
@@ -905,7 +905,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else if (comingEndDate != null && comingStartDate != null) {
@@ -916,7 +916,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             } else {
@@ -925,7 +926,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(category.getId(), amount);
                 }
             }
@@ -959,7 +961,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_WEEK")) {
@@ -968,7 +970,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_MONTH")) {
@@ -977,7 +979,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_MONTH")) {
@@ -986,7 +988,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_YEAR")) {
@@ -995,7 +997,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_THIRTY_DAY")) {
@@ -1004,7 +1006,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_YEAR")) {
@@ -1013,7 +1015,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else if (comingEndDate != null && comingStartDate != null) {
@@ -1024,7 +1026,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             } else {
@@ -1033,7 +1035,7 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+                    amount += product.getProfit();
                     productAmount.put(brand.getId(), amount);
                 }
             }
@@ -1066,7 +1068,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_WEEK")) {
@@ -1075,7 +1078,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getProduct().getBrand().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_MONTH")) {
@@ -1084,7 +1088,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getProduct().getBrand().getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_MONTH")) {
@@ -1093,7 +1098,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else if (Objects.equals(date, "THIS_YEAR")) {
@@ -1102,7 +1108,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_THIRTY_DAY")) {
@@ -1111,7 +1118,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else if (Objects.equals(date, "LAST_YEAR")) {
@@ -1120,7 +1128,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else if (comingEndDate != null && comingStartDate != null) {
@@ -1131,7 +1140,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             } else {
@@ -1140,7 +1150,8 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-                    amount += (product.getProduct().getSalePrice() * product.getTradedQuantity()) - (product.getProduct().getBuyPrice() * product.getTradedQuantity());
+
+                    amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
             }
