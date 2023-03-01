@@ -37,35 +37,27 @@ public class ExcelService {
     @Autowired
     BrandRepository brandRepository;
 
-
-
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
         List<ProductViewDtos> productViewDtoList = new ArrayList<>();
-        List<Product> productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(businessId);
         if (productList.isEmpty()) {
             return null;
         } else {
             for (Product product : productList) {
                 ProductViewDtos productViewDto = new ProductViewDtos();
                 productViewDto.setProductName(product.getName());
-                productViewDto.setBrandName(product.getBrand().getName());
+                if (product.getBrand() != null)productViewDto.setBrandName(product.getBrand().getName());
                 productViewDto.setBarcode(productViewDto.getBarcode());
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setMinQuantity(product.getMinQuantity());
-                List<Branch> branchList = product.getBranch();
-                for (Branch branch : branchList) {
-                    productViewDto.setBranch(branch.getName());
-                }
                 productViewDto.setExpiredDate(product.getExpireDate());
-
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranch_BusinessIdAndProductId(businessId, product.getId());
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(businessId, product.getId());
                 optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
                 productViewDtoList.add(productViewDto);
             }
-
             return productViewDtoList;
         }
     }
@@ -84,14 +76,8 @@ public class ExcelService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("NOT FOUND BRANCH");
         }
-        if (optionalCategory.isEmpty()){
-            return new ApiResponse("NOT FOUND CATEGORY");
-        }
         if (optionalMeasurement.isEmpty()){
             return new ApiResponse("NOT FOUND MEASUREMENT");
-        }
-        if (optionalBrand.isEmpty()){
-            return new ApiResponse("NOT FOUND BRAND");
         }
 
         try {
@@ -115,9 +101,9 @@ public class ExcelService {
                 product.setBranch(branchList);
                 product.setTax(10);
 
-                product.setCategory(optionalCategory.get());
+                optionalCategory.ifPresent(product::setCategory);
                 product.setMeasurement(optionalMeasurement.get());
-                product.setBrand(optionalBrand.get());
+                optionalBrand.ifPresent(product::setBrand);
                 product.setType(Type.SINGLE);
                 product.setPhoto(null);
                 productList.add(product);

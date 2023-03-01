@@ -35,16 +35,16 @@ public class ExcelGenerator {
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        createCell(row, 1, "name", style);
-        createCell(row, 2, "branch", style);
-        createCell(row, 3, "buy price", style);
-        createCell(row, 4, "sale price", style);
-        createCell(row, 5, "amount", style);
-        createCell(row, 6, "brand", style);
-        createCell(row, 7, "alert quantity", style);
-        createCell(row, 8, "expired date", style);
-        createCell(row, 9, "barcode", style);
-        createCell(row, 10, "measurement", style);
+        createCell(row, 0, "name", style);
+        createCell(row, 1, "branch", style);
+        createCell(row, 2, "buy price", style);
+        createCell(row, 3, "sale price", style);
+        createCell(row, 4, "amount", style);
+        createCell(row, 5, "brand", style);
+        createCell(row, 6, "alert quantity", style);
+        createCell(row, 7, "expired date", style);
+        createCell(row, 8, "barcode", style);
+        createCell(row, 9, "measurement", style);
     }
 
     private void createCell(Row row, int columnCount, Object valueOfCell, CellStyle style) {
@@ -66,7 +66,7 @@ public class ExcelGenerator {
         style.setFont(font);
         for (ProductViewDtos record: productViewDtosList) {
             Row row = sheet.createRow(rowCount++);
-            int columnCount = 1;
+            int columnCount = 0;
             createCell(row, columnCount++, record.getProductName(), style);
             createCell(row, columnCount++, record.getBranch(), style);
             createCell(row, columnCount++, record.getBuyPrice(), style);
