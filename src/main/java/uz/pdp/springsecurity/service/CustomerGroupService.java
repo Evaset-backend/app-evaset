@@ -27,7 +27,7 @@ public class CustomerGroupService {
 
         Optional<Business> optionalBusiness = businessRepository.findById(customerGroupDto.getBusinessId());
         if (optionalBusiness.isEmpty()) {
-            return new ApiResponse("BRANCH NOT FOUND", false);
+            return new ApiResponse("BUSINESS NOT FOUND", false);
         }
 
         CustomerGroup customerGroup = mapper.toEntity(customerGroupDto);
