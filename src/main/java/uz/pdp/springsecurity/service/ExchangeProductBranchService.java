@@ -136,15 +136,13 @@ public class ExchangeProductBranchService {
         List<ExchangeBranchGetOneDto> getOneDtoList = new ArrayList<>();
         for (ExchangeProduct exchangeProduct : exchangeProductBranch.getExchangeProductList()) {
             ExchangeBranchGetOneDto branchGetOneDto = new ExchangeBranchGetOneDto();
-            if (exchangeProduct.getProduct() != null) {
+            if(exchangeProduct.getProduct() != null) {
                 branchGetOneDto.setProductName(exchangeProduct.getProduct().getName());
-                branchGetOneDto.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
-                getOneDtoList.add(branchGetOneDto);
             } else {
                 branchGetOneDto.setProductName(exchangeProduct.getProductTypePrice().getName());
-                branchGetOneDto.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
-                getOneDtoList.add(branchGetOneDto);
             }
+            branchGetOneDto.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
+            getOneDtoList.add(branchGetOneDto);
         }
         return new ApiResponse("found", true, getOneDtoList);
     }
