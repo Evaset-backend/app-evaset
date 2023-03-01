@@ -57,10 +57,10 @@ public class ExcelController {
     @CheckPermission("POST_EXCEL")
     @PostMapping("/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam MultipartFile file,
-                                                      @RequestParam UUID categoryId,
-                                                      @RequestParam UUID measurementId,
                                                       @RequestParam UUID branchId,
-                                                      @RequestParam UUID brandId) {
+                                                      @RequestParam UUID measurementId,
+                                                      @RequestParam(required = false) UUID categoryId,
+                                                      @RequestParam(required = false) UUID brandId) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {

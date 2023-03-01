@@ -266,7 +266,7 @@ public class ReportsService {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         Optional<Brand> optionalBrand = brandRepository.findById(brandId);
         if (optionalBrand.isEmpty()) {
-            return new ApiResponse("Brand Not Found");
+            return new ApiResponse("Brand Not Found",false);
         }
 
         if (optionalBranch.isEmpty()) {
@@ -281,7 +281,7 @@ public class ReportsService {
         List<Product> productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brandId, businessId);
 
         if (productList.isEmpty()) {
-            return new ApiResponse("No Found Products");
+            return new ApiResponse("No Found Products",false);
         }
 
         double SumBySalePrice = 0;
@@ -324,7 +324,7 @@ public class ReportsService {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
         if (optionalCategory.isEmpty()) {
-            return new ApiResponse("Category Not Found");
+            return new ApiResponse("Category Not Found",false);
         }
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
@@ -338,7 +338,7 @@ public class ReportsService {
         List<Product> productList = productRepository.findAllByCategoryIdAndBusinessIdAndActiveTrue(categoryId, businessId);
 
         if (productList.isEmpty()) {
-            return new ApiResponse("No Found Products");
+            return new ApiResponse("No Found Products",false);
         }
 
         double SumBySalePrice = 0;
@@ -429,12 +429,12 @@ public class ReportsService {
             double amount = 0;
             if (tradeProduct.getProduct() != null) {
                 for (TradeProduct product : allByProductId) {
-                    amount += product.getTradedQuantity();
+                    amount += product.getProfit();
                     productAmount.put(product.getProduct().getId(), amount);
                 }
             } else {
                 for (TradeProduct product : allByProductId) {
-                    amount += product.getTradedQuantity();
+                    amount += product.getProfit();
                     productAmount.put(product.getProductTypePrice().getId(), amount);
                 }
             }
@@ -1254,7 +1254,7 @@ public class ReportsService {
                             List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
                             double totalAmount = 0;
                             for (TradeProduct product : allByProductId) {
-                                totalAmount += product.getTradedQuantity();
+                                totalAmount += product.getProfit();
                                 productAmount.put(product.getProduct().getId(), totalAmount);
                             }
                         }
@@ -1264,7 +1264,7 @@ public class ReportsService {
                             List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
                             double totalAmount = 0;
                             for (TradeProduct product : allByProductTypePriceId) {
-                                totalAmount += product.getTradedQuantity();
+                                totalAmount += product.getProfit();
                                 productAmount.put(product.getProductTypePrice().getId(), totalAmount);
                             }
                         }
@@ -1283,7 +1283,7 @@ public class ReportsService {
                         List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_IdAndTrade_CustomerId(tradeProduct.getProduct().getId(), customerId);
                         double totalAmount = 0;
                         for (TradeProduct product : allByProductId) {
-                            totalAmount += product.getTradedQuantity();
+                            totalAmount += product.getProfit();
                             productAmount.put(product.getProduct().getId(), totalAmount);
                         }
                     }
@@ -1293,7 +1293,7 @@ public class ReportsService {
                         List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceIdAndTrade_CustomerId(tradeProduct.getProductTypePrice().getId(), customerId);
                         double totalAmount = 0;
                         for (TradeProduct product : allByProductTypePriceId) {
-                            totalAmount += product.getTradedQuantity();
+                            totalAmount += product.getProfit();
                             productAmount.put(product.getProductTypePrice().getId(), totalAmount);
                         }
                     }
@@ -1311,7 +1311,7 @@ public class ReportsService {
                     List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
                     double totalAmount = 0;
                     for (TradeProduct product : allByProductId) {
-                        totalAmount += product.getTradedQuantity();
+                        totalAmount += product.getProfit();
                         productAmount.put(product.getProduct().getId(), totalAmount);
                     }
                 }
@@ -1321,7 +1321,7 @@ public class ReportsService {
                     List<TradeProduct> allByProductTypePriceId = tradeProductRepository.findAllByProductTypePriceId(tradeProduct.getProductTypePrice().getId());
                     double totalAmount = 0;
                     for (TradeProduct product : allByProductTypePriceId) {
-                        totalAmount += product.getTradedQuantity();
+                        totalAmount += product.getProfit();
                         productAmount.put(product.getProductTypePrice().getId(), totalAmount);
                     }
                 }
