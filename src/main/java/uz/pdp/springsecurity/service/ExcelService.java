@@ -8,15 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Type;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.ExportExcelDto;
 import uz.pdp.springsecurity.payload.ProductViewDtos;
 import uz.pdp.springsecurity.repository.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +32,10 @@ public class ExcelService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    ProductTypePriceRepository productTypePriceRepository;
+
 
     @Autowired
     BrandRepository brandRepository;
@@ -62,20 +65,23 @@ public class ExcelService {
         }
     }
 
-    @SneakyThrows
-    public ApiResponse save(MultipartFile file, UUID branchId, UUID measurementId, UUID categoryId,UUID brandId) {
+
+    public ApiResponse save(MultipartFile file, UUID categoryId, UUID measurementId, UUID branchId,UUID brandId) {
 
         Business business = null;
 
-        Optional<Category> optionalCategory = categoryRepository.findById(branchId);
-        Optional<Branch> optionalBranch = branchRepository.findById(categoryId);
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
         Optional<Brand> optionalBrand = brandRepository.findById(brandId);
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
 
 
         if (optionalBranch.isEmpty()){
             return new ApiResponse("NOT FOUND BRANCH");
         }
+        UUID businessId = optionalBranch.get().getBusiness().getId();
+
+
         if (optionalMeasurement.isEmpty()){
             return new ApiResponse("NOT FOUND MEASUREMENT");
         }
@@ -85,36 +91,57 @@ public class ExcelService {
             List<Branch> branchList = new ArrayList<>();
             branchList.add(optionalBranch.get());
 
-            List<ProductViewDtos> productViewDtosList = ExcelHelper.excelToTutorials(file.getInputStream());
+            List<ExportExcelDto> exportExcelDtoList = ExcelHelper.excelToTutorials(file.getInputStream());
             List<Product> productList=new ArrayList<>();
-            for (ProductViewDtos productViewDtos : productViewDtosList) {
+            List<Warehouse> warehouseList = new ArrayList<>();
+            for (ExportExcelDto excelDto : exportExcelDtoList) {
+                if (Objects.equals(excelDto.getProductName(), ""))
+                    continue;
                 Product product=new Product();
+                UUID productId = UUID.randomUUID();
+                product.setId(productId);
                 product.setBusiness(business);
-                product.setName(productViewDtos.getProductName());
-                product.setExpireDate(productViewDtos.getExpiredDate());
-                product.setBarcode(String.valueOf(productViewDtos.getBarcode()));
+                product.setName(excelDto.getProductName());
+                product.setExpireDate(excelDto.getExpiredDate());
+                boolean exists = productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
+                boolean exists1 = productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
+                if (exists && exists1) {
+                    return  new ApiResponse("Barcode already exists !",false);
+                }
+                product.setBarcode(String.valueOf(excelDto.getBarcode()));
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                product.setDueDate(formatter.parse(formatter.format(productViewDtos.getExpiredDate())));
-                product.setBuyPrice(productViewDtos.getBuyPrice());
-                product.setSalePrice(productViewDtos.getSalePrice());
-                product.setMinQuantity(productViewDtos.getMinQuantity());
+                if (excelDto.getExpiredDate() != null){
+                    product.setDueDate(formatter.parse(formatter.format(excelDto.getExpiredDate())));
+                }else {
+                    Date date=new Date();
+                    product.setDueDate(date);
+                }
+                product.setBuyPrice(excelDto.getBuyPrice());
+                product.setSalePrice(excelDto.getSalePrice());
+                product.setMinQuantity(excelDto.getMinQuantity());
                 product.setBranch(branchList);
-                product.setTax(10);
-
+                product.setTax(0);
                 optionalCategory.ifPresent(product::setCategory);
                 product.setMeasurement(optionalMeasurement.get());
                 optionalBrand.ifPresent(product::setBrand);
                 product.setType(Type.SINGLE);
                 product.setPhoto(null);
+                Warehouse warehouse=new Warehouse();
+                warehouse.setBranch(optionalBranch.get());
+                warehouse.setAmount(excelDto.getAmount());
+                warehouse.setProduct(product);
+                warehouseList.add(warehouse);
                 productList.add(product);
             }
-            if (productViewDtosList.size()>0){
+            if (exportExcelDtoList.size()>0){
+                warehouseRepository.saveAllAndFlush(warehouseList);
                 productRepository.saveAll(productList);
                 return new ApiResponse("Successfully Added ",true);
             }
         } catch (IOException e) {
-            throw new RuntimeException("fail to store excel data: " + e.getMessage());
-
+            throw new RuntimeException("fail to store excel data:" + e.getMessage());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return new ApiResponse();
     }
