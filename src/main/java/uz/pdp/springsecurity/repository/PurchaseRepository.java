@@ -14,6 +14,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
     List<Purchase> findAllByPaymentStatus_Id(UUID paymentStatus_id);
     List<Purchase> findAllByBranch_Id(UUID branch_id);
     List<Purchase> findAllByCreatedAtBetweenAndBranchId(Timestamp start, Timestamp end, UUID branch_id);
+    List<Purchase> findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp start, Timestamp end, UUID businessId);
     List<Purchase> findAllByDate(Date date);
     List<Purchase> findAllBySupplierId(UUID dealer_id);
 

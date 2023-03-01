@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.util.Times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -29,7 +30,8 @@ public class InfoService {
     BranchRepository branchRepository;
     @Autowired
     TradeProductRepository tradeProductRepository;
-    private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
+    private final static LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
+    private final static LocalDateTime TODAY_END = LocalDateTime.of(TODAY_START.getYear(), TODAY_START.getMonth(), TODAY_START.getDayOfMonth(),23,59,59);
 
     private final static Date date = new Date(System.currentTimeMillis());
     private final static Timestamp currentDay = new Timestamp(date.getTime());
@@ -76,7 +78,7 @@ public class InfoService {
             return new ApiResponse("Branch Not Found", false);
         }
 
-        Timestamp from = Timestamp.valueOf(TODAY);
+        Timestamp from = Timestamp.valueOf(TODAY_START);
         Timestamp to = new Timestamp(System.currentTimeMillis());
         if (startDate != null && endDate != null) {
             from = new Timestamp(startDate.getTime());
@@ -214,10 +216,29 @@ public class InfoService {
             timestampList.add(from);
         }
 
+        List<Date> purchaseDateList = new ArrayList<>();
+        List<Double> purchasePriceList = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
+            Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+
+            List<Purchase> purchaseList = purchaseRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId);
+            double totalPurchase = 0d;
+            if (!purchaseList.isEmpty()) {
+                for (Purchase purchase : purchaseList) {
+                    totalPurchase += purchase.getTotalSum();
+                }
+            }
+            purchasePriceList.add(totalPurchase);
+            purchaseDateList.add(Timestamp.valueOf(TODAY_START));
+        }
+
         InfoOutlayDto infoDto = new InfoOutlayDto(
                 outlayMap,
                 tradeMap,
-                timestampList
+                timestampList,
+                purchasePriceList,
+                purchaseDateList
         );
         return new ApiResponse(true, infoDto);
     }
@@ -259,10 +280,29 @@ public class InfoService {
             timestampList.add(from);
         }
 
+        List<Date> purchaseDateList = new ArrayList<>();
+        List<Double> purchasePriceList = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
+            Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+
+            List<Purchase> purchaseList = purchaseRepository.findAllByCreatedAtBetweenAndBranchId(from, to, businessId);
+            double totalPurchase = 0d;
+            if (!purchaseList.isEmpty()) {
+                for (Purchase purchase : purchaseList) {
+                    totalPurchase += purchase.getTotalSum();
+                }
+            }
+            purchasePriceList.add(totalPurchase);
+            purchaseDateList.add(Timestamp.valueOf(TODAY_START.minusDays(i)));
+        }
+
         InfoOutlayDto infoDto = new InfoOutlayDto(
                 outlayMap,
                 tradeMap,
-                timestampList
+                timestampList,
+                purchasePriceList,
+                purchaseDateList
         );
         return new ApiResponse(true, infoDto);
     }
