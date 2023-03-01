@@ -3,13 +3,12 @@ package uz.pdp.springsecurity.service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.springsecurity.payload.ProductViewDtos;
+import uz.pdp.springsecurity.payload.ExportExcelDto;
 
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,71 +24,62 @@ public class ExcelHelper {
         return true;
     }
 
-    public static List<ProductViewDtos> excelToTutorials(InputStream is) {
+        public static List<ExportExcelDto> excelToTutorials(InputStream is) {
 
         try {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
-            List<ProductViewDtos> productViewDtosList = new ArrayList<ProductViewDtos>();
+            List<ExportExcelDto> exportExcelDtoList = new ArrayList<ExportExcelDto>();
 
             int rowNumber = 0;
             while (rows.hasNext()) {
-                Row currentRow = rows.next();
+                Row row = rows.next();
 
                 if (rowNumber == 0) {
                     rowNumber++;
                     continue;
                 }
 
-                Iterator<Cell> cellsInRow = currentRow.iterator();
+                Iterator<Cell> cellsInRow = row.iterator();
 
-                ProductViewDtos productViewDtos = new ProductViewDtos();
+                ExportExcelDto exportExcelDto = new ExportExcelDto();
 
                 int cellIdx = 0;
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
                     switch (cellIdx) {
-
                         case 0:
-                            productViewDtos.setProductName(currentCell.getStringCellValue());
+                            exportExcelDto.setProductName(currentCell.getStringCellValue());
                             break;
                         case 1:
-                            productViewDtos.setBranch(currentCell.getStringCellValue());
+                            exportExcelDto.setBuyPrice(currentCell.getNumericCellValue());
                             break;
                         case 2:
-                            productViewDtos.setBuyPrice(currentCell.getNumericCellValue());
+                            exportExcelDto.setSalePrice(currentCell.getNumericCellValue());
                             break;
                         case 3:
-                            productViewDtos.setSalePrice(currentCell.getNumericCellValue());
+                            exportExcelDto.setAmount(currentCell.getNumericCellValue());
                             break;
                         case 4:
-                            productViewDtos.setAmount(currentCell.getNumericCellValue());
+                            exportExcelDto.setMinQuantity(currentCell.getNumericCellValue());
                             break;
                         case 5:
-                            productViewDtos.setBrandName(currentCell.getStringCellValue());
+                            exportExcelDto.setExpiredDate(currentCell.getDateCellValue());
                             break;
                         case 6:
-                            productViewDtos.setMinQuantity(currentCell.getNumericCellValue());
-                            break;
-                        case 7:
-                            productViewDtos.setExpiredDate(currentCell.getDateCellValue());
-                            break;
-                        case 8:
-                            productViewDtos.setBarcode(currentCell.getStringCellValue());
-                            break;
-                        case 9:
-                            productViewDtos.setMeasurementId(currentCell.getStringCellValue());
+                            currentCell.setCellType(CellType.STRING);
+                            exportExcelDto.setBarcode(currentCell.getStringCellValue());
                             break;
                         default:
                             break;
                     }
                     cellIdx++;
                 }
-                productViewDtosList.add(productViewDtos);
+                exportExcelDtoList.add(exportExcelDto);
                 workbook.close();
             }
-            return productViewDtosList;
+            return exportExcelDtoList;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
         }

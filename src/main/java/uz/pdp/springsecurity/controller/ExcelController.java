@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class ExcelController {
         String currentDateTime = dateFormatter.format(new Date());
 
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename = PRODUCT "+ ".xlsx";
+        String headerValue = "attachment; filename = PRODUCT " + ".xlsx";
         response.setHeader(headerKey, headerValue);
         List<ProductViewDtos> productViewDtos = excelService.getByBusiness(uuid);
         ExcelGenerator generator = new ExcelGenerator(productViewDtos);
@@ -56,22 +57,16 @@ public class ExcelController {
 
     @CheckPermission("POST_EXCEL")
     @PostMapping("/upload")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam MultipartFile file,
-                                                      @RequestParam UUID branchId,
-                                                      @RequestParam UUID measurementId,
-                                                      @RequestParam(required = false) UUID categoryId,
-                                                      @RequestParam(required = false) UUID brandId) {
-        String message = "";
+    public ApiResponse uploadFile(@RequestParam MultipartFile file,
+                                     @RequestParam UUID branchId,
+                                     @RequestParam UUID measurementId,
+                                     @RequestParam(required = false) UUID categoryId,
+                                     @RequestParam(required = false) UUID brandId) {
         if (ExcelHelper.hasExcelFormat(file)) {
-            try {
-                ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId,brandId);
-                ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-            } catch (Exception e) {
-                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-            }
+            ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId, brandId);
+            ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
         }
-               message = "Please upload an excel file!";
-               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((new ResponseMessage(message)));
+        return new ApiResponse();
     }
 }
