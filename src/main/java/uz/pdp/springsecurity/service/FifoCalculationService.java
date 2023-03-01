@@ -209,7 +209,7 @@ public class FifoCalculationService {
                 fifo.setRemainAmount(fifo.getRemainAmount() + quantity);
                 fifo.setActive(true);
                 profit += quantity * (salePrice - fifo.getBuyPrice());
-                break;
+                return profit;
             } else {
                 quantity -= soldQuantity;
                 fifo.setRemainAmount(fifo.getPurchasedAmount());
