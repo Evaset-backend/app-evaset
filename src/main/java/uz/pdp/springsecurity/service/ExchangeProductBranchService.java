@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.mapper.ExchangeProductBranchMapper;
 import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.ExchangeBranchGetOneDto;
 import uz.pdp.springsecurity.payload.ExchangeProductBranchDTO;
 import uz.pdp.springsecurity.payload.ExchangeProductDTO;
 import uz.pdp.springsecurity.repository.*;
@@ -132,11 +133,20 @@ public class ExchangeProductBranchService {
             return new ApiResponse("not found exchange product branch ", false);
         }
         ExchangeProductBranch exchangeProductBranch = optional.get();
-        List<ExchangeProductDTO> exchangeProductDTOList = exchangeProductMapper.toDtoList(exchangeProductBranch.getExchangeProductList());
-        ExchangeProductBranchDTO exchangeProductBranchDTO = mapper.toDto(exchangeProductBranch);
-        exchangeProductBranchDTO.setExchangeProductDTOS(exchangeProductDTOList);
-
-        return new ApiResponse(exchangeProductBranchDTO);
+        List<ExchangeBranchGetOneDto> getOneDtoList = new ArrayList<>();
+        for (ExchangeProduct exchangeProduct : exchangeProductBranch.getExchangeProductList()) {
+            ExchangeBranchGetOneDto branchGetOneDto = new ExchangeBranchGetOneDto();
+            if (exchangeProduct.getProduct() != null) {
+                branchGetOneDto.setProductName(exchangeProduct.getProduct().getName());
+                branchGetOneDto.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
+                getOneDtoList.add(branchGetOneDto);
+            } else {
+                branchGetOneDto.setProductName(exchangeProduct.getProductTypePrice().getName());
+                branchGetOneDto.setExchangeProductQuantity(exchangeProduct.getExchangeProductQuantity());
+                getOneDtoList.add(branchGetOneDto);
+            }
+        }
+        return new ApiResponse("found", true, getOneDtoList);
     }
 
     public ApiResponse deleteOne(UUID id) {
