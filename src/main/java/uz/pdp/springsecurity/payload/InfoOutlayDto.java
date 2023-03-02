@@ -17,6 +17,6 @@ public class InfoOutlayDto {
     private HashMap<Integer, Double> trade;
     List<Timestamp> timestampList;
     private List<Double> purchasePriceList;
-    private List<Date> purchaseDateList;
+    private List<String> purchaseDateList;
     private List<Integer> purchaseCountList;
 }
