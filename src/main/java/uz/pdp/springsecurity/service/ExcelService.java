@@ -95,6 +95,17 @@ public class ExcelService {
             List<Product> productList=new ArrayList<>();
             List<Warehouse> warehouseList = new ArrayList<>();
             for (ExportExcelDto excelDto : exportExcelDtoList) {
+
+                Optional<Product> optionalProduct = productRepository.findByBarcodeAndBranch_IdAndActiveTrue(excelDto.getBarcode(), branchId);
+                if (optionalProduct.isPresent()){
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchId,optionalProduct.get().getId());
+                    if (optionalWarehouse.isPresent()){
+                        Warehouse warehouse = optionalWarehouse.get();
+                        warehouse.setAmount(excelDto.getAmount()+ warehouse.getAmount());
+                    }
+                    continue;
+                }
+
                 if (Objects.equals(excelDto.getProductName(), ""))
                     continue;
                 Product product=new Product();
