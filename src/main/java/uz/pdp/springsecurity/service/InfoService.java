@@ -216,7 +216,7 @@ public class InfoService {
             timestampList.add(from);
         }
 
-        List<Date> purchaseDateList = new ArrayList<>();
+        List<String> purchaseDateList = new ArrayList<>();
         List<Double> purchasePriceList = new ArrayList<>();
         List<Integer> purchaseCountList = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
@@ -232,7 +232,7 @@ public class InfoService {
             }
             purchaseCountList.add(purchaseList.size());
             purchasePriceList.add(totalPurchase);
-            purchaseDateList.add(Timestamp.valueOf(TODAY_START.minusDays(i)));
+            purchaseDateList.add(TODAY_START.minusDays(i).getDayOfWeek().name());
         }
 
         InfoOutlayDto infoDto = new InfoOutlayDto(
@@ -283,7 +283,7 @@ public class InfoService {
             timestampList.add(from);
         }
 
-        List<Date> purchaseDateList = new ArrayList<>();
+        List<String> purchaseDateList = new ArrayList<>();
         List<Double> purchasePriceList = new ArrayList<>();
         List<Integer> purchaseCountList = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
@@ -299,7 +299,7 @@ public class InfoService {
             }
             purchaseCountList.add(purchaseList.size());
             purchasePriceList.add(totalPurchase);
-            purchaseDateList.add(Timestamp.valueOf(TODAY_START.minusDays(i)));
+            purchaseDateList.add(TODAY_START.minusDays(i).getDayOfWeek().name());
         }
 
         InfoOutlayDto infoDto = new InfoOutlayDto(
