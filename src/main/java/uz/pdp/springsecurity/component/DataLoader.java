@@ -64,6 +64,12 @@ public class DataLoader implements CommandLineRunner {
     AttachmentContentRepository attachmentContentRepository;
 
     @Autowired
+    BrandRepository brandRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
     TariffRepository tariffRepository;
 
     @Autowired
@@ -115,6 +121,27 @@ public class DataLoader implements CommandLineRunner {
                 if (measurementList.isEmpty()) {
                     measurementRepository.save(
                             new Measurement("dona",
+                                    business)
+                    );
+                }
+            }
+
+            if (business != null){
+                List<Brand> allByBusinessId = brandRepository.findAllByBusiness_Id(business.getId());
+                if (allByBusinessId.isEmpty()){
+                    brandRepository.save(
+                            new Brand("brand",
+                                    business)
+                    );
+                }
+            }
+
+            if (business != null){
+                List<Category> allByBusinessId = categoryRepository.findAllByBusiness_Id(business.getId());
+                if (allByBusinessId.isEmpty()){
+                    categoryRepository.save(
+                            new Category("category",
+
                                     business)
                     );
                 }
