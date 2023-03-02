@@ -72,9 +72,16 @@ public class ExcelService {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementId);
-        Optional<Brand> optionalBrand = brandRepository.findById(brandId);
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
-
+        Brand brand = null;
+        if (brandId != null){
+            Optional<Brand> optionalBrand = brandRepository.findById(brandId);
+            brand = optionalBrand.get();
+        }
+        Category category = null;
+        if (categoryId != null){
+            Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+            category = optionalCategory.get();
+        }
 
         if (optionalBranch.isEmpty()){
             return new ApiResponse("NOT FOUND BRANCH");
@@ -94,19 +101,30 @@ public class ExcelService {
             List<ExportExcelDto> exportExcelDtoList = ExcelHelper.excelToTutorials(file.getInputStream());
             List<Product> productList=new ArrayList<>();
             List<Warehouse> warehouseList = new ArrayList<>();
+            int count = 0;
             for (ExportExcelDto excelDto : exportExcelDtoList) {
-                if (Objects.equals(excelDto.getProductName(), ""))
+
+                Optional<Product> optionalProduct = productRepository.findByBarcodeAndBranch_IdAndActiveTrue(excelDto.getBarcode(), branchId);
+                if (optionalProduct.isPresent()){
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchId,optionalProduct.get().getId());
+                    if (optionalWarehouse.isPresent()){
+                        Warehouse warehouse = optionalWarehouse.get();
+                        warehouse.setAmount(excelDto.getAmount()+ warehouse.getAmount());
+                    }
                     continue;
+                }
+
+                if (Objects.equals(excelDto.getProductName(), "")){
+                    continue;
+                }
                 Product product=new Product();
-                UUID productId = UUID.randomUUID();
-                product.setId(productId);
                 product.setBusiness(business);
                 product.setName(excelDto.getProductName());
                 product.setExpireDate(excelDto.getExpiredDate());
                 boolean exists = productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
                 boolean exists1 = productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
                 if (exists && exists1) {
-                    return  new ApiResponse("Barcode already exists !",false);
+                    continue;
                 }
                 product.setBarcode(String.valueOf(excelDto.getBarcode()));
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -121,9 +139,13 @@ public class ExcelService {
                 product.setMinQuantity(excelDto.getMinQuantity());
                 product.setBranch(branchList);
                 product.setTax(0);
-                optionalCategory.ifPresent(product::setCategory);
+                if (category!=null){
+                    product.setCategory(category);
+                }
+                if (brand != null){
+                    product.setBrand(brand);
+                }
                 product.setMeasurement(optionalMeasurement.get());
-                optionalBrand.ifPresent(product::setBrand);
                 product.setType(Type.SINGLE);
                 product.setPhoto(null);
                 Warehouse warehouse=new Warehouse();
@@ -132,11 +154,12 @@ public class ExcelService {
                 warehouse.setProduct(product);
                 warehouseList.add(warehouse);
                 productList.add(product);
+                count++;
             }
             if (exportExcelDtoList.size()>0){
-                warehouseRepository.saveAllAndFlush(warehouseList);
                 productRepository.saveAll(productList);
-                return new ApiResponse("Successfully Added ",true);
+                warehouseRepository.saveAll(warehouseList);
+                return new ApiResponse("Successfully Added "+count+" Product",true);
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data:" + e.getMessage());
