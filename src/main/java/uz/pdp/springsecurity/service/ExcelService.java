@@ -98,8 +98,6 @@ public class ExcelService {
                 if (Objects.equals(excelDto.getProductName(), ""))
                     continue;
                 Product product=new Product();
-                UUID productId = UUID.randomUUID();
-                product.setId(productId);
                 product.setBusiness(business);
                 product.setName(excelDto.getProductName());
                 product.setExpireDate(excelDto.getExpiredDate());
@@ -134,8 +132,8 @@ public class ExcelService {
                 productList.add(product);
             }
             if (exportExcelDtoList.size()>0){
-                warehouseRepository.saveAllAndFlush(warehouseList);
                 productRepository.saveAll(productList);
+                warehouseRepository.saveAll(warehouseList);
                 return new ApiResponse("Successfully Added ",true);
             }
         } catch (IOException e) {
