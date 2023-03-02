@@ -117,12 +117,7 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
-        ApiResponse apiResponse = createOrEditTrade(trade, tradeDTO);
-
-        if (!apiResponse.isSuccess()) {
-            return new ApiResponse("ERROR", false);
-        }
-        return new ApiResponse("UPDATED", true);
+        return createOrEditTrade(trade, tradeDTO);
     }
 
     public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
@@ -159,7 +154,7 @@ public class TradeService {
             trade.setCustomer(customer);
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
             customerRepository.save(customer);
-        } else {
+        } else if (tradeDTO.getCustomerId() != null){
             Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
             if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
             Customer customer = optionalCustomer.get();
@@ -210,6 +205,16 @@ public class TradeService {
         trade.setDebtSum(tradeDTO.getDebtSum());
         tradeRepository.save(trade);
 
+        if(paymentRepository.existsByTradeId(trade.getId())){
+            List<Payment> paymentList = paymentRepository.findAllByTradeId(trade.getId());
+            if (!paymentList.isEmpty()){
+                for (Payment payment : paymentList) {
+                    paymentRepository.deleteById(payment.getId());
+                }
+            }
+//            paymentRepository.deleteAllByTradeId(trade.getId());
+        }
+
         List<Payment> paymentList = new ArrayList<>();
         for (PaymentDto paymentDto : tradeDTO.getPaymentDtoList()) {
             Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentDto.getPaymentMethodId());
@@ -240,7 +245,7 @@ public class TradeService {
                     TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
                     double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                     tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
-                    profit -= tradeProduct.getProfit();// to subtract profit of product
+//                    profit -= tradeProduct.getProfit();// to subtract profit of product
                     TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
                     fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
                     tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
@@ -257,18 +262,20 @@ public class TradeService {
                 Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                 if (optionalTradeProduct.isEmpty()) continue;
                 TradeProduct tradeProduct = optionalTradeProduct.get();
-                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) continue;
+                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) {
+                    profit +=tradeProduct.getProfit();
+                    continue;
+                }
                 double difference = tradeProductDto.getTradedQuantity() - tradeProduct.getTradedQuantity();
-                profit -= tradeProduct.getProfit();// to subtract profit of product
-                TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
-                if (savedTradeProduct != null) {
+                tradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
+                if (tradeProduct != null) {
                     if (difference > 0) {
-                        fifoCalculationService.createOrEditTradeProduct(branch, savedTradeProduct, difference);
+                        fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, difference);
                     } else if (difference < 0) {
-                        fifoCalculationService.returnedTrade(branch, savedTradeProduct, -difference);
+                        fifoCalculationService.returnedTrade(branch, tradeProduct, -difference);
                     }
-                    tradeProductList.add(savedTradeProduct);
-                    profit += savedTradeProduct.getProfit();
+                    tradeProductList.add(tradeProduct);
+                    profit += tradeProduct.getProfit();
                 }
             }
         }
