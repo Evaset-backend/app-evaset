@@ -51,5 +51,6 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
 
     List<TradeProduct> findAllByProductTypePriceId(UUID productTypePrice_id);
     List<TradeProduct> findAllByProductTypePriceIdAndTrade_CustomerId(UUID productTypePrice_id, UUID trade_customer_id);
+
 }
 
