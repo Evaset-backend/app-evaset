@@ -18,4 +18,5 @@ public class InfoOutlayDto {
     List<Timestamp> timestampList;
     private List<Double> purchasePriceList;
     private List<Date> purchaseDateList;
+    private List<Integer> purchaseCountList;
 }

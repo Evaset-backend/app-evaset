@@ -218,6 +218,7 @@ public class InfoService {
 
         List<Date> purchaseDateList = new ArrayList<>();
         List<Double> purchasePriceList = new ArrayList<>();
+        List<Integer> purchaseCountList = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
@@ -229,8 +230,9 @@ public class InfoService {
                     totalPurchase += purchase.getTotalSum();
                 }
             }
+            purchaseCountList.add(purchaseList.size());
             purchasePriceList.add(totalPurchase);
-            purchaseDateList.add(Timestamp.valueOf(TODAY_START));
+            purchaseDateList.add(Timestamp.valueOf(TODAY_START.minusDays(i)));
         }
 
         InfoOutlayDto infoDto = new InfoOutlayDto(
@@ -238,7 +240,8 @@ public class InfoService {
                 tradeMap,
                 timestampList,
                 purchasePriceList,
-                purchaseDateList
+                purchaseDateList,
+                purchaseCountList
         );
         return new ApiResponse(true, infoDto);
     }
@@ -249,7 +252,7 @@ public class InfoService {
             return new ApiResponse("Branch Not Found",false);
         }
         LocalDateTime now = LocalDateTime.now();
-        HashMap<Integer, Double> outlayMap = new HashMap();
+        HashMap<Integer, Double> outlayMap = new HashMap<>();
         HashMap<Integer, Double> tradeMap = new HashMap<>();
         List<Timestamp> timestampList = new ArrayList<>();
         timestampList.add(Timestamp.valueOf(now));
@@ -282,6 +285,7 @@ public class InfoService {
 
         List<Date> purchaseDateList = new ArrayList<>();
         List<Double> purchasePriceList = new ArrayList<>();
+        List<Integer> purchaseCountList = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
@@ -293,6 +297,7 @@ public class InfoService {
                     totalPurchase += purchase.getTotalSum();
                 }
             }
+            purchaseCountList.add(purchaseList.size());
             purchasePriceList.add(totalPurchase);
             purchaseDateList.add(Timestamp.valueOf(TODAY_START.minusDays(i)));
         }
@@ -302,7 +307,8 @@ public class InfoService {
                 tradeMap,
                 timestampList,
                 purchasePriceList,
-                purchaseDateList
+                purchaseDateList,
+                purchaseCountList
         );
         return new ApiResponse(true, infoDto);
     }

@@ -1,9 +1,7 @@
 package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.pdp.springsecurity.entity.Address;
 import uz.pdp.springsecurity.entity.Payment;
-import uz.pdp.springsecurity.entity.Trade;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -15,4 +13,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findAllByPayMethod_BusinessId(UUID businessId);
     List<Payment> findAllByPayMethodId(UUID businessId);
     List<Payment> findAllByTradeId(UUID tradeId);
+
+    boolean existsByTradeId(UUID tradeId);
 }
