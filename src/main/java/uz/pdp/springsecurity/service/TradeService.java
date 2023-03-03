@@ -145,6 +145,10 @@ public class TradeService {
             return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
         }
 
+        if (tradeDTO.getProductTraderDto().isEmpty()) {
+            return new ApiResponse("PRODUCT LIST NOT FOUND", false);
+        }
+
         double debtSum = trade.getDebtSum();
         if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
             if (tradeDTO.getCustomerId() == null) return new ApiResponse("CUSTOMER NOT FOUND", false);
