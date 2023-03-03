@@ -391,11 +391,13 @@ public class ProductService {
     public ApiResponse getByBarcode(String barcode, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productAllByBarcode = new ArrayList<>();
+        Branch branchGet = null;
         for (Branch branch : branches) {
             Optional<Product> optionalProduct = productRepository.findAllByBarcodeAndBranchIdAndActiveTrue(barcode, branch.getId());
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
                 productAllByBarcode.add(product);
+                branchGet = branch;
             }
         }
 
@@ -413,7 +415,7 @@ public class ProductService {
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchGet.getId(), product.getId());
             if (optionalWarehouse.isPresent()) {
                 Warehouse warehouse = optionalWarehouse.get();
                 if (warehouse.getProduct().getId().equals(product.getId())) {
