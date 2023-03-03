@@ -39,6 +39,7 @@ public class ExcelService {
 
     @Autowired
     BrandRepository brandRepository;
+    private final FifoCalculationRepository fifoCalculationRepository;
 
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
         List<ProductViewDtos> productViewDtoList = new ArrayList<>();
@@ -100,6 +101,7 @@ public class ExcelService {
 
             List<ExportExcelDto> exportExcelDtoList = ExcelHelper.excelToTutorials(file.getInputStream());
             List<Product> productList=new ArrayList<>();
+            List<FifoCalculation> fifoCalculationList = new ArrayList<>();
             List<Warehouse> warehouseList = new ArrayList<>();
             int count = 0;
             for (ExportExcelDto excelDto : exportExcelDtoList) {
@@ -110,6 +112,16 @@ public class ExcelService {
                     if (optionalWarehouse.isPresent()){
                         Warehouse warehouse = optionalWarehouse.get();
                         warehouse.setAmount(excelDto.getAmount()+ warehouse.getAmount());
+                        fifoCalculationList.add(
+                            new FifoCalculation(
+                                optionalBranch.get(),
+                                excelDto.getAmount(),
+                                excelDto.getAmount(),
+                                excelDto.getBuyPrice(),
+                                new Date(),
+                                optionalProduct.get()
+                            )
+                        );
                     }
                     continue;
                 }
@@ -152,6 +164,16 @@ public class ExcelService {
                 warehouse.setBranch(optionalBranch.get());
                 warehouse.setAmount(excelDto.getAmount());
                 warehouse.setProduct(product);
+                fifoCalculationList.add(
+                    new FifoCalculation(
+                        optionalBranch.get(),
+                        excelDto.getAmount(),
+                        excelDto.getAmount(),
+                        excelDto.getBuyPrice(),
+                        new Date(),
+                        product
+                    )
+                );
                 warehouseList.add(warehouse);
                 productList.add(product);
                 count++;
@@ -159,6 +181,7 @@ public class ExcelService {
             if (exportExcelDtoList.size()>0){
                 productRepository.saveAll(productList);
                 warehouseRepository.saveAll(warehouseList);
+                fifoCalculationRepository.saveAll(fifoCalculationList);
                 return new ApiResponse("Successfully Added "+count+" Product",true);
             }
         } catch (IOException e) {
