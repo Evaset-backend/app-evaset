@@ -430,12 +430,12 @@ public class ReportsService {
             double amount = 0;
             if (tradeProduct.getProduct() != null) {
                 for (TradeProduct product : allByProductId) {
-                    amount += product.getProfit();
+                    amount += product.getTradedQuantity();
                     productAmount.put(product.getProduct().getId(), amount);
                 }
             } else {
                 for (TradeProduct product : allByProductId) {
-                    amount += product.getProfit();
+                    amount += product.getTradedQuantity();
                     productAmount.put(product.getProductTypePrice().getId(), amount);
                 }
             }
@@ -1092,7 +1092,6 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-
                     amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
@@ -1102,7 +1101,6 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-
                     amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
@@ -1112,7 +1110,6 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-
                     amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
@@ -1134,7 +1131,6 @@ public class ReportsService {
                     return new ApiResponse("Not Found", false);
                 }
                 for (TradeProduct product : allByProductId) {
-
                     amount += product.getProfit();
                     productAmount.put(product.getTrade().getCustomer().getId(), amount);
                 }
