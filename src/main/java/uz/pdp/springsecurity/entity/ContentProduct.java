@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.Transient;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
@@ -43,5 +44,6 @@ public class ContentProduct extends AbsEntity {
     private boolean delete;
 
     //get uchun omborda bor maxsulotning amounti
+    @Transient
     private double productWarehouseAmount;
 }
