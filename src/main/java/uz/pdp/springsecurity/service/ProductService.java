@@ -56,7 +56,8 @@ public class ProductService {
     private final SubscriptionRepository subscriptionRepository;
 
 
-    public ApiResponse addProduct(ProductDto productDto) {UUID businessId = productDto.getBusinessId();
+    public ApiResponse addProduct(ProductDto productDto) {
+        UUID businessId = productDto.getBusinessId();
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("not found business", false);
@@ -72,7 +73,7 @@ public class ProductService {
         List<Product> allProduct = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
         int size = allProduct.size();
 
-        if (subscription.getTariff().getProductAmount() >= size || subscription.getTariff().getProductAmount() == 0){
+        if (subscription.getTariff().getProductAmount() >= size || subscription.getTariff().getProductAmount() == 0) {
             Product product = new Product();
             product.setBusiness(optionalBusiness.get());
             return createOrEditProduct(product, productDto, false);
@@ -87,7 +88,8 @@ public class ProductService {
         }
         return createOrEditProduct(optionalProduct.get(), productDto, true);
     }
-    public ApiResponse createOrEditProduct(Product product, ProductDto productDto, boolean isUpdate){
+
+    public ApiResponse createOrEditProduct(Product product, ProductDto productDto, boolean isUpdate) {
 
         UUID measurementId = productDto.getMeasurementId();
         List<UUID> branchId = productDto.getBranchId();
@@ -152,12 +154,12 @@ public class ProductService {
             if (isUpdate) {
                 if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId()))
                     return new ApiResponse("product with the barcode is already exist");
-            }else {
+            } else {
                 if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             }
             product.setBarcode(productDto.getBarcode());
-        }else {
+        } else {
             product.setBarcode(generateBarcode(product.getBusiness().getId(), product.getName(), product.getId(), isUpdate));
         }
         Product saveProduct = productRepository.save(product);
@@ -208,7 +210,7 @@ public class ProductService {
             if (isUpdate) {
                 if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId()))
                     return new ApiResponse("product with the barcode is already exist");
-            }else {
+            } else {
                 if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             }
@@ -251,7 +253,7 @@ public class ProductService {
                         return new ApiResponse("product with the barcode is already exist");
                     }
                     productTypePrice.setBarcode(typePricePostDto.getBarcode());
-                }else {
+                } else {
                     productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), true));
                 }
                 productTypePriceList.add(productTypePrice);
@@ -269,7 +271,7 @@ public class ProductService {
                         return new ApiResponse("product with the barcode is already exist");
                     }
                     productTypePrice.setBarcode(typePricePostDto.getBarcode());
-                }else {
+                } else {
                     productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
                 }
                 productTypePriceList.add(productTypePrice);
@@ -290,7 +292,7 @@ public class ProductService {
             if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(barcode, businessId, productId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
             return barcode;
-        }else {
+        } else {
             if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(barcode, businessId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
             return barcode;
@@ -385,6 +387,7 @@ public class ProductService {
         }
         return new ApiResponse("NOT FOUND", false);
     }
+
     public ApiResponse getByBarcode(String barcode, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productAllByBarcode = new ArrayList<>();
@@ -464,6 +467,7 @@ public class ProductService {
         }
         return new ApiResponse("FOUND", true, viewDtos);
     }
+
     public ApiResponse getByBrand(UUID brand_id, User user) {
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
@@ -519,39 +523,8 @@ public class ProductService {
     }
 
     public ApiResponse getByBranch(UUID branch_id) {
-        ProductViewDto productViewDto = new ProductViewDto();
+       return getProductByBranch(branch_id);
 
-
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveIsTrue(branch_id);
-
-        if (productList.isEmpty()) {
-            return new ApiResponse("NOT FOUND", false);
-        } else {
-            List<ProductViewDto> viewDtos = new ArrayList<>();
-            for (Product product : productList) {
-                productViewDto.setProductId(product.getId());
-                productViewDto.setProductName(product.getName());
-                if (product.getBrand() != null)
-                    productViewDto.setBrandName(product.getBrand().getName());
-                productViewDto.setBuyPrice(product.getBuyPrice());
-                productViewDto.setSalePrice(product.getSalePrice());
-                productViewDto.setMinQuantity(product.getMinQuantity());
-                productViewDto.setBranch(product.getBranch());
-                productViewDto.setExpiredDate(product.getExpireDate());
-
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct_Id(product.getId());
-                if (optionalWarehouse.isPresent()) {
-                    Warehouse warehouse = optionalWarehouse.get();
-                    if (warehouse.getProduct().getId().equals(product.getId())) {
-                        productViewDto.setAmount(warehouse.getAmount());
-                    }
-                }
-                viewDtos.add(productViewDto);
-            }
-            if (viewDtos.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-            return new ApiResponse("FOUND", true, viewDtos);
-        }
     }
 
     public ApiResponse getByBranchForSearch(UUID branch_id) {
@@ -585,7 +558,7 @@ public class ProductService {
                         getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                         getForPurchaseDtoList.add(getForPurchaseDto);
                     }
-                } else{
+                } else {
                     ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                     getForPurchaseDto.setProductId(product.getId());
                     getForPurchaseDto.setType(product.getType().name());
@@ -648,6 +621,24 @@ public class ProductService {
     }
 
     public ApiResponse getByBranchProduct(UUID branchId) {
+        return getProductByBranch(branchId);
+    }
+
+    public ApiResponse deleteProducts(List<UUID> ids) {
+        for (UUID id : ids) {
+            Optional<Product> optional = productRepository.findById(id);
+            if (optional.isEmpty()) {
+                return new ApiResponse("not found", false);
+            }
+            Product product = optional.get();
+            product.setActive(false);
+            productRepository.save(product);
+        }
+        return new ApiResponse("DELETED", true);
+    }
+
+
+    private ApiResponse getProductByBranch(UUID branchId) {
         List<ProductViewDto> productViewDtoList = new ArrayList<>();
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
 
@@ -673,7 +664,8 @@ public class ProductService {
                 productViewDto.setExpiredDate(product.getExpireDate());
                 if (product.getPhoto() != null)
                     productViewDto.setPhotoId(product.getPhoto().getId());
-                if (product.getMeasurement() != null) productViewDto.setMeasurementId(product.getMeasurement().getName());
+                if (product.getMeasurement() != null)
+                    productViewDto.setMeasurementId(product.getMeasurement().getName());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchId, product.getId());
                 optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
                 productViewDtoList.add(productViewDto);
@@ -681,20 +673,5 @@ public class ProductService {
             return new ApiResponse("FOUND", true, productViewDtoList);
         }
     }
-
-
-    public ApiResponse deleteProducts(List<UUID> ids) {
-        for (UUID id : ids) {
-            Optional<Product> optional = productRepository.findById(id);
-            if (optional.isEmpty()) {
-                return new ApiResponse("not found", false);
-            }
-            Product product = optional.get();
-            product.setActive(false);
-            productRepository.save(product);
-        }
-        return new ApiResponse("DELETED", true);
-    }
-
 
 }
