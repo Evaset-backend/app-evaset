@@ -510,13 +510,13 @@ public class ReportsService {
 
     public ApiResponse allProductAmountByBranch(UUID branchId) {
 
-
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
 
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(optionalBranch.get().getId());
+        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
+        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchIdAndProduct_ActiveIsTrue(branchId);
 
         if (productList.isEmpty()) {
             return new ApiResponse("No Found Products", false);
@@ -536,7 +536,19 @@ public class ReportsService {
                 amounts.setTotalSumBySalePrice(totalSumBySalePrice);
                 amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
             }
+        }
+        for (ProductTypePrice product : productTypePriceList) {
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branchId,product.getId());
+            if (optionalWarehouse.isPresent()) {
+                double amount = optionalWarehouse.get().getAmount();
+                double salePrice = product.getSalePrice();
+                double buyPrice = product.getBuyPrice();
 
+                totalSumBySalePrice += amount * salePrice;
+                totalSumByBuyPrice += amount * buyPrice;
+                amounts.setTotalSumBySalePrice(totalSumBySalePrice);
+                amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
+            }
         }
         return new ApiResponse("Business Products Amount", true, amounts);
     }
