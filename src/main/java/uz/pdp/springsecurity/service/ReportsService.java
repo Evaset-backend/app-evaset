@@ -561,6 +561,16 @@ public class ReportsService {
                 return new ApiResponse("Not Found Outlay", false);
             }
         }
+        Map<UUID, Double> productAmount = new HashMap<>();
+        double amount = 0;
+        for (Outlay outlay : outlayList) {
+            amount += outlay.getTotalSum();
+            productAmount.put(outlay.getId(), amount);
+        }
+        for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
+            Optional<Outlay> optionalOutlay = outlayRepository.findById(entry.getKey());
+            optionalOutlay.get().setTotalSum(entry.getValue());
+        }
 
         outlayList.sort(Comparator.comparing(Outlay::getTotalSum));
         return new ApiResponse("Found", true, outlayList);
