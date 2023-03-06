@@ -55,6 +55,9 @@ public class ReportsService {
     @Autowired
     PaymentRepository paymentRepository;
 
+    @Autowired
+    ProductTypePriceRepository productTypePriceRepository;
+
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(System.currentTimeMillis());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -95,48 +98,77 @@ public class ReportsService {
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
         List<Product> productList = new ArrayList<>();
-        if (categoryId == null && branchId != null && production == null && brandId == null) {
+        List<ProductTypePrice> productTypePriceList = new ArrayList<>();
+        if (categoryId == null && production == null && brandId == null) {
             productList = productRepository.findAllByBranchIdAndActiveIsTrue(branchId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BranchIdAndProduct_ActiveIsTrue(branchId);
             if (productList.isEmpty()) {
                 return new ApiResponse("No Found Products");
             }
         } else if (categoryId != null && brandId == null) {
             productList = productRepository.findAllByCategoryIdAndBranchIdAndActiveTrue(categoryId, branchId);
-        } else if (categoryId == null && production == null && brandId != null) {
+            productTypePriceList = productTypePriceRepository.findAllByProduct_Category_IdAndProduct_Branch_IdAndProduct_ActiveIsTrue(categoryId, branchId);
+        } else if (categoryId == null && production == null) {
             productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brandId, branchId);
-        } else if (production != null && categoryId != null && brandId != null) {
+            productTypePriceList = productTypePriceRepository.findAllByProduct_Brand_IdAndProduct_Branch_IdAndProduct_ActiveIsTrue(brandId, branchId);
+        } else if (production != null && categoryId != null) {
             List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BrandIdAndProduct_BranchId(categoryId, brandId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
+
             List<Product> products = new ArrayList<>();
+            List<ProductTypePrice> priceList = new ArrayList<>();
             for (Production productions : productionList) {
-                Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
-                products.add(optionalProduct.get());
+                if (productions.getProduct() != null) {
+                    Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
+                    products.add(optionalProduct.get());
+                } else {
+                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(productions.getProductTypePrice().getId());
+                    priceList.add(optionalProductTypePrice.get());
+                }
             }
             productList = products;
+            productTypePriceList = priceList;
+
         } else if (production != null && categoryId != null && brandId == null) {
             List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BranchId(categoryId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
+
             List<Product> products = new ArrayList<>();
+            List<ProductTypePrice> priceList = new ArrayList<>();
             for (Production productions : productionList) {
-                Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
-                products.add(optionalProduct.get());
+                if (productions.getProduct() != null) {
+                    Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
+                    products.add(optionalProduct.get());
+                } else {
+                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(productions.getProductTypePrice().getId());
+                    priceList.add(optionalProductTypePrice.get());
+                }
             }
             productList = products;
+            productTypePriceList = priceList;
+
         } else if (production != null && categoryId == null && brandId != null) {
             List<Production> productionList = productionRepository.findAllByProduct_BrandIdAndProduct_BranchId(categoryId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
             List<Product> products = new ArrayList<>();
+            List<ProductTypePrice> priceList = new ArrayList<>();
             for (Production productions : productionList) {
-                Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
-                products.add(optionalProduct.get());
+                if (productions.getProduct() != null) {
+                    Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
+                    products.add(optionalProduct.get());
+                } else {
+                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(productions.getProductTypePrice().getId());
+                    priceList.add(optionalProductTypePrice.get());
+                }
             }
             productList = products;
+            productTypePriceList = priceList;
         } else if (brandId != null && categoryId != null) {
             productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brandId, categoryId, branchId);
         } else if (production != null && categoryId == null && brandId == null) {
@@ -145,13 +177,20 @@ public class ReportsService {
                 return new ApiResponse("Production Not Found", false);
             }
             List<Product> products = new ArrayList<>();
+            List<ProductTypePrice> priceList = new ArrayList<>();
             for (Production productions : productionList) {
-                Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
-                products.add(optionalProduct.get());
+                if (productions.getProduct() != null) {
+                    Optional<Product> optionalProduct = productRepository.findById(productions.getProduct().getId());
+                    products.add(optionalProduct.get());
+                } else {
+                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(productions.getProductTypePrice().getId());
+                    priceList.add(optionalProductTypePrice.get());
+                }
             }
             productList = products;
+            productTypePriceList = priceList;
         }
-        if (productList.isEmpty()) {
+        if (productList.isEmpty() && productTypePriceList.isEmpty()) {
             return new ApiResponse("Not Found", false);
         }
 
@@ -186,6 +225,37 @@ public class ReportsService {
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
             productReportDtoList.add(productReportDto);
         }
+
+        for (ProductTypePrice productTypePrice : productTypePriceList) {
+            productReportDto = new ProductReportDto();
+            productReportDto.setName(productTypePrice.getName());
+            if (productTypePrice.getProduct().getBrand() != null)
+                productReportDto.setBrand(productTypePrice.getProduct().getBrand().getName());
+            productReportDto.setBranch(optionalBranch.get().getName());
+            if (productTypePrice.getProduct().getBrand() != null)
+                productReportDto.setCategory(productTypePrice.getProduct().getCategory().getName());
+            productReportDto.setBuyPrice(productTypePrice.getBuyPrice());
+            productReportDto.setSalePrice(productTypePrice.getSalePrice());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(productTypePrice.getProduct().getId(), optionalBranch.get().getId());
+            Warehouse warehouse = new Warehouse();
+            if (optionalWarehouse.isPresent()) {
+                warehouse = optionalWarehouse.get();
+            }
+            productReportDto.setAmount(warehouse.getAmount());
+
+            double amount = warehouse.getAmount();
+            double salePrice = productTypePrice.getSalePrice();
+            double buyPrice = productTypePrice.getBuyPrice();
+
+            SumBySalePrice = amount * salePrice;
+            SumByBuyPrice = amount * buyPrice;
+            productReportDto.setSumBySalePrice(SumBySalePrice);
+            productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            productReportDtoList.add(productReportDto);
+        }
+
+
         productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount).reversed());
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
@@ -244,19 +314,28 @@ public class ReportsService {
         List<TradeReportsDto> tradeReportsDtoList = new ArrayList<>();
         for (TradeProduct tradeProduct : tradeProductList) {
             TradeReportsDto tradeReportsDto = new TradeReportsDto();
+            if (tradeProduct.getProduct() != null) {
+                tradeReportsDto.setName(tradeProduct.getProduct().getName());
+                tradeReportsDto.setBarcode(tradeProduct.getProduct().getBarcode());
+                tradeReportsDto.setSalePrice(tradeProduct.getProduct().getSalePrice());
+            } else {
+                tradeReportsDto.setName(tradeProduct.getProductTypePrice().getName());
+                tradeReportsDto.setBarcode(tradeProduct.getProductTypePrice().getBarcode());
+                tradeReportsDto.setSalePrice(tradeProduct.getProductTypePrice().getSalePrice());
+            }
+
             tradeReportsDto.setTradeProductId(tradeProduct.getTrade().getId());
-            tradeReportsDto.setName(tradeProduct.getProduct().getName());
-            tradeReportsDto.setBarcode(tradeProduct.getProduct().getBarcode());
             tradeReportsDto.setTradedDate(tradeProduct.getTrade().getPayDate());
 
-            if (tradeProduct.getTrade().getCustomer() != null)
+            if (tradeProduct.getTrade().getCustomer() != null) {
                 tradeReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+            }
             tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
             tradeReportsDto.setAmount(tradeProduct.getTradedQuantity());
-            if (tradeProduct.getTrade().getCustomer() != null)
+            if (tradeProduct.getTrade().getCustomer() != null) {
                 tradeReportsDto.setDiscount(tradeProduct.getTrade().getCustomer().getCustomerGroup().getPercent());
+            }
             tradeReportsDto.setTotalSum(tradeProduct.getTotalSalePrice());
-            tradeReportsDto.setSalePrice(tradeProduct.getProduct().getSalePrice());
             tradeReportsDtoList.add(tradeReportsDto);
         }
         tradeReportsDtoList.sort(Comparator.comparing(TradeReportsDto::getAmount).reversed());
