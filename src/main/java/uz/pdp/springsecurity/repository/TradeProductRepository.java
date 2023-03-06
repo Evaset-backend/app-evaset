@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import uz.pdp.springsecurity.entity.ProductTypePrice;
 import uz.pdp.springsecurity.entity.TradeProduct;
 
 import java.sql.Timestamp;
@@ -10,7 +11,6 @@ import java.util.UUID;
 
 public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID> {
   List<TradeProduct> findAllByProduct_Id(UUID product_id);
-
 
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BranchId(Timestamp createdAt, Timestamp createdAt2, UUID product_branch_id);
 
