@@ -17,6 +17,7 @@ public class InfoDto {
     private double tradersDebt;
     private double myOutlay;
     private double totalProfit;
+    private double todayProfit;
 
     private HashMap<String, Double> byPayMethods;
 }
