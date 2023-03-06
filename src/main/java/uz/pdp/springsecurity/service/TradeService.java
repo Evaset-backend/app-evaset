@@ -149,23 +149,6 @@ public class TradeService {
             return new ApiResponse("PRODUCT LIST NOT FOUND", false);
         }
 
-        double debtSum = trade.getDebtSum();
-        if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
-            if (tradeDTO.getCustomerId() == null) return new ApiResponse("CUSTOMER NOT FOUND", false);
-            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
-            Customer customer = optionalCustomer.get();
-            trade.setCustomer(customer);
-            customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
-            customerRepository.save(customer);
-        } else if (tradeDTO.getCustomerId() != null){
-            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
-            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
-            Customer customer = optionalCustomer.get();
-            trade.setCustomer(customer);
-        }
-
-
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
         if (!branch.getBusiness().getSaleMinus()) {
             HashMap<UUID, Double> map = new HashMap<>();
@@ -201,6 +184,22 @@ public class TradeService {
             }
 
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+        }
+
+        double debtSum = trade.getDebtSum();
+        if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
+            if (tradeDTO.getCustomerId() == null) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Customer customer = optionalCustomer.get();
+            trade.setCustomer(customer);
+            customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
+            customerRepository.save(customer);
+        } else if (tradeDTO.getCustomerId() != null){
+            Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
+            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Customer customer = optionalCustomer.get();
+            trade.setCustomer(customer);
         }
 
         trade.setPayDate(tradeDTO.getPayDate());
