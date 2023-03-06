@@ -63,11 +63,13 @@ public class InfoService {
             return new ApiResponse("Business Not Found", false);
         }
 
+        List<Outlay> outlayList = new ArrayList<>();
         return getInfoHelper(businessId,
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
                 tradeRepository.findAllByBranch_BusinessId(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
-                paymentRepository.findAllByPayMethod_BusinessId(businessId)
+                paymentRepository.findAllByPayMethod_BusinessId(businessId),
+                outlayList// doing nothing
         );
     }
 
@@ -118,7 +120,8 @@ public class InfoService {
                     purchaseRepository.findAllByBranch_Id(branchId),
                     tradeRepository.findAllByBranch_Id(branchId),
                     outlayRepository.findAllByBranch_Id(branchId),
-                    paymentRepository.findAllByTrade_BranchId(branchId)
+                    paymentRepository.findAllByTrade_BranchId(branchId),
+                    outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId)
             );
         }
 
@@ -127,12 +130,13 @@ public class InfoService {
                 purchaseRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 tradeRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
-                paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId)
+                paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId),
+                outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId)
         );
 
     }
 
-    private ApiResponse getInfoHelper(UUID businessId, List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<Payment> paymentList) {
+    private ApiResponse getInfoHelper(UUID businessId, List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<Payment> paymentList, List<Outlay> todayOutlayList) {
 
 
         double allPurchase = 0;
@@ -163,6 +167,12 @@ public class InfoService {
             totalOutlay += outlay.getTotalSum();
         }
         infoDto.setMyOutlay(totalOutlay);
+
+        double todayProfit = 0;
+        for (Outlay outlay : todayOutlayList) {
+            todayProfit += outlay.getTotalSum();
+        }
+        infoDto.setTodayProfit(todayProfit);
 
         HashMap<String, Double> byPayMethods = new HashMap<>();
         List<PaymentMethod> paymentMethodList = payMethodRepository.findAllByBusiness_Id(businessId);
