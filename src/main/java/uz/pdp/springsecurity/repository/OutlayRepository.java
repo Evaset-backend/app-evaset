@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
 
+    List<Outlay> findAllByOutlayCategoryId(UUID outlayCategory_id);
     List<Outlay> findAllByDateIsBetweenAndBranch_Id(Date firs_date, Date second_date, UUID branch_id);
 
     List<Outlay> findAllByDateAndBranch_Id(Date firs_date, UUID branch_id);

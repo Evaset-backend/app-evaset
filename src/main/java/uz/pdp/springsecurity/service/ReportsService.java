@@ -360,8 +360,8 @@ public class ReportsService {
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
         List<Product> productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brandId, businessId);
-
-        if (productList.isEmpty()) {
+        List<ProductTypePrice> productTypePrices = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        if (productList.isEmpty() && productTypePrices.isEmpty()) {
             return new ApiResponse("No Found Products", false);
         }
 
@@ -396,10 +396,35 @@ public class ReportsService {
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
             productReportDtoList.add(productReportDto);
         }
+        for (ProductTypePrice product : productTypePrices) {
+            productReportDto = new ProductReportDto();
+            productReportDto.setName(product.getName());
+            if (product.getProduct().getBrand() != null) productReportDto.setBrand(product.getProduct().getBrand().getName());
+            productReportDto.setBranch(optionalBranch.get().getName());
+            if (product.getProduct().getCategory() != null) productReportDto.setCategory(product.getProduct().getCategory().getName());
+            productReportDto.setBuyPrice(product.getBuyPrice());
+            productReportDto.setSalePrice(product.getSalePrice());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(optionalBranch.get().getId(),product.getId());
+            Warehouse warehouse = new Warehouse();
+            if (optionalWarehouse.isPresent()) {
+                warehouse = optionalWarehouse.get();
+            }
+            productReportDto.setAmount(warehouse.getAmount());
+
+            double amount = warehouse.getAmount();
+            double salePrice = product.getSalePrice();
+            double buyPrice = product.getBuyPrice();
+
+            SumBySalePrice = amount * salePrice;
+            SumByBuyPrice = amount * buyPrice;
+            productReportDto.setSumBySalePrice(SumBySalePrice);
+            productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            productReportDtoList.add(productReportDto);
+        }
         productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount).reversed());
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
-
     public ApiResponse allProductByCategory(UUID branchId, UUID categoryId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
