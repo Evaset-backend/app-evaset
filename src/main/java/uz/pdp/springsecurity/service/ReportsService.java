@@ -366,8 +366,8 @@ public class ReportsService {
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
         List<Product> productList = productRepository.findAllByCategoryIdAndBusinessIdAndActiveTrue(categoryId, businessId);
-
-        if (productList.isEmpty()) {
+        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_CategoryIdAndProduct_BranchIdAndProduct_ActiveTrue(categoryId, branchId);
+        if (productList.isEmpty() && productTypePriceList.isEmpty()) {
             return new ApiResponse("No Found Products", false);
         }
 
@@ -386,6 +386,32 @@ public class ReportsService {
             productReportDto.setSalePrice(product.getSalePrice());
 
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(product.getId(), optionalBranch.get().getId());
+            Warehouse warehouse = new Warehouse();
+            if (optionalWarehouse.isPresent()) {
+                warehouse = optionalWarehouse.get();
+            }
+            productReportDto.setAmount(warehouse.getAmount());
+
+            double amount = warehouse.getAmount();
+            double salePrice = product.getSalePrice();
+            double buyPrice = product.getBuyPrice();
+
+            SumBySalePrice = amount * salePrice;
+            SumByBuyPrice = amount * buyPrice;
+            productReportDto.setSumBySalePrice(SumBySalePrice);
+            productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            productReportDtoList.add(productReportDto);
+        }
+        for (ProductTypePrice product : productTypePriceList) {
+            productReportDto = new ProductReportDto();
+            productReportDto.setName(product.getName());
+            if (product.getProduct().getBrand() != null) productReportDto.setBrand(product.getProduct().getBrand().getName());
+            productReportDto.setBranch(optionalBranch.get().getName());
+            if (product.getProduct().getCategory() != null) productReportDto.setCategory(product.getProduct().getCategory().getName());
+            productReportDto.setBuyPrice(product.getBuyPrice());
+            productReportDto.setSalePrice(product.getSalePrice());
+
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(product.getId(), optionalBranch.get().getId());
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
