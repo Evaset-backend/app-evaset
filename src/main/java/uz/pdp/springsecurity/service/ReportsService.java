@@ -237,7 +237,7 @@ public class ReportsService {
             productReportDto.setBuyPrice(productTypePrice.getBuyPrice());
             productReportDto.setSalePrice(productTypePrice.getSalePrice());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductTypePriceIdAndBranchId(productTypePrice.getId(), optionalBranch.get().getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductTypePriceIdAndBranchId(productTypePrice.getId(), branchId);
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
@@ -895,7 +895,12 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
+        List<TradeProduct> tradeProductList;
+        tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
+        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        for (ProductTypePrice productTypePrice : productTypePriceList) {
+            tradeProductList = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceId(branchId,productTypePrice.getId());
+        }
         if (tradeProductList.isEmpty()) {
             return new ApiResponse("Not Found", false);
         }
