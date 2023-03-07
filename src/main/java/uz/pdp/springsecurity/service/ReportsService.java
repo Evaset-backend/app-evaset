@@ -399,13 +399,15 @@ public class ReportsService {
         for (ProductTypePrice product : productTypePrices) {
             productReportDto = new ProductReportDto();
             productReportDto.setName(product.getName());
-            if (product.getProduct().getBrand() != null) productReportDto.setBrand(product.getProduct().getBrand().getName());
+            if (product.getProduct().getBrand() != null)
+                productReportDto.setBrand(product.getProduct().getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            if (product.getProduct().getCategory() != null) productReportDto.setCategory(product.getProduct().getCategory().getName());
+            if (product.getProduct().getCategory() != null)
+                productReportDto.setCategory(product.getProduct().getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(optionalBranch.get().getId(),product.getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(optionalBranch.get().getId(), product.getId());
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
@@ -425,6 +427,7 @@ public class ReportsService {
         productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount).reversed());
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
+
     public ApiResponse allProductByCategory(UUID branchId, UUID categoryId) {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
@@ -481,9 +484,11 @@ public class ReportsService {
         for (ProductTypePrice product : productTypePriceList) {
             productReportDto = new ProductReportDto();
             productReportDto.setName(product.getName());
-            if (product.getProduct().getBrand() != null) productReportDto.setBrand(product.getProduct().getBrand().getName());
+            if (product.getProduct().getBrand() != null)
+                productReportDto.setBrand(product.getProduct().getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            if (product.getProduct().getCategory() != null) productReportDto.setCategory(product.getProduct().getCategory().getName());
+            if (product.getProduct().getCategory() != null)
+                productReportDto.setCategory(product.getProduct().getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -567,6 +572,7 @@ public class ReportsService {
         Map<UUID, Double> productAmount = new HashMap<>();
 
 
+        List<TradeProduct> allByProductId = new ArrayList<>();
         for (TradeProduct tradeProduct : tradeProductList) {
             List<TradeProduct> tradeProducts;
             if (tradeProduct.getProduct() == null){
@@ -839,11 +845,14 @@ public class ReportsService {
     }
 
     public ApiResponse mostSaleProducts(UUID branchId, UUID categoryId, UUID brandId, Date startDate, Date endDate) {
+
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
+
         List<TradeProduct> tradeProductList = new ArrayList<>();
+
         if (categoryId == null && brandId == null && startDate == null && endDate == null) {
             tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
             if (tradeProductList.isEmpty()) {
@@ -901,8 +910,10 @@ public class ReportsService {
         }
 
         Map<UUID, Double> productAmount = new HashMap<>();
+        List<TradeProduct> allByProductId = new ArrayList<>();
+
         for (TradeProduct tradeProduct : tradeProductList) {
-            List<TradeProduct> allByProductId = new ArrayList<>();
+
             List<TradeProduct> tradeProducts = new ArrayList<>();
             if (tradeProduct.getProduct() != null){
                 allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
@@ -923,6 +934,7 @@ public class ReportsService {
         }
         List<MostSaleProductsDto> mostSaleProductsDtoList = new ArrayList<>();
         for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
+
             Optional<Product> product = productRepository.findById(entry.getKey());
             if (product.isPresent()){
                 MostSaleProductsDto mostSaleProductsDto = new MostSaleProductsDto();
@@ -946,6 +958,7 @@ public class ReportsService {
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
                 mostSaleProductsDtoList.add(mostSaleProductsDto);
             }
+
 
         }
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount).reversed());
