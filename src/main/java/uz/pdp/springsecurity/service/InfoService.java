@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InfoDto;
 import uz.pdp.springsecurity.payload.InfoOutlayDto;
+import uz.pdp.springsecurity.payload.OutlayGetCategory;
 import uz.pdp.springsecurity.repository.*;
 
 
@@ -185,6 +186,20 @@ public class InfoService {
         }
         infoDto.setByPayMethods(byPayMethods);
 
+        Map<String, Double> outlayMap = new HashMap<>();
+        for (Outlay outlay : outlayList) {
+            outlayMap.put(outlay.getOutlayCategory().getTitle(), outlayMap.getOrDefault(outlay.getOutlayCategory().getTitle(), 0d) + outlay.getTotalSum());
+        }
+
+        List<OutlayGetCategory> outlayByCategory = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : outlayMap.entrySet()) {
+            OutlayGetCategory category = new OutlayGetCategory();
+            category.setType(entry.getKey());
+            category.setTotalSum(entry.getValue());
+            outlayByCategory.add(category);
+        }
+        outlayByCategory.sort(Comparator.comparing(OutlayGetCategory::getTotalSum));
+        infoDto.setOutlayByCategory(outlayByCategory);
         return new ApiResponse("FOUND", true, infoDto);
     }
 

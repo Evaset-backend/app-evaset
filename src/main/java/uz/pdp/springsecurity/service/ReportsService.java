@@ -237,7 +237,7 @@ public class ReportsService {
             productReportDto.setBuyPrice(productTypePrice.getBuyPrice());
             productReportDto.setSalePrice(productTypePrice.getSalePrice());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(productTypePrice.getProduct().getId(), optionalBranch.get().getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductTypePriceIdAndBranchId(productTypePrice.getId(), branchId);
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
@@ -521,9 +521,9 @@ public class ReportsService {
             return new ApiResponse("Branch Not Found", false);
         }
         List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
-        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchIdAndProduct_ActiveIsTrue(branchId);
+        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
 
-        if (productList.isEmpty()) {
+        if (productList.isEmpty() && productTypePriceList.isEmpty()) {
             return new ApiResponse("No Found Products", false);
         }
         double totalSumBySalePrice = 0D;
@@ -931,7 +931,12 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
+        List<TradeProduct> tradeProductList;
+        tradeProductList = tradeProductRepository.findAllByProduct_BranchId(optionalBranch.get().getId());
+        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        for (ProductTypePrice productTypePrice : productTypePriceList) {
+            tradeProductList = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceId(branchId,productTypePrice.getId());
+        }
         if (tradeProductList.isEmpty()) {
             return new ApiResponse("Not Found", false);
         }
