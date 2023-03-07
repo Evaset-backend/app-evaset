@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.TradeProduct;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID> {
@@ -55,8 +56,12 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
     List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BusinessId(Timestamp createdAt, Timestamp createdAt2, UUID product_business_id);
 
     List<TradeProduct> findAllByProductTypePriceId(UUID productTypePrice_id);
+    List<TradeProduct> findAllByProductTypePrice(ProductTypePrice productTypePrice);
+
     List<TradeProduct> findAllByProductTypePriceIdAndTrade_CustomerId(UUID productTypePrice_id, UUID trade_customer_id);
 
   List<TradeProduct> findAllByProduct_CategoryId(UUID id);
+
+  Optional<TradeProduct> findByProductTypePriceId(UUID id);
 }
 
