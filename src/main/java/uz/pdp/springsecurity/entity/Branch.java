@@ -28,5 +28,7 @@ public class Branch extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
+
+    //todo ochirilsin
     private double percent;
 }

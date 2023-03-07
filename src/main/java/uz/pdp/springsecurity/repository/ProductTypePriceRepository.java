@@ -12,6 +12,7 @@ public interface ProductTypePriceRepository extends JpaRepository<ProductTypePri
 
     Optional<ProductTypePrice> findByProductId(UUID product_id);
 
+    List<ProductTypePrice> findAllByProduct_Business_Id(UUID product_business_id);
     List<ProductTypePrice> findAllByProduct_BranchId(UUID product_branch_id);
     List<ProductTypePrice> findAllByProduct_CategoryIdAndProduct_BranchIdAndProduct_ActiveTrue(UUID product_category_id, UUID product_branch_id);
 

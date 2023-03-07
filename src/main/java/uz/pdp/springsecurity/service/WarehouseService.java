@@ -208,14 +208,22 @@ public class WarehouseService {
                 } else {
                     List<Branch> branchList = exchangeProduct.getProduct().getBranch();
                     Warehouse warehouse = new Warehouse();
-                    branchList.add(receivedBranch);
+                    boolean b = false;
+                    for (Branch branch : branchList) {
+                        if (branch.getId().equals(receivedBranch.getId())) {
+                            b = true;
+                        }
+                    }
+                    Optional<Product> optionalProduct = productRepository.findById(exchangeProduct.getProduct().getId());
+                    if (!b) {
+                        branchList.add(receivedBranch);
+                        Product product = optionalProduct.get();
+                        product.setBranch(branchList);
+                        productRepository.save(product);
+                    }
                     warehouse.setBranch(receivedBranch);
                     warehouse.setAmount(exchangeProduct.getExchangeProductQuantity());
-                    Optional<Product> optionalProduct = productRepository.findById(exchangeProduct.getProduct().getId());
                     optionalProduct.ifPresent(warehouse::setProduct);
-                    Product product = optionalProduct.get();
-                    product.setBranch(branchList);
-                    productRepository.save(product);
                     warehouseRepository.save(warehouse);
                 }
             } else {
@@ -237,16 +245,27 @@ public class WarehouseService {
                     warehouse.setAmount(warehouse.getAmount() + exchangeProduct.getExchangeProductQuantity());
                     warehouseRepository.save(warehouse);
                 } else {
-                    List<Branch> branchList = exchangeProduct.getProduct().getBranch();
+                    List<Branch> branchList = exchangeProduct.getProductTypePrice().getProduct().getBranch();
+                    boolean b = false;
+
+                    for (Branch branch : branchList) {
+                        if (branch.getId().equals(receivedBranch)) {
+                            b = true;
+                        }
+                    }
+
+                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(exchangeProduct.getProductTypePrice().getId());
+                    if (!b) {
+                        branchList.add(receivedBranch);
+                        Product product = exchangeProduct.getProductTypePrice().getProduct();
+                        product.setBranch(branchList);
+                        productRepository.save(product);
+                    }
+
                     Warehouse warehouse = new Warehouse();
                     warehouse.setBranch(receivedBranch);
-                    branchList.add(receivedBranch);
                     warehouse.setAmount(exchangeProduct.getExchangeProductQuantity());
-                    Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(exchangeProduct.getProductTypePrice().getId());
                     optionalProductTypePrice.ifPresent(warehouse::setProductTypePrice);
-                    Product product = exchangeProduct.getProductTypePrice().getProduct();
-                    product.setBranch(branchList);
-                    productRepository.save(product);
                     warehouseRepository.save(warehouse);
                 }
             }

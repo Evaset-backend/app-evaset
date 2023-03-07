@@ -149,8 +149,8 @@ public class ProductController {
      */
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-brand/{brand_id}")
-    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id, @CurrentUser User user)  {
-        ApiResponse apiResponse = productService.getByBrand(brand_id, user);
+    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id)  {
+        ApiResponse apiResponse = productService.getByBrand(brand_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -185,8 +185,10 @@ public class ProductController {
 
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-business/{business_id}")
-    public HttpEntity<?> getByBusiness(@PathVariable UUID business_id) {
-        ApiResponse apiResponse = productService.getByBusiness(business_id);
+    public HttpEntity<?> getByBusiness(@PathVariable UUID business_id,
+                                       @RequestParam(required = false) UUID branch_id,
+                                       @RequestParam(required = false) UUID brand_id) {
+        ApiResponse apiResponse = productService.getByBusiness(business_id,branch_id,brand_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

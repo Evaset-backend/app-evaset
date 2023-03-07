@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Product;
+import uz.pdp.springsecurity.enums.Type;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,14 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID business_id);
 
-    List<Product> findAllByCategoryIdAndActiveTrue(UUID categoryId);
-    Optional<Product> findByBarcodeAndBranchIdAndActiveTrue(String barcode, UUID branch_id);
-
-    Optional<Product> findByBarcodeAndBranchIdAndActive(String barcode, UUID branch_id, boolean active);
-
-    Optional<Product> findByNameAndBranchIdAndActiveTrue(String name,UUID branchId);
-
-    void deleteByIdAndBranchId(UUID id, UUID branch_id);
+    List<Product> findAllByBrandIdAndActiveIsTrue(UUID brand_id);
 
     Optional<Product> findByIdAndBranchIdAndActiveTrue(UUID id, UUID branchId);
 
@@ -31,18 +25,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brand_id, UUID branch_id);
     List<Product> findAllByBrandIdAndBusinessIdAndActiveTrue(UUID brand_id, UUID businessId);
 
-
     List<Product> findAllByBranchIdAndActiveIsTrue(UUID branch_id);
 
     List<Product> findAllByBranchIdAndBarcodeOrNameAndActiveTrue(UUID branch_id, String barcode, String name);
-
-    List<Product> findAllByMeasurementIdAndBranchIdAndActiveTrue(UUID measurement_id, UUID branch_id);
-
-    List<Product> findAllByNameAndBusinessId(String name, UUID business_id);
-
-
-    Optional<Product> findByIdAndBranch_IdAndActiveTrue(UUID productExchangeId, UUID id);
-
 
     Optional<Product> findByBarcodeAndBranch_IdAndActiveTrue(String barcode, UUID receivedBranch);
 
@@ -50,4 +35,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
 
     List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
+
+    List<Product> findAllByBusiness_IdAndActiveIsTrueAndTypeLike(UUID business_id, Type type);
 }
