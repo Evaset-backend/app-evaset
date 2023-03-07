@@ -17,6 +17,5 @@ public class ProductReportDto {
     private double amount;
     private double SumBySalePrice;
     private double SumByBuyPrice;
-
     private String barcode;
 }

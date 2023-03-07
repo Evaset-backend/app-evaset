@@ -15,6 +15,7 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     Optional<Warehouse> findByBranch_BusinessIdAndProductId(UUID branchId, UUID businessId);
     Optional<Warehouse> findByProductIdAndBranchId(UUID product_id, UUID branch_id);
+    Optional<Warehouse> findByProductTypePriceIdAndBranchId(UUID productTypePrice_id, UUID branch_id);
 
     Optional<Warehouse> findByProduct_Id(UUID productId);
     List<Warehouse> findAllByProduct_Id(UUID productId);
