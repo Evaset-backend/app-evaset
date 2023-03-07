@@ -2,6 +2,9 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
@@ -275,5 +278,39 @@ public class WarehouseService {
         exchangeProductBranchRepository.save(exchangeProductBranch);
         fifoCalculationService.createExchange(exchangeProductBranch);
         return new ApiResponse("successfully saved", true);
+    }
+
+    public ApiResponse getLessProduct(UUID businessId, UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Warehouse> allWarehouse;
+
+        List<GetLessProductDto> getLessProductDtoList = new ArrayList<>();
+
+        if (businessId != null) {
+            allWarehouse = warehouseRepository
+                    .findAllByProduct_BusinessIdAndAmountNotOrderByAmountAsc(businessId, 0, pageable);
+        } else {
+            allWarehouse = warehouseRepository
+                    .findAllByBranchIdAndAmountNotOrderByAmountAsc(branchId, 0, pageable);
+        }
+
+        List<Warehouse> warehouseList = allWarehouse.toList();
+        for (Warehouse warehouse : warehouseList) {
+            GetLessProductDto getLessProductDto = new GetLessProductDto();
+            if (warehouse.getProduct() != null) {
+                getLessProductDto.setName(warehouse.getProduct().getName());
+            } else {
+                getLessProductDto.setName(warehouse.getProductTypePrice().getName());
+            }
+            getLessProductDto.setAmount(warehouse.getAmount());
+            getLessProductDtoList.add(getLessProductDto);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("getLessProduct", getLessProductDtoList);
+        response.put("currentPage", allWarehouse.getNumber());
+        response.put("totalItems", allWarehouse.getTotalElements());
+        response.put("totalPages", allWarehouse.getTotalPages());
+        return new ApiResponse("all", true, response);
     }
 }

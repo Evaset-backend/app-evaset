@@ -169,9 +169,7 @@ public class ProductService {
 
         for (ProductTypeComboDto productTypeComboDto : productTypeComboDtoList) {
             Optional<Product> optionalProduct = productRepository.findById(productTypeComboDto.getContentProductId());
-            if (optionalProduct.isEmpty()) {
-                return new ApiResponse("not found content product", false);
-            }
+            Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(productTypeComboDto.getContentProductId());
             if (isUpdate && productTypeComboDto.getComboId() != null) {
                 Optional<ProductTypeCombo> comboOptional = comboRepository.findById(productTypeComboDto.getComboId());
                 if (comboOptional.isEmpty()) {
@@ -179,7 +177,10 @@ public class ProductService {
                 }
                 ProductTypeCombo productTypeCombo = comboOptional.get();
                 productTypeCombo.setMainProduct(saveProduct);
-                productTypeCombo.setContentProduct(optionalProduct.get());
+
+                optionalProduct.ifPresent(productTypeCombo::setContentProduct);
+                optionalProductTypePrice.ifPresent(productTypeCombo::setContentProductTypePrice);
+
                 productTypeCombo.setAmount(productTypeComboDto.getAmount());
                 productTypeCombo.setBuyPrice(productTypeComboDto.getBuyPrice());
                 productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
@@ -189,7 +190,9 @@ public class ProductService {
                 ProductTypeCombo productTypeCombo = new ProductTypeCombo();
                 productTypeCombo.setMainProduct(saveProduct);
 //                productTypeCombo.setMeasurement(saveProduct.getMeasurement());
-                productTypeCombo.setContentProduct(optionalProduct.get());
+                optionalProduct.ifPresent(productTypeCombo::setContentProduct);
+                optionalProductTypePrice.ifPresent(productTypeCombo::setContentProductTypePrice);
+
                 productTypeCombo.setAmount(productTypeComboDto.getAmount());
                 productTypeCombo.setBuyPrice(productTypeComboDto.getBuyPrice());
                 productTypeCombo.setSalePrice(productTypeComboDto.getSalePrice());
@@ -360,7 +363,11 @@ public class ProductService {
             for (ProductTypeCombo combo : allComboProduct) {
                 ProductTypeComboGetDto comboGetDto = new ProductTypeComboGetDto();
                 comboGetDto.setComboId(combo.getId());
-                comboGetDto.setContentProduct(combo.getContentProduct());
+                if (combo.getContentProduct() != null) {
+                    comboGetDto.setContentProduct(combo.getContentProduct());
+                } else {
+                    comboGetDto.setContentProductTypePrice(combo.getContentProductTypePrice());
+                }
                 comboGetDto.setAmount(combo.getAmount());
                 comboGetDto.setBuyPrice(combo.getBuyPrice());
                 comboGetDto.setSalePrice(combo.getSalePrice());
