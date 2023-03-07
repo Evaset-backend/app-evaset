@@ -558,7 +558,7 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found");
         }
-        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByProduct_BranchId(branchId);
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchId(branchId);
 
         if (tradeProductList.isEmpty()) {
             return new ApiResponse("Traded Product Not Found");
@@ -568,15 +568,21 @@ public class ReportsService {
 
 
         for (TradeProduct tradeProduct : tradeProductList) {
-            List<TradeProduct> allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+            List<TradeProduct> tradeProducts;
+            if (tradeProduct.getProduct() == null){
+                tradeProducts = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceId(tradeProduct.getTrade().getBranch().getId(),tradeProduct.getProductTypePrice().getId());
+            }else {
+                tradeProducts = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
+            }
+
             double amount = 0;
             if (tradeProduct.getProduct() != null) {
-                for (TradeProduct product : allByProductId) {
+                for (TradeProduct product : tradeProducts) {
                     amount += product.getTradedQuantity();
                     productAmount.put(product.getProduct().getId(), amount);
                 }
             } else {
-                for (TradeProduct product : allByProductId) {
+                for (TradeProduct product : tradeProducts) {
                     amount += product.getTradedQuantity();
                     productAmount.put(product.getProductTypePrice().getId(), amount);
                 }
@@ -587,13 +593,24 @@ public class ReportsService {
         for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
             MostSaleProductsDto mostSaleProductsDto = new MostSaleProductsDto();
             Optional<Product> product = productRepository.findById(entry.getKey());
-            mostSaleProductsDto.setName(product.get().getName());
+            if (product.isPresent()){
+                mostSaleProductsDto.setName(product.get().getName());
+                mostSaleProductsDto.setAmount(entry.getValue());
+                mostSaleProductsDto.setSalePrice(product.get().getSalePrice());
+                mostSaleProductsDto.setBuyPrice(product.get().getBuyPrice());
+                mostSaleProductsDto.setBarcode(product.get().getBarcode());
+                mostSaleProductsDto.setMeasurement(product.get().getMeasurement().getName());
+                mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+            }
+            Optional<ProductTypePrice> productTypePrice = productTypePriceRepository.findById(entry.getKey());
+            mostSaleProductsDto.setName(productTypePrice.get().getName());
             mostSaleProductsDto.setAmount(entry.getValue());
-            mostSaleProductsDto.setSalePrice(product.get().getSalePrice());
-            mostSaleProductsDto.setBuyPrice(product.get().getBuyPrice());
-            mostSaleProductsDto.setBarcode(product.get().getBarcode());
-            mostSaleProductsDto.setMeasurement(product.get().getMeasurement().getName());
-            mostSaleProductsDto.setBranchName(product.get().getBranch().get(0).getName());
+            mostSaleProductsDto.setSalePrice(productTypePrice.get().getSalePrice());
+            mostSaleProductsDto.setBuyPrice(productTypePrice.get().getBuyPrice());
+            mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
+            mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
+            mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+
             mostSaleProductsDtoList.add(mostSaleProductsDto);
         }
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount));
