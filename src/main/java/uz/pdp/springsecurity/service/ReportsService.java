@@ -914,7 +914,6 @@ public class ReportsService {
 
         for (TradeProduct tradeProduct : tradeProductList) {
 
-            List<TradeProduct> allByProductId = new ArrayList<>();
             List<TradeProduct> tradeProducts = new ArrayList<>();
             if (tradeProduct.getProduct() != null){
                 allByProductId = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
