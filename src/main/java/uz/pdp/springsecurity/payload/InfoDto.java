@@ -19,5 +19,7 @@ public class InfoDto {
     private double totalProfit;
     private double todayProfit;
 
+    private List<OutlayGetCategory> outlayByCategory;
+
     private HashMap<String, Double> byPayMethods;
 }
