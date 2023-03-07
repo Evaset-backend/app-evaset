@@ -17,6 +17,7 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   List<TradeProduct> findAllByProduct_IdAndTrade_CustomerId(UUID product_id, UUID trade_customer_id);
 
   List<TradeProduct> findAllByCreatedAtBetweenAndProductId(Timestamp startDate, Timestamp endDate, UUID product_id);
+  List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePriceId(Timestamp startDate, Timestamp endDate, UUID product_id);
   List<TradeProduct> findAllByCreatedAtBetween(Timestamp createdAt, Timestamp createdAt2);
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_CategoryId(Timestamp startDate, Timestamp endDate, UUID product_category_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
