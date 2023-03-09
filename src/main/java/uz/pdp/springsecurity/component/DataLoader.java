@@ -559,8 +559,7 @@ public class DataLoader implements CommandLineRunner {
                     branch = new Branch(
                             "Test Filial",
                             address,
-                            business,
-                            1
+                            business
                     );
                     branchRepository.save(branch);
                     branches.add(branch);

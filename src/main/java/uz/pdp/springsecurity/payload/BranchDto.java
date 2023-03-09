@@ -14,5 +14,4 @@ public class BranchDto {
     private String name;
     private UUID addressId;
     private UUID businessId;
-    private double percent;
 }
