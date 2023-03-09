@@ -21,9 +21,12 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePriceId(Timestamp startDate, Timestamp endDate, UUID product_id);
   List<TradeProduct> findAllByCreatedAtBetween(Timestamp createdAt, Timestamp createdAt2);
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_CategoryId(Timestamp startDate, Timestamp endDate, UUID product_category_id);
+  List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePrice_Product_CategoryId(Timestamp startDate, Timestamp endDate, UUID product_category_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
+    List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePrice_Product_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndTrade_CustomerId(Timestamp startDate, Timestamp endDate, UUID trade_customer_id);
   List<TradeProduct> findAllByProduct_BrandId(UUID brandId);
+  List<TradeProduct> findAllByProductTypePrice_Product_BrandId(UUID brandId);
   List<TradeProduct> findAllByTradeId(UUID tradeId);
   List<TradeProduct> findAllByProduct_BranchId(UUID product_branch_id);
   List<TradeProduct> findAllByTrade_BranchId(UUID product_branch_id);
@@ -61,6 +64,7 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
     List<TradeProduct> findAllByProductTypePriceIdAndTrade_CustomerId(UUID productTypePrice_id, UUID trade_customer_id);
 
   List<TradeProduct> findAllByProduct_CategoryId(UUID id);
+  List<TradeProduct> findAllByProductTypePrice_Product_CategoryId(UUID id);
 
   Optional<TradeProduct> findByProductTypePriceId(UUID id);
 }
