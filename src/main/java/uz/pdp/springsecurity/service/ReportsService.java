@@ -832,11 +832,10 @@ public class ReportsService {
         }
 
         for (TradeProduct tradeProduct : tradeProductList) {
+            CustomerReportsDto customerReportsDto = new CustomerReportsDto();
             if (tradeProduct.getTrade().getCustomer() == null)
                 continue;
-            CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-            if (tradeProduct.getTrade().getCustomer() != null)
-                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+            customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
             customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
             customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
             customerReportsDto.setProduct(tradeProduct.getProduct().getName());
