@@ -171,6 +171,7 @@ public class ReportsService {
             productTypePriceList = priceList;
         } else if (brandId != null && categoryId != null) {
             productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brandId, categoryId, branchId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BrandIdAndProduct_CategoryIdAndProduct_Branch_IdAndProduct_ActiveIsTrue(brandId,categoryId,branchId);
         } else if (production != null && categoryId == null && brandId == null) {
             List<Production> productionList = productionRepository.findAllByBranchId(branchId);
             if (productionList.isEmpty()) {
@@ -223,6 +224,8 @@ public class ReportsService {
             SumByBuyPrice = amount * buyPrice;
             productReportDto.setSumBySalePrice(SumBySalePrice);
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            if (productReportDto.getBarcode() == null && productReportDto.getAmount() == 0 && productReportDto.getBuyPrice() == 0 && productReportDto.getSalePrice() == 0)
+                continue;
             productReportDtoList.add(productReportDto);
         }
 
@@ -254,8 +257,6 @@ public class ReportsService {
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
             productReportDtoList.add(productReportDto);
         }
-
-
         productReportDtoList.sort(Comparator.comparing(ProductReportDto::getAmount).reversed());
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
