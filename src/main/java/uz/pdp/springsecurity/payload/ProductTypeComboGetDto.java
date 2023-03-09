@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.Measurement;
 import uz.pdp.springsecurity.entity.Product;
+import uz.pdp.springsecurity.entity.ProductTypePrice;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ public class ProductTypeComboGetDto {
     private UUID comboId;
 
     private Product contentProduct;
+    private ProductTypePrice contentProductTypePrice;
 
     private double amount;
 
