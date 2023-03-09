@@ -832,6 +832,8 @@ public class ReportsService {
         }
 
         for (TradeProduct tradeProduct : tradeProductList) {
+            if (tradeProduct.getTrade().getCustomer() == null)
+                continue;
             CustomerReportsDto customerReportsDto = new CustomerReportsDto();
             if (tradeProduct.getTrade().getCustomer() != null)
                 customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
