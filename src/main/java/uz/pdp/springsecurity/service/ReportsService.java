@@ -395,6 +395,8 @@ public class ReportsService {
             SumByBuyPrice = amount * buyPrice;
             productReportDto.setSumBySalePrice(SumBySalePrice);
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            if (productReportDto.getSalePrice() == 0 && productReportDto.getAmount() == 0 && productReportDto.getBuyPrice() == 0 && productReportDto.getBarcode()== null)
+                continue;
             productReportDtoList.add(productReportDto);
         }
         for (ProductTypePrice product : productTypePrices) {
@@ -480,6 +482,8 @@ public class ReportsService {
             SumByBuyPrice = amount * buyPrice;
             productReportDto.setSumBySalePrice(SumBySalePrice);
             productReportDto.setSumByBuyPrice(SumByBuyPrice);
+            if (productReportDto.getBarcode() == null && productReportDto.getBuyPrice() == 0 && productReportDto.getSalePrice() == 0 && productReportDto.getAmount() == 0)
+                continue;
             productReportDtoList.add(productReportDto);
         }
         for (ProductTypePrice product : productTypePriceList) {
@@ -492,8 +496,10 @@ public class ReportsService {
                 productReportDto.setCategory(product.getProduct().getCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
+            productReportDto.setBrand(product.getBarcode());
+            productReportDto.setBarcode(product.getBarcode());
 
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(product.getId(), optionalBranch.get().getId());
+            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branchId,product.getId());
             Warehouse warehouse = new Warehouse();
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
