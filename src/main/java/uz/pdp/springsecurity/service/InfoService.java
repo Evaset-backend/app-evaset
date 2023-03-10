@@ -25,6 +25,7 @@ public class InfoService {
     private final TradeRepository tradeRepository;
     private final PaymentRepository paymentRepository;
     private final PayMethodRepository payMethodRepository;
+    private final CustomerRepository customerRepository;
     @Autowired
     OutlayRepository outlayRepository;
     @Autowired
@@ -70,7 +71,8 @@ public class InfoService {
                 tradeRepository.findAllByBranch_BusinessId(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId),
-                outlayList// doing nothing
+                outlayList,// doing nothing
+                customerRepository.findAllByBusiness_IdAndDebtIsNot(businessId, 0d)
         );
     }
 
@@ -122,7 +124,8 @@ public class InfoService {
                     tradeRepository.findAllByBranch_Id(branchId),
                     outlayRepository.findAllByBranch_Id(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
-                    outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId)
+                    outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
+                    customerRepository.findAllByBranchIdAndDebtIsNot(branchId, 0d)
             );
         }
 
@@ -132,12 +135,21 @@ public class InfoService {
                 tradeRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId),
-                outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId)
+                outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
+                customerRepository.findAllByBranchIdAndDebtIsNot(branchId, 0d)
         );
 
     }
 
-    private ApiResponse getInfoHelper(UUID businessId, List<Purchase> purchaseList, List<Trade> tradeList, List<Outlay> outlayList, List<Payment> paymentList, List<Outlay> todayOutlayList) {
+    private ApiResponse getInfoHelper(
+            UUID businessId,
+            List<Purchase> purchaseList,
+            List<Trade> tradeList,
+            List<Outlay> outlayList,
+            List<Payment> paymentList,
+            List<Outlay> todayOutlayList,
+            List<Customer> customerList
+    ) {
 
 
         double allPurchase = 0;
@@ -149,6 +161,7 @@ public class InfoService {
         InfoDto infoDto = new InfoDto();
         infoDto.setMyPurchase(allPurchase);
         infoDto.setMyDebt(allMyDebt);
+        infoDto.setCustomerList(customerList);
 
         double allTrade = 0;
         double allTradeDebt = 0;
