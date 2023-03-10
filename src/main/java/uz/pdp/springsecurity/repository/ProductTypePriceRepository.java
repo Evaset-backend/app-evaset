@@ -25,4 +25,6 @@ public interface ProductTypePriceRepository extends JpaRepository<ProductTypePri
     List<ProductTypePrice> findAllByProduct_BrandIdAndProduct_CategoryIdAndProduct_Branch_IdAndProduct_ActiveIsTrue(UUID product_brandId, UUID product_category_id, UUID product_branch_id);
     boolean existsByBarcodeAndProduct_BusinessId(String barcode, UUID businessId);
     boolean existsByBarcodeAndProduct_BusinessIdAndIdIsNot(String barcode, UUID businessId, UUID productTypePriceId);
+
+    List<ProductTypePrice> findAllByProduct_BranchIdAndProduct_BrandId(UUID product_branch_id, UUID product_brand_id);
 }
