@@ -24,6 +24,8 @@ public class ProductDto {
 
     private UUID categoryId;
 
+    private UUID childCategoryId;
+
     @NotNull(message = "required line")
     private UUID measurementId;
 
