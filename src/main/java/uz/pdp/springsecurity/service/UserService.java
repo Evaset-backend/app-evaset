@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class UserService {
     AttachmentRepository attachmentRepository;
 
     private final SubscriptionRepository subscriptionRepository;
+    private final RoleRepository roleRepository;
 
     public ApiResponse add(UserDto userDto, boolean isNewUser) {
         UUID businessId = userDto.getBusinessId();
@@ -209,7 +211,10 @@ public class UserService {
     }
 
     public ApiResponse getAllByBusinessId(UUID business_id) {
-        List<User> allByBusiness_id = userRepository.findAllByBusiness_Id(business_id);
+        Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+        if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
+        Role superAdmin = optionalRole.get();
+        List<User> allByBusiness_id = userRepository.findAllByBusiness_IdAndRoleIsNot(business_id, superAdmin);
         if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusiness_id);
     }
@@ -218,8 +223,10 @@ public class UserService {
     public ApiResponse getAllByBranchId(UUID branch_id) {
         Optional<Branch> optionalBranch = branchRepository.findById(branch_id);
         if (optionalBranch.isPresent()) {
-            Set<Branch> branches = new HashSet<>();
-            List<User> allByBranch_id = userRepository.findAllByBranchesId(branch_id);
+            Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+            if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
+            Role superAdmin = optionalRole.get();
+            List<User> allByBranch_id = userRepository.findAllByBranchesIdAndRoleIsNot(branch_id, superAdmin);
             return new ApiResponse("FOUND", true, allByBranch_id);
         }
         return new ApiResponse("NOT FOUND", false);
