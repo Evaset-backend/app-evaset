@@ -250,6 +250,10 @@ public class ProductService {
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
+                if (typePricePostDto.getPhotoId() != null){
+                    Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
+                    optionalAttachment.ifPresent(productTypePrice::setPhoto);
+                }
                 if (typePricePostDto.getBarcode() != null && !typePricePostDto.getBarcode().isBlank()) {
                     if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(typePricePostDto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())) {
                         return new ApiResponse("product with the barcode is already exist");
@@ -268,6 +272,10 @@ public class ProductService {
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
+                if (typePricePostDto.getPhotoId() != null){
+                    Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
+                    optionalAttachment.ifPresent(productTypePrice::setPhoto);
+                }
                 if (typePricePostDto.getBarcode() != null && !typePricePostDto.getBarcode().isBlank()) {
                     if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
                         return new ApiResponse("product with the barcode is already exist");
@@ -349,6 +357,7 @@ public class ProductService {
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getProductTypeValue().getId());
+                if (productTypePrice.getPhoto() != null)productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
                 productTypePriceGetDto.setQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
