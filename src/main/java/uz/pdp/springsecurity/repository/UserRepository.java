@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.User;
 
 import java.util.List;
@@ -27,8 +28,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findAllByBusiness_Id(UUID business_id);
 
+    List<User> findAllByBusiness_IdAndRoleIsNot(UUID business_id, Role role);
+
 //    List<User> findAllByBranches(Set<Branch> branches);
 
-    List<User> findAllByBranchesId(UUID branches_id);
+    List<User> findAllByBranchesIdAndRoleIsNot(UUID branches_id, Role role);
 
 }
