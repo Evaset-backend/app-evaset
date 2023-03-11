@@ -122,6 +122,13 @@ public class ProductService {
 
         }
 
+        if (productDto.getChildCategoryId() != null) {
+            UUID categoryId = productDto.getChildCategoryId();
+            Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+            optionalCategory.ifPresent(product::setChildCategory);
+
+        }
+
         if (productDto.getBrandId() != null) {
             UUID brandId = productDto.getBrandId();
             Optional<Brand> optionalBrand = brandRepository.findById(brandId);

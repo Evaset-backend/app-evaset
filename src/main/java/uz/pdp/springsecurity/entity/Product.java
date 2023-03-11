@@ -43,6 +43,9 @@ public class Product extends AbsEntity {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Category category;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Category childCategory;
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Measurement measurement;

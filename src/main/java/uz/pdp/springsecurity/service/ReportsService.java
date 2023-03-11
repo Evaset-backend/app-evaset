@@ -205,7 +205,8 @@ public class ReportsService {
             productReportDto.setName(product.getName());
             if (product.getBrand() != null) productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            if (product.getBrand() != null) productReportDto.setCategory(product.getCategory().getName());
+            if (product.getCategory() != null) productReportDto.setCategory(product.getCategory().getName());
+            if (product.getChildCategory() != null) productReportDto.setCategory(product.getChildCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -235,8 +236,10 @@ public class ReportsService {
             if (productTypePrice.getProduct().getBrand() != null)
                 productReportDto.setBrand(productTypePrice.getProduct().getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
-            if (productTypePrice.getProduct().getBrand() != null)
+            if (productTypePrice.getProduct().getCategory() != null)
                 productReportDto.setCategory(productTypePrice.getProduct().getCategory().getName());
+            if (productTypePrice.getProduct().getChildCategory() != null)
+                productReportDto.setChildCategory(productTypePrice.getProduct().getChildCategory().getName());
             productReportDto.setBuyPrice(productTypePrice.getBuyPrice());
             productReportDto.setSalePrice(productTypePrice.getSalePrice());
 
@@ -377,6 +380,7 @@ public class ReportsService {
             if (product.getBrand() != null) productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
             if (product.getCategory() != null) productReportDto.setCategory(product.getCategory().getName());
+            if (product.getChildCategory() != null) productReportDto.setChildCategory(product.getChildCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -407,6 +411,8 @@ public class ReportsService {
             productReportDto.setBranch(optionalBranch.get().getName());
             if (product.getProduct().getCategory() != null)
                 productReportDto.setCategory(product.getProduct().getCategory().getName());
+            if (product.getProduct().getChildCategory() != null)
+                productReportDto.setChildCategory(product.getProduct().getChildCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -464,6 +470,7 @@ public class ReportsService {
             if (product.getBrand() != null) productReportDto.setBrand(product.getBrand().getName());
             productReportDto.setBranch(optionalBranch.get().getName());
             if (product.getCategory() != null) productReportDto.setCategory(product.getCategory().getName());
+            if (product.getChildCategory() != null) productReportDto.setChildCategory(product.getChildCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
 
@@ -494,6 +501,8 @@ public class ReportsService {
             productReportDto.setBranch(optionalBranch.get().getName());
             if (product.getProduct().getCategory() != null)
                 productReportDto.setCategory(product.getProduct().getCategory().getName());
+            if (product.getProduct().getChildCategory() != null)
+                productReportDto.setChildCategory(product.getProduct().getChildCategory().getName());
             productReportDto.setBuyPrice(product.getBuyPrice());
             productReportDto.setSalePrice(product.getSalePrice());
             productReportDto.setBrand(product.getBarcode());
