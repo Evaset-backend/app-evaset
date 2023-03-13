@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.RoleDto;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.RoleRepository;
+import uz.pdp.springsecurity.util.Constants;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -27,7 +28,7 @@ public class RoleService {
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
 
         boolean exists = roleRepository.existsByNameIgnoreCaseAndBusinessId(roleDto.getName(), roleDto.getBusinessId());
-        if (exists) return new ApiResponse("ROLE ALREADY EXISTS", false);
+        if (exists || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
         Role role = new Role();
         role.setName(roleDto.getName());
         role.setPermissions(roleDto.getPermissions());
@@ -48,7 +49,7 @@ public class RoleService {
         if (optionalRole.isEmpty()) return new ApiResponse("ROLE NOT FOUND", false);
 
         boolean exist = roleRepository.existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(roleDto.getName(), roleDto.getBusinessId(), id);
-        if (exist) return new ApiResponse("ROLE ALREADY EXISTS", false);
+        if (exist  || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
 
         Role role = optionalRole.get();
         role.setName(roleDto.getName());
@@ -73,7 +74,7 @@ public class RoleService {
     }
 
     public ApiResponse getAllByBusiness(UUID business_id) {
-        List<Role> allByBusiness_id = roleRepository.findAllByBusiness_Id(business_id);
+        List<Role> allByBusiness_id = roleRepository.findAllByBusiness_IdAndNameIsNot(business_id, Constants.SUPERADMIN);
         if (allByBusiness_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusiness_id);
     }

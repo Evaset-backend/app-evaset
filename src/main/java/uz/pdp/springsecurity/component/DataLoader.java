@@ -195,6 +195,8 @@ public class DataLoader implements CommandLineRunner {
                 new Role(
                 Constants.ADMIN,
                 Arrays.asList(
+                    GET_TARIFF,
+
                     ADD_ADDRESS,
                     EDIT_ADDRESS,
                     VIEW_ADDRESS,

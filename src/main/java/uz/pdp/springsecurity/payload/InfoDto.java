@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.springsecurity.entity.Customer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,4 +23,6 @@ public class InfoDto {
     private List<OutlayGetCategory> outlayByCategory;
 
     private HashMap<String, Double> byPayMethods;
+
+    List<Customer> customerList;
 }
