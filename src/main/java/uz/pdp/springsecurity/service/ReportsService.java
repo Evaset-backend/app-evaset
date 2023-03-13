@@ -616,15 +616,16 @@ public class ReportsService {
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
             }
             Optional<ProductTypePrice> productTypePrice = productTypePriceRepository.findById(entry.getKey());
-            mostSaleProductsDto.setName(productTypePrice.get().getName());
-            mostSaleProductsDto.setAmount(entry.getValue());
-            mostSaleProductsDto.setSalePrice(productTypePrice.get().getSalePrice());
-            mostSaleProductsDto.setBuyPrice(productTypePrice.get().getBuyPrice());
-            mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
-            mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
-            mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
-
-            mostSaleProductsDtoList.add(mostSaleProductsDto);
+            if (productTypePrice.isPresent()) {
+                mostSaleProductsDto.setName(productTypePrice.get().getName());
+                mostSaleProductsDto.setAmount(entry.getValue());
+                mostSaleProductsDto.setSalePrice(productTypePrice.get().getSalePrice());
+                mostSaleProductsDto.setBuyPrice(productTypePrice.get().getBuyPrice());
+                mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
+                mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
+                mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+                mostSaleProductsDtoList.add(mostSaleProductsDto);
+            }
         }
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount));
         return new ApiResponse("Found", true, mostSaleProductsDtoList);
