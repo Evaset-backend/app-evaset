@@ -286,21 +286,21 @@ public class WarehouseService {
 
         List<GetLessProductDto> getLessProductDtoList = new ArrayList<>();
 
-        if (businessId != null) {
-            allWarehouse = warehouseRepository
-                    .findAllByProduct_BusinessIdAndAmountNotOrderByAmountAsc(businessId, 0, pageable);
-        } else {
+        if (branchId != null) {
             allWarehouse = warehouseRepository
                     .findAllByBranchIdAndAmountNotOrderByAmountAsc(branchId, 0, pageable);
+        } else {
+            allWarehouse = warehouseRepository
+                    .findAllByProduct_BusinessIdAndAmountNotOrderByAmountAsc(businessId, 0, pageable);
         }
 
         List<Warehouse> warehouseList = allWarehouse.toList();
         for (Warehouse warehouse : warehouseList) {
             GetLessProductDto getLessProductDto = new GetLessProductDto();
-            if (warehouse.getProduct() != null) {
-                getLessProductDto.setName(warehouse.getProduct().getName());
-            } else {
+            if (warehouse.getProductTypePrice() != null) {
                 getLessProductDto.setName(warehouse.getProductTypePrice().getName());
+            } else {
+                getLessProductDto.setName(warehouse.getProduct().getName());
             }
             getLessProductDto.setAmount(warehouse.getAmount());
             getLessProductDtoList.add(getLessProductDto);

@@ -770,13 +770,8 @@ public class ReportsService {
             totalSum += outlay.getTotalSum();
             productAmount.put(category.getId(), totalSum);
         }
-        for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
-            Optional<Outlay> optionalOutlay = outlayRepository.findById(entry.getKey());
-            optionalOutlay.get().setTotalSum(entry.getValue());
-        }
-
         Map<String, Double> outlays = new HashMap<>();
-        List<Outlay> all = new ArrayList<>();
+        List<Outlay> all;
         for (Outlay outlay : outlayList) {
             if (startDate != null) {
                 all = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(start, end, branchId, outlay.getOutlayCategory().getId());
@@ -843,20 +838,37 @@ public class ReportsService {
         }
 
         for (TradeProduct tradeProduct : tradeProductList) {
-            CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-            if (tradeProduct.getTrade().getCustomer() == null)
-                continue;
-            customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
-            customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
-            customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
-            customerReportsDto.setProduct(tradeProduct.getProduct().getName());
-            customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
-            customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
-            customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
-            customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-            customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
-            customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
-            customerReportsDtoList.add(customerReportsDto);
+            if (tradeProduct.getProduct() != null) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                if (tradeProduct.getTrade().getCustomer() == null)
+                    continue;
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }else {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                if (tradeProduct.getTrade().getCustomer() == null)
+                    continue;
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProductTypePrice().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
         }
 
         customerReportsDtoList.sort(Comparator.comparing(CustomerReportsDto::getTotalSum).reversed());
