@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID> {
   List<TradeProduct> findAllByProduct_Id(UUID product_id);
 
+  List<TradeProduct> findAllByTrade_BranchIdAndProduct_Id(UUID trade_branch_id, UUID product_id);
+
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BranchId(Timestamp createdAt, Timestamp createdAt2, UUID product_branch_id);
 
   List<TradeProduct> findAllByProduct_IdAndTrade_CustomerId(UUID product_id, UUID trade_customer_id);
