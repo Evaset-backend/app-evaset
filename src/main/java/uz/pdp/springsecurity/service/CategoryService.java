@@ -130,10 +130,13 @@ public class CategoryService {
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
         dto.setBusinessId(category.getBusiness().getId());
-        if (category.getParentCategory().getId() != null) {
+        if (category.getParentCategory() != null) {
             dto.setParentCategory(category.getParentCategory().getId());
+            dto.setParentCategoryName(category.getParentCategory().getName());
+        }else {
+            dto.setParentCategory(null);
+            dto.setParentCategoryName(null);
         }
-        dto.setParentCategory(null);
         return dto;
     }
 

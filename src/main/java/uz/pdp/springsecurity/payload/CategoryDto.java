@@ -19,6 +19,8 @@ public class CategoryDto {
     private String description;
     private UUID parentCategory;
 
+    private String parentCategoryName;
+
     public CategoryDto(String name, UUID businessId, String description,UUID parentCategory) {
         this.name = name;
         this.businessId = businessId;
