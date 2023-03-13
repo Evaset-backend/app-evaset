@@ -291,7 +291,7 @@ public class WarehouseService {
                     .findAllByBranchIdAndAmountNotOrderByAmountAsc(branchId, 0, pageable);
         } else {
             allWarehouse = warehouseRepository
-                    .findAllByProduct_BusinessIdAndAmountNotOrderByAmountAsc(businessId, 0, pageable);
+                    .findAllByBranch_BusinessIdAndAmountNotOrderByAmountAsc(businessId, 0, pageable);
         }
 
         List<Warehouse> warehouseList = allWarehouse.toList();
