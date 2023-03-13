@@ -586,36 +586,33 @@ public class ReportsService {
         }
 
         Map<UUID, Double> productAmount = new HashMap<>();
-
-
         List<TradeProduct> allByProductId = new ArrayList<>();
         for (TradeProduct tradeProduct : tradeProductList) {
-            List<TradeProduct> tradeProducts;
-            if (tradeProduct.getProduct() == null){
-                tradeProducts = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceId(tradeProduct.getTrade().getBranch().getId(),tradeProduct.getProductTypePrice().getId());
-            }else {
-                tradeProducts = tradeProductRepository.findAllByProduct_Id(tradeProduct.getProduct().getId());
-            }
-
             double amount = 0;
-            if (tradeProduct.getProduct() != null) {
-                for (TradeProduct product : tradeProducts) {
-                    amount += product.getTradedQuantity();
-                    productAmount.put(product.getProduct().getId(), amount);
+            if (tradeProduct.getProductTypePrice() != null) {
+                List<TradeProduct> tradeProducts = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceId(tradeProduct.getTrade().getBranch().getId(), tradeProduct.getProductTypePrice().getId());
+                if (tradeProduct.getProductTypePrice() != null) {
+                    for (TradeProduct product : tradeProducts) {
+                        amount += product.getTradedQuantity();
+                        productAmount.put(product.getProductTypePrice().getId(), amount);
+                    }
                 }
-            } else {
-                for (TradeProduct product : tradeProducts) {
-                    amount += product.getTradedQuantity();
-                    productAmount.put(product.getProductTypePrice().getId(), amount);
+            }
+            if (tradeProduct.getProduct() != null) {
+                List<TradeProduct> productList = tradeProductRepository.findAllByTrade_BranchIdAndProduct_Id(tradeProduct.getTrade().getBranch().getId(), tradeProduct.getProduct().getId());
+                if (tradeProduct.getProduct() != null) {
+                    for (TradeProduct product : productList) {
+                        amount += product.getTradedQuantity();
+                        productAmount.put(product.getProduct().getId(), amount);
+                    }
                 }
             }
         }
-
-        List<MostSaleProductsDto> mostSaleProductsDtoList = new ArrayList<>();
-        for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
+            List<MostSaleProductsDto> mostSaleProductsDtoList = new ArrayList<>();
+            for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
             MostSaleProductsDto mostSaleProductsDto = new MostSaleProductsDto();
             Optional<Product> product = productRepository.findById(entry.getKey());
-            if (product.isPresent()){
+            if (product.isPresent()) {
                 mostSaleProductsDto.setName(product.get().getName());
                 mostSaleProductsDto.setAmount(entry.getValue());
                 mostSaleProductsDto.setSalePrice(product.get().getSalePrice());
@@ -623,18 +620,21 @@ public class ReportsService {
                 mostSaleProductsDto.setBarcode(product.get().getBarcode());
                 mostSaleProductsDto.setMeasurement(product.get().getMeasurement().getName());
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+                mostSaleProductsDtoList.add(mostSaleProductsDto);
             }
             Optional<ProductTypePrice> productTypePrice = productTypePriceRepository.findById(entry.getKey());
-            mostSaleProductsDto.setName(productTypePrice.get().getName());
-            mostSaleProductsDto.setAmount(entry.getValue());
-            mostSaleProductsDto.setSalePrice(productTypePrice.get().getSalePrice());
-            mostSaleProductsDto.setBuyPrice(productTypePrice.get().getBuyPrice());
-            mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
-            mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
-            mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+            if (productTypePrice.isPresent()) {
+                mostSaleProductsDto.setName(productTypePrice.get().getName());
+                mostSaleProductsDto.setAmount(entry.getValue());
+                mostSaleProductsDto.setSalePrice(productTypePrice.get().getSalePrice());
+                mostSaleProductsDto.setBuyPrice(productTypePrice.get().getBuyPrice());
+                mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
+                mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
+                mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+                mostSaleProductsDtoList.add(mostSaleProductsDto);
+            }
 
-            mostSaleProductsDtoList.add(mostSaleProductsDto);
-        }
+    }
         mostSaleProductsDtoList.sort(Comparator.comparing(MostSaleProductsDto::getAmount));
         return new ApiResponse("Found", true, mostSaleProductsDtoList);
     }
