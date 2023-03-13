@@ -54,6 +54,8 @@ public class ReportsService {
 
     @Autowired
     PaymentRepository paymentRepository;
+    @Autowired
+    OutlayCategoryRepository outlayCategoryRepository;
 
     @Autowired
     ProductTypePriceRepository productTypePriceRepository;
@@ -724,7 +726,6 @@ public class ReportsService {
         return new ApiResponse("Found", true, totalDelivery);
     }
 
-
     public ApiResponse outlayReports(UUID branchId, UUID categoryId, Date startDate, Date endDate) {
         List<Outlay> outlayList = new ArrayList<>();
         Timestamp start = null;
@@ -735,13 +736,13 @@ public class ReportsService {
             return new ApiResponse("Not Found", false);
         }
 
-
         if (startDate != null && endDate != null) {
             start = new Timestamp(startDate.getTime());
             end = new Timestamp(endDate.getTime());
         }
 
         if (categoryId == null && startDate == null && endDate == null) {
+            outlayCategoryRepository.findAllByBranch_Id(branchId);
             outlayList = outlayRepository.findAllByBranch_Id(branchId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay", false);
@@ -763,18 +764,14 @@ public class ReportsService {
             }
         }
         Map<UUID, Double> productAmount = new HashMap<>();
-        double amount = 0;
         for (Outlay outlay : outlayList) {
-            amount += outlay.getTotalSum();
-            productAmount.put(outlay.getId(), amount);
+            OutlayCategory category = outlay.getOutlayCategory();
+            double totalSum = productAmount.getOrDefault(category.getId(), 0.0);
+            totalSum += outlay.getTotalSum();
+            productAmount.put(category.getId(), totalSum);
         }
-        for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
-            Optional<Outlay> optionalOutlay = outlayRepository.findById(entry.getKey());
-            optionalOutlay.get().setTotalSum(entry.getValue());
-        }
-
         Map<String, Double> outlays = new HashMap<>();
-        List<Outlay> all = new ArrayList<>();
+        List<Outlay> all;
         for (Outlay outlay : outlayList) {
             if (startDate != null) {
                 all = outlayRepository.findAllByCreatedAtBetweenAndBranchIdAndOutlayCategoryId(start, end, branchId, outlay.getOutlayCategory().getId());
@@ -841,20 +838,37 @@ public class ReportsService {
         }
 
         for (TradeProduct tradeProduct : tradeProductList) {
-            CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-            if (tradeProduct.getTrade().getCustomer() == null)
-                continue;
-            customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
-            customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
-            customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
-            customerReportsDto.setProduct(tradeProduct.getProduct().getName());
-            customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
-            customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
-            customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
-            customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
-            customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
-            customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
-            customerReportsDtoList.add(customerReportsDto);
+            if (tradeProduct.getProduct() != null) {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                if (tradeProduct.getTrade().getCustomer() == null)
+                    continue;
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProduct().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }else {
+                CustomerReportsDto customerReportsDto = new CustomerReportsDto();
+                if (tradeProduct.getTrade().getCustomer() == null)
+                    continue;
+                customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
+                customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
+                customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
+                customerReportsDto.setProduct(tradeProduct.getProductTypePrice().getName());
+                customerReportsDto.setPaidSum(tradeProduct.getTrade().getPaidSum());
+                customerReportsDto.setTradedQuantity(tradeProduct.getTradedQuantity());
+                customerReportsDto.setBranchName(tradeProduct.getTrade().getBranch().getName());
+                customerReportsDto.setTotalSum(tradeProduct.getTrade().getTotalSum());
+                customerReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
+                customerReportsDto.setPaymentStatus(tradeProduct.getTrade().getPaymentStatus().getStatus());
+                customerReportsDtoList.add(customerReportsDto);
+            }
         }
 
         customerReportsDtoList.sort(Comparator.comparing(CustomerReportsDto::getTotalSum).reversed());
