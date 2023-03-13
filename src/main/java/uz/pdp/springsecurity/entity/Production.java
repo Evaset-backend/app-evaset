@@ -36,9 +36,9 @@ public class Production extends AbsEntity {
 
     private Double quantity;
 
-    private Double totalQuantity;
+    private double totalQuantity;
 
-    private Double invalid = 0d;
+    private double invalid = 0d;
 
     private double contentPrice;
 
