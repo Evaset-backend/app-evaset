@@ -195,7 +195,8 @@ public class DataLoader implements CommandLineRunner {
                 new Role(
                 Constants.ADMIN,
                 Arrays.asList(
-                    GET_TARIFF,
+//                        todo
+//                    GET_TARIFF,
 
                     ADD_ADDRESS,
                     EDIT_ADDRESS,
@@ -347,7 +348,8 @@ public class DataLoader implements CommandLineRunner {
             Role manager = roleRepository.save(new Role(
                 Constants.MANAGER,
                     Arrays.asList(
-                        GET_TARIFF,
+//                          todo
+//                        GET_TARIFF,
 
                         ADD_ADDRESS,
                         EDIT_ADDRESS,
