@@ -54,6 +54,8 @@ public class ReportsService {
 
     @Autowired
     PaymentRepository paymentRepository;
+    @Autowired
+    OutlayCategoryRepository outlayCategoryRepository;
 
     @Autowired
     ProductTypePriceRepository productTypePriceRepository;
@@ -724,7 +726,6 @@ public class ReportsService {
         return new ApiResponse("Found", true, totalDelivery);
     }
 
-
     public ApiResponse outlayReports(UUID branchId, UUID categoryId, Date startDate, Date endDate) {
         List<Outlay> outlayList = new ArrayList<>();
         Timestamp start = null;
@@ -735,13 +736,13 @@ public class ReportsService {
             return new ApiResponse("Not Found", false);
         }
 
-
         if (startDate != null && endDate != null) {
             start = new Timestamp(startDate.getTime());
             end = new Timestamp(endDate.getTime());
         }
 
         if (categoryId == null && startDate == null && endDate == null) {
+            outlayCategoryRepository.findAllByBranch_Id(branchId);
             outlayList = outlayRepository.findAllByBranch_Id(branchId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay", false);
@@ -763,10 +764,11 @@ public class ReportsService {
             }
         }
         Map<UUID, Double> productAmount = new HashMap<>();
-        double amount = 0;
         for (Outlay outlay : outlayList) {
-            amount += outlay.getTotalSum();
-            productAmount.put(outlay.getId(), amount);
+            OutlayCategory category = outlay.getOutlayCategory();
+            double totalSum = productAmount.getOrDefault(category.getId(), 0.0);
+            totalSum += outlay.getTotalSum();
+            productAmount.put(category.getId(), totalSum);
         }
         for (Map.Entry<UUID, Double> entry : productAmount.entrySet()) {
             Optional<Outlay> optionalOutlay = outlayRepository.findById(entry.getKey());
