@@ -62,7 +62,7 @@ public class UserService {
             }
         }
 
-        boolean b = userRepository.existsByUsername(userDto.getUsername());
+        boolean b = userRepository.existsByUsernameIgnoreCase(userDto.getUsername());
         if (b) return new ApiResponse("USER ALREADY EXISTS", false);
 
         ApiResponse response = roleService.get(userDto.getRoleId());
@@ -105,7 +105,7 @@ public class UserService {
         if (optionalUser.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
 
         if (!optionalUser.get().getUsername().equals(userDto.getUsername())) {
-            boolean b = userRepository.existsByUsername(userDto.getUsername());
+            boolean b = userRepository.existsByUsernameIgnoreCase(userDto.getUsername());
             if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
         }
 
@@ -182,7 +182,7 @@ public class UserService {
             return new ApiResponse("NOT FOUND USER");
 
         if (!optionalUser.get().getUsername().equals(profileDto.getUsername())) {
-            boolean b = userRepository.existsByUsername(profileDto.getUsername());
+            boolean b = userRepository.existsByUsernameIgnoreCase(profileDto.getUsername());
             if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
         }
 

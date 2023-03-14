@@ -63,7 +63,7 @@ public class BusinessService {
     private final static LocalDateTime THIS_YEAR = LocalDateTime.of(TODAY.getYear(), 1, 1, 0, 0, 0);
 
     public ApiResponse add(BusinessDto businessDto) {
-        if (businessRepository.existsByName(businessDto.getName()))
+        if (businessRepository.existsByNameIgnoreCase(businessDto.getName()))
             return new ApiResponse("A BUSINESS WITH THAT NAME ALREADY EXISTS", false);
         Business business = new Business();
         business.setName(businessDto.getName());
@@ -237,13 +237,13 @@ public class BusinessService {
     }
 
     public ApiResponse checkBusinessName(CheckDto checkDto) {
-        boolean exists = businessRepository.existsByName(checkDto.getCheckName());
+        boolean exists = businessRepository.existsByNameIgnoreCase(checkDto.getCheckName());
         if (exists) return new ApiResponse("EXIST", false);
         return new ApiResponse(true);
     }
 
     public ApiResponse checkUsername(CheckDto checkDto) {
-        boolean exists = userRepository.existsByUsername(checkDto.getCheckName());
+        boolean exists = userRepository.existsByUsernameIgnoreCase(checkDto.getCheckName());
         if (exists) return new ApiResponse("EXIST", false);
         return new ApiResponse(true);
     }
