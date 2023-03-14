@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
@@ -22,12 +23,13 @@ public class ProductionService {
     public ApiResponse add(ProductionDto productionDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(productionDto.getBranchId());
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
-
         Branch branch = optionalBranch.get();
-        Production production = new Production();
-        production.setBranch(branch);
+
+        if (productionDto.getInvalid() >= productionDto.getTotalQuantity())return new ApiResponse("WRONG QUANTITY", false);
+        if (productionDto.getDate() == null)return new ApiResponse("NOT FOUND DATE", false);
 
         List<ContentProductDto> contentProductDtoList = productionDto.getContentProductDtoList();
+        if (contentProductDtoList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT_LIST", false);
         if (!branch.getBusiness().getSaleMinus()) {
             HashMap<UUID, Double> map = new HashMap<>();
             for (ContentProductDto dto : contentProductDtoList) {
@@ -44,10 +46,15 @@ public class ProductionService {
                     return new ApiResponse("PRODUCT NOT FOUND", false);
                 }
             }
-
+            if (map.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT_LIST", false);
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
-        production.setQuantity(productionDto.getQuantity());
+
+        Production production = new Production();
+        production.setBranch(branch);
+        production.setTotalQuantity(productionDto.getTotalQuantity());
+        production.setQuantity(productionDto.getTotalQuantity() - productionDto.getInvalid());
+        production.setInvalid(productionDto.getInvalid());
         production.setDate(productionDto.getDate());
         production.setCostEachOne(productionDto.isCostEachOne());
         production.setContentPrice(productionDto.getContentPrice());
@@ -72,7 +79,7 @@ public class ProductionService {
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
-        double cost = production.isCostEachOne()?production.getQuantity():1;
+        double cost = production.isCostEachOne()?production.getTotalQuantity():1;
         production.setTotalPrice(cost * production.getCost() + contentPrice);
 
         if (productionDto.getProductId() != null) {

@@ -29,7 +29,9 @@ public class ProductionDto{
     private Date date;
 
     @NotNull
-    private double quantity = 1;
+    private double totalQuantity;
+
+    private double invalid = 0;
 
     @NotNull
     private double contentPrice;
