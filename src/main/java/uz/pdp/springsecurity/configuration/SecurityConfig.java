@@ -50,6 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**",
                         "/v2/api-docs",
                         "/api/business/create",
+                        "/api/business/checkBusinessName",
+                        "/api/business/checkUsername",
                         "/api/tariff/getToChooseATariff",
                         "api/notification/*",
                         "/api/tariff/getById/*",

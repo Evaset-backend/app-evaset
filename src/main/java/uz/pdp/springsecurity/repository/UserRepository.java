@@ -1,18 +1,16 @@
 package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    boolean existsByUsername(String username);
+    boolean existsByUsernameIgnoreCase(String username);
 
     Optional<User> findByUsernameAndIdNot(String username, UUID id);
 

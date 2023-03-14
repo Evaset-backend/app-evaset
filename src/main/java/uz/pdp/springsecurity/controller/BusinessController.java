@@ -105,13 +105,13 @@ public class BusinessController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @GetMapping("/checkBusinessName")
+    @PostMapping("/checkBusinessName")
     public HttpEntity<?> checkBusinessName(@RequestBody CheckDto checkDto) {
         ApiResponse apiResponse = businessService.checkBusinessName(checkDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @GetMapping("/checkUsername")
+    @PostMapping("/checkUsername")
     public HttpEntity<?> checkUsername(@RequestBody CheckDto checkDto) {
         ApiResponse apiResponse = businessService.checkUsername(checkDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
