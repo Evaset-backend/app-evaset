@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BusinessDto;
 import uz.pdp.springsecurity.payload.BusinessEditDto;
+import uz.pdp.springsecurity.payload.CheckDto;
 import uz.pdp.springsecurity.service.BusinessService;
 
 import java.util.UUID;
@@ -101,6 +102,18 @@ public class BusinessController {
     @GetMapping("/info")
     public HttpEntity<?> getInfo(@RequestParam String time) {
         ApiResponse apiResponse = businessService.getInfo(time);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @GetMapping("/checkBusinessName")
+    public HttpEntity<?> checkBusinessName(@RequestBody CheckDto checkDto) {
+        ApiResponse apiResponse = businessService.checkBusinessName(checkDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @GetMapping("/checkUsername")
+    public HttpEntity<?> checkUsername(@RequestBody CheckDto checkDto) {
+        ApiResponse apiResponse = businessService.checkUsername(checkDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

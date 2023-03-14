@@ -235,4 +235,16 @@ public class BusinessService {
 
         return new ApiResponse(true, infoDto);
     }
+
+    public ApiResponse checkBusinessName(CheckDto checkDto) {
+        boolean exists = businessRepository.existsByName(checkDto.getCheckName());
+        if (exists) return new ApiResponse("EXIST", false);
+        return new ApiResponse(true);
+    }
+
+    public ApiResponse checkUsername(CheckDto checkDto) {
+        boolean exists = userRepository.existsByUsername(checkDto.getCheckName());
+        if (exists) return new ApiResponse("EXIST", false);
+        return new ApiResponse(true);
+    }
 }
