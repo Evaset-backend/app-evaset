@@ -26,7 +26,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class User extends AbsEntity implements UserDetails {
 
 
@@ -56,6 +56,8 @@ public class User extends AbsEntity implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Attachment photo;
 
+    private boolean active;
+
     //yoqilgan
     private boolean enabled = false;
     //muddati tugamagan
@@ -66,7 +68,7 @@ public class User extends AbsEntity implements UserDetails {
     private boolean credentialsNonExpired = true;
 
 
-    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled,Business business) {
+    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -96,7 +98,7 @@ public class User extends AbsEntity implements UserDetails {
         this.enabled = enabled;
     }
 
-    public User(String firstName, String lastName, String username, String password, Role role,  Business business, Attachment photo, boolean enabled, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired) {
+    public User(String firstName, String lastName, String username, String password, Role role, Business business, Attachment photo, boolean enabled, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;

@@ -35,8 +35,8 @@ public class CustomerGroupService {
         return new ApiResponse("ADDED", true);
     }
 
-    public ApiResponse getAll() {
-        List<CustomerGroup> customerGroupList = customerGroupRepository.findAll();
+    public ApiResponse getAll(UUID businessId) {
+        List<CustomerGroup> customerGroupList = customerGroupRepository.findAllByBusiness_Id(businessId);
         return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
     }
 
