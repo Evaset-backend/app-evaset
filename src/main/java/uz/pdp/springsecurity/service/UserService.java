@@ -169,6 +169,8 @@ public class UserService {
     public ApiResponse delete(UUID id) {
         Optional<User> byId = userRepository.findById(id);
         if (byId.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
+        User user = byId.get();
+        if (user.getRole().getName().equals(Constants.ADMIN)) return new ApiResponse("ADMINNI O'CHIRIB BO'LMAYDI", false);
         userRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }

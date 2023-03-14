@@ -28,7 +28,7 @@ public class RoleService {
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
 
         boolean exists = roleRepository.existsByNameIgnoreCaseAndBusinessId(roleDto.getName(), roleDto.getBusinessId());
-        if (exists || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
+        if (exists || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN) || roleDto.getName().equalsIgnoreCase(Constants.ADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
         Role role = new Role();
         role.setName(roleDto.getName());
         role.setPermissions(roleDto.getPermissions());
@@ -49,7 +49,7 @@ public class RoleService {
         if (optionalRole.isEmpty()) return new ApiResponse("ROLE NOT FOUND", false);
 
         boolean exist = roleRepository.existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(roleDto.getName(), roleDto.getBusinessId(), id);
-        if (exist  || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
+        if (exist  || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN)  || roleDto.getName().equalsIgnoreCase(Constants.ADMIN)) return new ApiResponse("ROLE ALREADY EXISTS", false);
 
         Role role = optionalRole.get();
         role.setName(roleDto.getName());
@@ -67,8 +67,10 @@ public class RoleService {
     }
 
     public ApiResponse delete(UUID id) {
-        boolean b = roleRepository.existsById(id);
-        if (!b) return new ApiResponse("ROLE NOT FOUND", false);
+        Optional<Role> optionalRole = roleRepository.findById(id);
+        if (optionalRole.isEmpty()) return new ApiResponse("error", false);
+        Role role = optionalRole.get();
+        if (role.getName().equals(Constants.ADMIN)) return new ApiResponse("ERROR", false);
         roleRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }
