@@ -37,6 +37,9 @@ public class CustomerGroupService {
 
     public ApiResponse getAll(UUID businessId) {
         List<CustomerGroup> customerGroupList = customerGroupRepository.findAllByBusiness_Id(businessId);
+        if (customerGroupList.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
         return new ApiResponse("ALL_CUSTOMERS", true, mapper.toDtoList(customerGroupList));
     }
 
