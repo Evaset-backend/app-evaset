@@ -31,4 +31,5 @@ public class UserDto {
     private Boolean enabled;
 
     private UUID photoId;
+
 }

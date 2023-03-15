@@ -28,10 +28,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findAllByBusiness_Id(UUID business_id);
 
-    List<User> findAllByBusiness_IdAndRoleIsNot(UUID business_id, Role role);
+    List<User> findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(UUID business_id, Role role);
 
 //    List<User> findAllByBranches(Set<Branch> branches);
 
-    List<User> findAllByBranchesIdAndRoleIsNot(UUID branches_id, Role role);
+    List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
 
 }
