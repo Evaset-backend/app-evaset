@@ -78,7 +78,7 @@ public class User extends AbsEntity implements UserDetails {
         this.business = business;
     }
 
-    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business, Set<Branch> branches) {
+    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business, Set<Branch> branches,boolean active) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -87,6 +87,7 @@ public class User extends AbsEntity implements UserDetails {
         this.enabled = enabled;
         this.business = business;
         this.branches = branches;
+        this.isActive();
     }
 
     public User(String firstName, String lastName, String username, String password, Role role, boolean enabled) {
