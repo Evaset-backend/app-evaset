@@ -126,9 +126,9 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
 
-            if (business != null){
+            if (business != null) {
                 List<Brand> allByBusinessId = brandRepository.findAllByBusiness_Id(business.getId());
-                if (allByBusinessId.isEmpty()){
+                if (allByBusinessId.isEmpty()) {
                     brandRepository.save(
                             new Brand("brand",
                                     business)
@@ -136,9 +136,9 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
 
-            if (business != null){
+            if (business != null) {
                 List<Category> allByBusinessId = categoryRepository.findAllByBusiness_Id(business.getId());
-                if (allByBusinessId.isEmpty()){
+                if (allByBusinessId.isEmpty()) {
                     categoryRepository.save(
                             new Category("category",
 
@@ -192,286 +192,286 @@ public class DataLoader implements CommandLineRunner {
 
 
             Role admin = roleRepository.save(
-                new Role(
-                Constants.ADMIN,
-                Arrays.asList(
-                    GET_TARIFF,
+                    new Role(
+                            Constants.ADMIN,
+                            Arrays.asList(
+                                    GET_TARIFF,
 
-                    ADD_ADDRESS,
-                    EDIT_ADDRESS,
-                    VIEW_ADDRESS,
-                    DELETE_ADDRESS,
+                                    ADD_ADDRESS,
+                                    EDIT_ADDRESS,
+                                    VIEW_ADDRESS,
+                                    DELETE_ADDRESS,
 
-                    UPLOAD_MEDIA,
-                    DOWNLOAD_MEDIA,
-                    VIEW_MEDIA_INFO,
-                    DELETE_MEDIA,
+                                    UPLOAD_MEDIA,
+                                    DOWNLOAD_MEDIA,
+                                    VIEW_MEDIA_INFO,
+                                    DELETE_MEDIA,
 
-                    ADD_BRANCH,
-                    EDIT_BRANCH,
-                    VIEW_BRANCH_ADMIN,
-                    VIEW_BRANCH,
-                    DELETE_BRANCH,
+                                    ADD_BRANCH,
+                                    EDIT_BRANCH,
+                                    VIEW_BRANCH_ADMIN,
+                                    VIEW_BRANCH,
+                                    DELETE_BRANCH,
 
-                    ADD_BRAND,
-                    EDIT_BRAND,
-                    VIEW_BRAND,
-                    DELETE_BRAND,
+                                    ADD_BRAND,
+                                    EDIT_BRAND,
+                                    VIEW_BRAND,
+                                    DELETE_BRAND,
 
-                    ADD_CATEGORY,
-                    EDIT_CATEGORY,
-                    VIEW_CATEGORY,
-                    VIEW_CATEGORY_ADMIN,
-                    DELETE_CATEGORY,
-                    ADD_CHILD_CATEGORY,
+                                    ADD_CATEGORY,
+                                    EDIT_CATEGORY,
+                                    VIEW_CATEGORY,
+                                    VIEW_CATEGORY_ADMIN,
+                                    DELETE_CATEGORY,
+                                    ADD_CHILD_CATEGORY,
 
-                    ADD_CURRENCY,
-                    EDIT_CURRENCY,
-                    VIEW_CURRENCY,
-                    DELETE_CURRENCY,
+                                    ADD_CURRENCY,
+                                    EDIT_CURRENCY,
+                                    VIEW_CURRENCY,
+                                    DELETE_CURRENCY,
 
-                    ADD_CUSTOMER,
-                    EDIT_CUSTOMER,
-                    VIEW_CUSTOMER,
-                    VIEW_CUSTOMER_ADMIN,
-                    DELETE_CUSTOMER,
+                                    ADD_CUSTOMER,
+                                    EDIT_CUSTOMER,
+                                    VIEW_CUSTOMER,
+                                    VIEW_CUSTOMER_ADMIN,
+                                    DELETE_CUSTOMER,
 
-                    ADD_MEASUREMENT,
-                    EDIT_MEASUREMENT,
-                    VIEW_MEASUREMENT,
-                    VIEW_MEASUREMENT_ADMIN,
-                    DELETE_MEASUREMENT,
+                                    ADD_MEASUREMENT,
+                                    EDIT_MEASUREMENT,
+                                    VIEW_MEASUREMENT,
+                                    VIEW_MEASUREMENT_ADMIN,
+                                    DELETE_MEASUREMENT,
 
-                    ADD_OUTLAY,
-                    EDIT_OUTLAY,
-                    VIEW_OUTLAY,
-                    VIEW_OUTLAY_ADMIN,
-                    DELETE_OUTLAY,
+                                    ADD_OUTLAY,
+                                    EDIT_OUTLAY,
+                                    VIEW_OUTLAY,
+                                    VIEW_OUTLAY_ADMIN,
+                                    DELETE_OUTLAY,
 
-                    ADD_PRODUCT,
-                    EDIT_PRODUCT,
-                    VIEW_PRODUCT,
+                                    ADD_PRODUCT,
+                                    EDIT_PRODUCT,
+                                    VIEW_PRODUCT,
 
-                    VIEW_PRODUCT_ADMIN,
-                    DELETE_PRODUCT,
+                                    VIEW_PRODUCT_ADMIN,
+                                    DELETE_PRODUCT,
 
-                    ADD_ROLE,
-                    EDIT_ROLE,
-                    VIEW_ROLE,
-                    VIEW_ROLE_ADMIN,
-                    DELETE_ROLE,
+                                    ADD_ROLE,
+                                    EDIT_ROLE,
+                                    VIEW_ROLE,
+                                    VIEW_ROLE_ADMIN,
+                                    DELETE_ROLE,
 
-                    ADD_SUPPLIER,
-                    EDIT_SUPPLIER,
-                    VIEW_SUPPLIER,
-                    VIEW_SUPPLIER_ADMIN,
-                    DELETE_SUPPLIER,
+                                    ADD_SUPPLIER,
+                                    EDIT_SUPPLIER,
+                                    VIEW_SUPPLIER,
+                                    VIEW_SUPPLIER_ADMIN,
+                                    DELETE_SUPPLIER,
 
-                    ADD_USER,
-                    EDIT_USER,
-                    VIEW_USER,
-                    VIEW_USER_ADMIN,
-                    DELETE_USER,
-                    EDIT_MY_PROFILE,
+                                    ADD_USER,
+                                    EDIT_USER,
+                                    VIEW_USER,
+                                    VIEW_USER_ADMIN,
+                                    DELETE_USER,
+                                    EDIT_MY_PROFILE,
 
-                    ADD_TRADE,
-                    EDIT_TRADE,
-                    VIEW_TRADE,
-                    VIEW_TRADE_ADMIN,
-                    DELETE_TRADE,
-                    DELETE_MY_TRADE,
-                    VIEW_MY_TRADE,
+                                    ADD_TRADE,
+                                    EDIT_TRADE,
+                                    VIEW_TRADE,
+                                    VIEW_TRADE_ADMIN,
+                                    DELETE_TRADE,
+                                    DELETE_MY_TRADE,
+                                    VIEW_MY_TRADE,
 
-                    ADD_PAY_METHOD,
-                    EDIT_PAY_METHOD,
-                    VIEW_PAY_METHOD,
-                    VIEW_PAY_METHOD_ADMIN,
-                    DELETE_PAY_METHOD,
+                                    ADD_PAY_METHOD,
+                                    EDIT_PAY_METHOD,
+                                    VIEW_PAY_METHOD,
+                                    VIEW_PAY_METHOD_ADMIN,
+                                    DELETE_PAY_METHOD,
 
-                    ADD_PAY_STATUS,
-                    EDIT_PAY_STATUS,
-                    VIEW_PAY_STATUS,
-                    VIEW_PAY_STATUS_ADMIN,
-                    DELETE_PAY_STATUS,
+                                    ADD_PAY_STATUS,
+                                    EDIT_PAY_STATUS,
+                                    VIEW_PAY_STATUS,
+                                    VIEW_PAY_STATUS_ADMIN,
+                                    DELETE_PAY_STATUS,
 
-                    ADD_PURCHASE,
-                    EDIT_PURCHASE,
-                    VIEW_PURCHASE,
-                    VIEW_PURCHASE_ADMIN,
-                    DELETE_PURCHASE,
+                                    ADD_PURCHASE,
+                                    EDIT_PURCHASE,
+                                    VIEW_PURCHASE,
+                                    VIEW_PURCHASE_ADMIN,
+                                    DELETE_PURCHASE,
 
-                    ADD_EXCHANGE,
-                    EDIT_EXCHANGE,
-                    VIEW_EXCHANGE,
-                    VIEW_EXCHANGE_ADMIN,
-                    DELETE_EXCHANGE,
+                                    ADD_EXCHANGE,
+                                    EDIT_EXCHANGE,
+                                    VIEW_EXCHANGE,
+                                    VIEW_EXCHANGE_ADMIN,
+                                    DELETE_EXCHANGE,
 
-                    VIEW_BENEFIT_AND_LOST,
+                                    VIEW_BENEFIT_AND_LOST,
 
 //                    ADD_BUSINESS,
 //                    EDIT_BUSINESS,
 //                    VIEW_BUSINESS,
 //                    DELETE_BUSINESS,
 
-                    ADD_CUSTOMER_GROUP,
-                    DELETE_CUSTOMER_GROUP,
-                    EDIT_CUSTOMER_GROUP,
-                    VIEW_CUSTOMER_GROUP,
+                                    ADD_CUSTOMER_GROUP,
+                                    DELETE_CUSTOMER_GROUP,
+                                    EDIT_CUSTOMER_GROUP,
+                                    VIEW_CUSTOMER_GROUP,
 
-                    ADD_TAX,
-                    DELETE_TAX,
-                    EDIT_TAX,
-                    VIEW_TAX,
-                    ADD_PRODUCT_TYPE,
-                    GET_PRODUCT_TYPE,
+                                    ADD_TAX,
+                                    DELETE_TAX,
+                                    EDIT_TAX,
+                                    VIEW_TAX,
+                                    ADD_PRODUCT_TYPE,
+                                    GET_PRODUCT_TYPE,
 
-                    UPDATE_PRODUCT_TYPE,
-                    DELETE_PRODUCT_TYPE,
+                                    UPDATE_PRODUCT_TYPE,
+                                    DELETE_PRODUCT_TYPE,
 
-                    GET_EXCEL,
-                    POST_EXCEL,
+                                    GET_EXCEL,
+                                    POST_EXCEL,
 
-                    VIEW_INFO,
+                                    VIEW_INFO,
 
 
-                    CREATE_CONTENT,
-                    EDIT_CONTENT,
-                    GET_CONTENT,
-                    DELETE_CONTENT,
+                                    CREATE_CONTENT,
+                                    EDIT_CONTENT,
+                                    GET_CONTENT,
+                                    DELETE_CONTENT,
 
-                    CREATE_PRODUCTION,
-                    GET_PRODUCTION,
-                    VIEW_REPORT
-                    ),
-                business));
+                                    CREATE_PRODUCTION,
+                                    GET_PRODUCTION,
+                                    VIEW_REPORT
+                            ),
+                            business));
             Role manager = roleRepository.save(new Role(
-                Constants.MANAGER,
+                    Constants.MANAGER,
                     Arrays.asList(
-                        GET_TARIFF,
+                            GET_TARIFF,
 
-                        ADD_ADDRESS,
-                        EDIT_ADDRESS,
-                        VIEW_ADDRESS,
-                        DELETE_ADDRESS,
+                            ADD_ADDRESS,
+                            EDIT_ADDRESS,
+                            VIEW_ADDRESS,
+                            DELETE_ADDRESS,
 
-                        UPLOAD_MEDIA,
-                        DOWNLOAD_MEDIA,
-                        VIEW_MEDIA_INFO,
-                        DELETE_MEDIA,
+                            UPLOAD_MEDIA,
+                            DOWNLOAD_MEDIA,
+                            VIEW_MEDIA_INFO,
+                            DELETE_MEDIA,
 
-                        ADD_BRAND,
-                        EDIT_BRAND,
-                        VIEW_BRAND,
-                        DELETE_BRAND,
+                            ADD_BRAND,
+                            EDIT_BRAND,
+                            VIEW_BRAND,
+                            DELETE_BRAND,
 
-                        ADD_CATEGORY,
-                        EDIT_CATEGORY,
-                        VIEW_CATEGORY,
-                        DELETE_CATEGORY,
-                        ADD_CHILD_CATEGORY,
+                            ADD_CATEGORY,
+                            EDIT_CATEGORY,
+                            VIEW_CATEGORY,
+                            DELETE_CATEGORY,
+                            ADD_CHILD_CATEGORY,
 
-                        ADD_CURRENCY,
-                        EDIT_CURRENCY,
-                        VIEW_CURRENCY,
-                        DELETE_CURRENCY,
+                            ADD_CURRENCY,
+                            EDIT_CURRENCY,
+                            VIEW_CURRENCY,
+                            DELETE_CURRENCY,
 
-                        ADD_CUSTOMER,
-                        EDIT_CUSTOMER,
-                        VIEW_CUSTOMER,
-                        DELETE_CUSTOMER,
+                            ADD_CUSTOMER,
+                            EDIT_CUSTOMER,
+                            VIEW_CUSTOMER,
+                            DELETE_CUSTOMER,
 
-                        ADD_MEASUREMENT,
-                        EDIT_MEASUREMENT,
-                        VIEW_MEASUREMENT,
-                        DELETE_MEASUREMENT,
+                            ADD_MEASUREMENT,
+                            EDIT_MEASUREMENT,
+                            VIEW_MEASUREMENT,
+                            DELETE_MEASUREMENT,
 
-                        ADD_OUTLAY,
-                        EDIT_OUTLAY,
-                        VIEW_OUTLAY,
-                        DELETE_OUTLAY,
+                            ADD_OUTLAY,
+                            EDIT_OUTLAY,
+                            VIEW_OUTLAY,
+                            DELETE_OUTLAY,
 
-                        ADD_PRODUCT,
-                        EDIT_PRODUCT,
-                        VIEW_PRODUCT,
-                        DELETE_PRODUCT,
-                        VIEW_PRODUCT_ADMIN,
+                            ADD_PRODUCT,
+                            EDIT_PRODUCT,
+                            VIEW_PRODUCT,
+                            DELETE_PRODUCT,
+                            VIEW_PRODUCT_ADMIN,
 
-                        ADD_ROLE,
-                        EDIT_ROLE,
-                        VIEW_ROLE,
-                        DELETE_ROLE,
+                            ADD_ROLE,
+                            EDIT_ROLE,
+                            VIEW_ROLE,
+                            DELETE_ROLE,
 
-                        ADD_SUPPLIER,
-                        EDIT_SUPPLIER,
-                        VIEW_SUPPLIER,
-                        DELETE_SUPPLIER,
+                            ADD_SUPPLIER,
+                            EDIT_SUPPLIER,
+                            VIEW_SUPPLIER,
+                            DELETE_SUPPLIER,
 
-                        ADD_USER,
-                        EDIT_USER,
-                        VIEW_USER,
-                        DELETE_USER,
-                        EDIT_MY_PROFILE,
+                            ADD_USER,
+                            EDIT_USER,
+                            VIEW_USER,
+                            DELETE_USER,
+                            EDIT_MY_PROFILE,
 
-                        ADD_TRADE,
-                        EDIT_TRADE,
-                        VIEW_TRADE,
-                        DELETE_TRADE,
-                        DELETE_MY_TRADE,
-                        VIEW_MY_TRADE,
+                            ADD_TRADE,
+                            EDIT_TRADE,
+                            VIEW_TRADE,
+                            DELETE_TRADE,
+                            DELETE_MY_TRADE,
+                            VIEW_MY_TRADE,
 
-                        ADD_TAX,
-                        DELETE_TAX,
-                        EDIT_TAX,
-                        VIEW_TAX,
+                            ADD_TAX,
+                            DELETE_TAX,
+                            EDIT_TAX,
+                            VIEW_TAX,
 
-                        ADD_CUSTOMER_GROUP,
-                        DELETE_CUSTOMER_GROUP,
-                        EDIT_CUSTOMER_GROUP,
-                        VIEW_CUSTOMER_GROUP,
+                            ADD_CUSTOMER_GROUP,
+                            DELETE_CUSTOMER_GROUP,
+                            EDIT_CUSTOMER_GROUP,
+                            VIEW_CUSTOMER_GROUP,
 
-                        ADD_PAY_METHOD,
-                        EDIT_PAY_METHOD,
-                        VIEW_PAY_METHOD,
-                        DELETE_PAY_METHOD,
+                            ADD_PAY_METHOD,
+                            EDIT_PAY_METHOD,
+                            VIEW_PAY_METHOD,
+                            DELETE_PAY_METHOD,
 
-                        ADD_PAY_STATUS,
-                        EDIT_PAY_STATUS,
-                        VIEW_PAY_STATUS,
-                        DELETE_PAY_STATUS,
+                            ADD_PAY_STATUS,
+                            EDIT_PAY_STATUS,
+                            VIEW_PAY_STATUS,
+                            DELETE_PAY_STATUS,
 
-                        ADD_PURCHASE,
-                        EDIT_PURCHASE,
-                        VIEW_PURCHASE,
-                        DELETE_PURCHASE,
+                            ADD_PURCHASE,
+                            EDIT_PURCHASE,
+                            VIEW_PURCHASE,
+                            DELETE_PURCHASE,
 
-                        ADD_EXCHANGE,
-                        EDIT_EXCHANGE,
-                        VIEW_EXCHANGE,
-                        DELETE_EXCHANGE,
+                            ADD_EXCHANGE,
+                            EDIT_EXCHANGE,
+                            VIEW_EXCHANGE,
+                            DELETE_EXCHANGE,
 
-                        VIEW_BENEFIT_AND_LOST,
+                            VIEW_BENEFIT_AND_LOST,
 
-                        ADD_PRODUCT_TYPE,
-                        GET_PRODUCT_TYPE,
-                        UPDATE_PRODUCT_TYPE,
-                        DELETE_PRODUCT_TYPE,
+                            ADD_PRODUCT_TYPE,
+                            GET_PRODUCT_TYPE,
+                            UPDATE_PRODUCT_TYPE,
+                            DELETE_PRODUCT_TYPE,
 
-                        GET_EXCEL,
-                        POST_EXCEL,
+                            GET_EXCEL,
+                            POST_EXCEL,
 
-                        VIEW_INFO,
+                            VIEW_INFO,
 
-                        GET_BUSINESS_ALL_AMOUNT,
+                            GET_BUSINESS_ALL_AMOUNT,
 
 
-                        CREATE_CONTENT,
-                        EDIT_CONTENT,
-                        GET_CONTENT,
-                        DELETE_CONTENT,
+                            CREATE_CONTENT,
+                            EDIT_CONTENT,
+                            GET_CONTENT,
+                            DELETE_CONTENT,
 
-                        CREATE_PRODUCTION,
-                        GET_PRODUCTION,
-                        VIEW_REPORT),
+                            CREATE_PRODUCTION,
+                            GET_PRODUCTION,
+                            VIEW_REPORT),
                     business));
 
             Role employee = roleRepository.save(new Role(
@@ -576,7 +576,8 @@ public class DataLoader implements CommandLineRunner {
                     admin,
                     true,
                     business,
-                    branches
+                    branches,
+                    true
             ));
 
             userRepository.save(new User(
@@ -587,7 +588,8 @@ public class DataLoader implements CommandLineRunner {
                     superAdmin,
                     true,
                     business,
-                    branches
+                    branches,
+                    true
             ));
             userRepository.save(new User(
                     "Manager",
@@ -597,7 +599,8 @@ public class DataLoader implements CommandLineRunner {
                     manager,
                     true,
                     business,
-                    branches
+                    branches,
+                    true
             ));
 
             userRepository.save(new User(
@@ -608,7 +611,8 @@ public class DataLoader implements CommandLineRunner {
                     employee,
                     true,
                     business,
-                    branches
+                    branches,
+                    true
             ));
 
             List<PaymentStatus> all = paymentStatusRepository.findAll();

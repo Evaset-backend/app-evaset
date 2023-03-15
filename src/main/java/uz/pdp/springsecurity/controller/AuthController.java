@@ -25,7 +25,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-public class    AuthController {
+public class AuthController {
     @Autowired
     AuthService authService;
 
@@ -37,6 +37,7 @@ public class    AuthController {
 
     /**
      * LOGIN YO'LI
+     *
      * @param loginDto
      * @return
      */
@@ -46,9 +47,9 @@ public class    AuthController {
         User principal = (User) authenticate.getPrincipal();
         String token = jwtProvider.generateToken(principal.getUsername(), principal.getRole());
         DecodedJWT jwt = JWT.decode(token);
-        if (jwt.getExpiresAt().before(new Date())){
+        if (jwt.getExpiresAt().before(new Date())) {
             return ResponseEntity.status(401).body(new ApiResponse("Token is expired"));
         }
-        return ResponseEntity.status(200).body(new ApiResponse(token,true,principal));
+        return ResponseEntity.status(200).body(new ApiResponse(token, true, principal));
     }
 }

@@ -57,7 +57,7 @@ public class UserService {
             Subscription subscription = optionalSubscription.get();
             if (subscription.getTariff().getEmployeeAmount() >= size || subscription.getTariff().getEmployeeAmount() == 0) {
 
-            }else {
+            } else {
                 return new ApiResponse("You have opened a sufficient branch according to the employee", false);
             }
         }
@@ -75,6 +75,7 @@ public class UserService {
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole((Role) response.getObject());
+        user.setActive(true);
 
         HashSet<Branch> branches = new HashSet<>();
         for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
@@ -170,8 +171,12 @@ public class UserService {
         Optional<User> byId = userRepository.findById(id);
         if (byId.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
         User user = byId.get();
-        if (user.getRole().getName().equals(Constants.ADMIN)) return new ApiResponse("ADMINNI O'CHIRIB BO'LMAYDI", false);
-        userRepository.deleteById(id);
+        if (user.getRole().getName().equals(Constants.ADMIN) || user.getRole().getName().equals(Constants.SUPERADMIN))
+            return new ApiResponse("ADMINNI O'CHIRIB BO'LMAYDI", false);
+
+        user.setActive(false);
+        user.setEnabled(false);
+        userRepository.save(user);
         return new ApiResponse("DELETED", true);
     }
 
@@ -216,7 +221,7 @@ public class UserService {
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
         if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
         Role superAdmin = optionalRole.get();
-        List<User> allByBusiness_id = userRepository.findAllByBusiness_IdAndRoleIsNot(business_id, superAdmin);
+        List<User> allByBusiness_id = userRepository.findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(business_id, superAdmin);
         if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusiness_id);
     }
@@ -228,7 +233,7 @@ public class UserService {
             Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
             if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
             Role superAdmin = optionalRole.get();
-            List<User> allByBranch_id = userRepository.findAllByBranchesIdAndRoleIsNot(branch_id, superAdmin);
+            List<User> allByBranch_id = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branch_id, superAdmin);
             return new ApiResponse("FOUND", true, allByBranch_id);
         }
         return new ApiResponse("NOT FOUND", false);
