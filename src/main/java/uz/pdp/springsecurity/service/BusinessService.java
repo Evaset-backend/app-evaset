@@ -239,12 +239,12 @@ public class BusinessService {
     public ApiResponse checkBusinessName(CheckDto checkDto) {
         boolean exists = businessRepository.existsByNameIgnoreCase(checkDto.getCheckName());
         if (exists) return new ApiResponse("EXIST", false);
-        return new ApiResponse(true);
+        return new ApiResponse("NOT FOUND FOUND", true);
     }
 
     public ApiResponse checkUsername(CheckDto checkDto) {
         boolean exists = userRepository.existsByUsernameIgnoreCase(checkDto.getCheckName());
         if (exists) return new ApiResponse("EXIST", false);
-        return new ApiResponse(true);
+        return new ApiResponse("NOT FOUND FOUND", true);
     }
 }
