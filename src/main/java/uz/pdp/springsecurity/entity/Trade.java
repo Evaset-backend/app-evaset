@@ -27,11 +27,6 @@ public class Trade extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User trader;
 
-   /* @OneToMany
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn
-    private List<TradeProduct> tradeProductList;*/
-
     @ManyToOne
     private Branch branch;
 

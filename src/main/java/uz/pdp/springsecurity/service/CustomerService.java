@@ -118,42 +118,55 @@ public class CustomerService {
     }
 
     public ApiResponse repayment(UUID id, RepaymentDto repaymentDto) {
-        try {
-            Optional<Customer> optionalCustomer = customerRepository.findById(id);
-            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
-            Customer customer = optionalCustomer.get();
-
-            if (repaymentDto.getRepayment() != null && customer.getDebt() != null) {
-                customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
-                customerRepository.save(customer);
-
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+        if (repaymentDto.getPayDate() == null) return new ApiResponse("PAY_DATE NOT FOUND", false);
+        Customer customer = optionalCustomer.get();
+        if (repaymentDto.getRepayment() != null && customer.getDebt() != null) {
+            customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
+            customer.setPayDate(repaymentDto.getPayDate());
+            customerRepository.save(customer);
+            try {
+                repaymentHelper(repaymentDto.getRepayment(), customer);
                 return new ApiResponse("Repayment Customer !", true);
-            } else {
-                return new ApiResponse("brat qarzingiz null kelyabdi !", false);
+            } catch (Exception e) {
+                return new ApiResponse("ERROR", false);
             }
-        } catch (Exception e) {
-            return new ApiResponse("Exception Xatolik !", false);
+        } else {
+            return new ApiResponse("brat qarzingiz null kelyabdi !", false);
         }
-
     }
 
-    private void repaymentHelper(double paidSum, UUID customerId) {
+    private void repaymentHelper(double paidSum, Customer customer) {
         PaymentStatus tolangan = paymentStatusRepository.findByStatus(StatusName.TOLANGAN.name());
         PaymentStatus qisman_tolangan = paymentStatusRepository.findByStatus(StatusName.QISMAN_TOLANGAN.name());
-        List<Trade> tradeList = tradeRepository.findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(customerId, 0d);
+        List<Trade> tradeList = tradeRepository.findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(customer.getId(), 0d);
         for (Trade trade : tradeList) {
             List<Payment> paymentList = paymentRepository.findAllByTradeId(trade.getId());
             Payment payment = paymentList.get(0);
             if (paidSum > trade.getDebtSum()){
+                paidSum -= trade.getDebtSum();
                 trade.setDebtSum(0);
                 trade.setPaidSum(trade.getTotalSum());
                 trade.setPaymentStatus(tolangan);
-                payment.setPaidSum(trade.getPaidSum());
+                payment.setPaidSum(payment.getPaidSum() + trade.getDebtSum());
+                paymentRepository.save(payment);
             }else if (paidSum == trade.getDebtSum()){
-
+                trade.setDebtSum(0);
+                trade.setPaidSum(trade.getTotalSum());
+                trade.setPaymentStatus(tolangan);
+                payment.setPaidSum(payment.getPaidSum() + trade.getDebtSum());
+                paymentRepository.save(payment);
+                break;
             }else {
+                trade.setDebtSum(trade.getDebtSum() - paidSum);
                 trade.setPaidSum(trade.getPaidSum() + paidSum);
+                trade.setPaymentStatus(qisman_tolangan);
+                payment.setPaidSum(payment.getPaidSum() + paidSum);
+                paymentRepository.save(payment);
+                break;
             }
         }
+        tradeRepository.saveAll(tradeList);
     }
 }

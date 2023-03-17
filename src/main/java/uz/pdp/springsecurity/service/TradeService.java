@@ -194,6 +194,7 @@ public class TradeService {
             Customer customer = optionalCustomer.get();
             trade.setCustomer(customer);
             customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
+            customer.setPayDate(tradeDTO.getPayDate());
             customerRepository.save(customer);
         } else if (tradeDTO.getCustomerId() != null){
             Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
