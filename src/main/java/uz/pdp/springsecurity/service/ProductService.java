@@ -217,10 +217,12 @@ public class ProductService {
         product.setProfitPercent(productDto.getProfitPercent());
         if (productDto.getBarcode() != null && !productDto.getBarcode().isBlank()) {
             if (isUpdate) {
-                if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId()))
+                if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId())
+                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             } else {
-                if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
+                if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId())
+                    || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             }
             product.setBarcode(productDto.getBarcode());
@@ -238,7 +240,7 @@ public class ProductService {
         product.setType(Type.MANY);
 
         Product saveProduct = productRepository.save(product);
-        List<ProductTypePrice> productTypePriceList = new ArrayList<>();
+//        List<ProductTypePrice> productTypePriceList = new ArrayList<>();
 
         for (ProductTypePricePostDto typePricePostDto : productDto.getProductTypePricePostDtoList()) {
             Optional<ProductTypeValue> optionalProductTypeValue = productTypeValueRepository.findById(typePricePostDto.getProductTypeValueId());
@@ -262,14 +264,17 @@ public class ProductService {
                     optionalAttachment.ifPresent(productTypePrice::setPhoto);
                 }
                 if (typePricePostDto.getBarcode() != null && !typePricePostDto.getBarcode().isBlank()) {
-                    if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(typePricePostDto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())) {
-                        return new ApiResponse("product with the barcode is already exist");
+                    if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(typePricePostDto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())
+                            || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
+                        productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
+                    }else {
+                        productTypePrice.setBarcode(typePricePostDto.getBarcode());
                     }
-                    productTypePrice.setBarcode(typePricePostDto.getBarcode());
                 } else {
-                    productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), true));
+                    productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
                 }
-                productTypePriceList.add(productTypePrice);
+                productTypePriceRepository.save(productTypePrice);
+//                productTypePriceList.add(productTypePrice);
             } else {
                 ProductTypeValue productTypeValue = optionalProductTypeValue.get();
                 ProductTypePrice productTypePrice = new ProductTypePrice();
@@ -284,18 +289,21 @@ public class ProductService {
                     optionalAttachment.ifPresent(productTypePrice::setPhoto);
                 }
                 if (typePricePostDto.getBarcode() != null && !typePricePostDto.getBarcode().isBlank()) {
-                    if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
-                        return new ApiResponse("product with the barcode is already exist");
+                    if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(typePricePostDto.getBarcode(), product.getBusiness().getId())
+                        || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
+                        productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
+                    }else {
+                        productTypePrice.setBarcode(typePricePostDto.getBarcode());
                     }
-                    productTypePrice.setBarcode(typePricePostDto.getBarcode());
                 } else {
                     productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
                 }
-                productTypePriceList.add(productTypePrice);
+                productTypePriceRepository.save(productTypePrice);
+//                productTypePriceList.add(productTypePrice);
             }
         }
 
-        productTypePriceRepository.saveAll(productTypePriceList);
+//        productTypePriceRepository.saveAll(productTypePriceList);
         return new ApiResponse("successfully saved", true);
     }
 

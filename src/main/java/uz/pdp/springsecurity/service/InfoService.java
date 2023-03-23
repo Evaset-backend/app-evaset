@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.util.Times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -72,7 +71,7 @@ public class InfoService {
                 outlayRepository.findAllByBusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId),
                 outlayList,// doing nothing
-                customerRepository.findAllByBusiness_IdAndDebtIsNot(businessId, 0d)
+                customerRepository.findAllByBusiness_IdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
         );
     }
 
@@ -125,7 +124,7 @@ public class InfoService {
                     outlayRepository.findAllByBranch_Id(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
-                    customerRepository.findAllByBranchIdAndDebtIsNot(branchId, 0d)
+                    customerRepository.findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
             );
         }
 
@@ -136,7 +135,7 @@ public class InfoService {
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
-                customerRepository.findAllByBranchIdAndDebtIsNot(branchId, 0d)
+                customerRepository.findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
         );
 
     }

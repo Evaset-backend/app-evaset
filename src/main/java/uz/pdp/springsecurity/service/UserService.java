@@ -199,7 +199,9 @@ public class UserService {
         user.setLastName(profileDto.getLastName());
         user.setUsername(profileDto.getUsername());
 
-        user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
+        if (profileDto.getPassword() != null && !profileDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
+        }
 
         Optional<Attachment> optionalPhoto = attachmentRepository.findById(profileDto.getPhotoId());
         if (optionalPhoto.isEmpty()) return new ApiResponse("PHOTO NOT FOUND", false);
