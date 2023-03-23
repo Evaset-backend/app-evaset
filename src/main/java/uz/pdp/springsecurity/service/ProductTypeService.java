@@ -32,10 +32,6 @@ public class ProductTypeService {
     AttachmentRepository attachmentRepository;
 
 
-
-
-
-
     public ApiResponse addProductType(ProductTypePostDto postDto) {
 
         Optional<Business> optionalBusiness = businessRepository.findById(postDto.getBusinessId());
@@ -126,6 +122,11 @@ public class ProductTypeService {
             getDto.setValues(productTypeValueDto);
             productTypePostDto.add(getDto);
         }
+
+        if (productTypePostDto.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
         return new ApiResponse(true, productTypePostDto);
     }
 
