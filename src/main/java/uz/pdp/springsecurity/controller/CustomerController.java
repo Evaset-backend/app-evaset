@@ -39,7 +39,7 @@ public class CustomerController {
     /**
      * CUSTOMERNI EDIT QILSIH ID ORQALI
      *
-     * @id  id
+     * @param id
      * @param customerDto
      * @return ApiResponse(success - > true message - > EDITED)
      */
@@ -53,7 +53,7 @@ public class CustomerController {
     /**
      * ID ORQALI BITTA MIJOZNI CUSTOMERNI OLIB CIQISH
      *
-     * @id id
+     * @param id
      * @return ApiResponse(success - > true object - > value)
      */
     @CheckPermission("VIEW_CUSTOMER")
