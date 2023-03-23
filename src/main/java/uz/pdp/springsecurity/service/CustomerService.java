@@ -118,6 +118,16 @@ public class CustomerService {
     }
 
     public ApiResponse repayment(UUID id, RepaymentDto repaymentDto) {
+
+        try {
+            Optional<Customer> optionalCustomer = customerRepository.findById(id);
+            if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            Customer customer = optionalCustomer.get();
+
+            if (repaymentDto.getRepayment() != null && customer.getDebt() != null) {
+                customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
+                customerRepository.save(customer);
+
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
         if (repaymentDto.getPayDate() == null) return new ApiResponse("PAY_DATE NOT FOUND", false);
@@ -128,6 +138,7 @@ public class CustomerService {
             customerRepository.save(customer);
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
+
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);

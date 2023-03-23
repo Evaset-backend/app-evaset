@@ -1744,7 +1744,7 @@ public class ReportsService {
                                 totalAmount += product.getProfit();
                                 productAmount.put(product.getProduct().getId(), totalAmount);
                             }
-                        }
+                         }
                     }
                     for (TradeProduct tradeProduct : allTradeCustomerId) {
                         if (tradeProduct.getProductTypePrice() != null) {

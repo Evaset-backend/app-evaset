@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,16 +25,12 @@ public class ExcelService {
     WarehouseRepository warehouseRepository;
     @Autowired
     MeasurementRepository measurementRepository;
-
     @Autowired
     BranchRepository branchRepository;
-
     @Autowired
     CategoryRepository categoryRepository;
-
     @Autowired
     ProductTypePriceRepository productTypePriceRepository;
-
 
     @Autowired
     BrandRepository brandRepository;
