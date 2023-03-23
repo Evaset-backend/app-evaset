@@ -308,11 +308,6 @@ public class DataLoader implements CommandLineRunner {
 
                                     VIEW_BENEFIT_AND_LOST,
 
-//                    ADD_BUSINESS,
-//                    EDIT_BUSINESS,
-//                    VIEW_BUSINESS,
-//                    DELETE_BUSINESS,
-
                                     ADD_CUSTOMER_GROUP,
                                     DELETE_CUSTOMER_GROUP,
                                     EDIT_CUSTOMER_GROUP,
@@ -341,7 +336,9 @@ public class DataLoader implements CommandLineRunner {
 
                                     CREATE_PRODUCTION,
                                     GET_PRODUCTION,
-                                    VIEW_REPORT
+                                    VIEW_REPORT,
+
+                                    GET_COURSE
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
