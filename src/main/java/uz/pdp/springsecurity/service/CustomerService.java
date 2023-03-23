@@ -126,7 +126,6 @@ public class CustomerService {
             if (repaymentDto.getRepayment() != null && customer.getDebt() != null) {
                 customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
                 customerRepository.save(customer);
-
                 return new ApiResponse("Repayment Customer !", true);
             } else {
                 return new ApiResponse("brat qarzingiz null kelyabdi !", false);
