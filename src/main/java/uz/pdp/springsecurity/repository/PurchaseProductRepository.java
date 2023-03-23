@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PurchaseProductRepository extends JpaRepository<PurchaseProduct, UUID> {
-
-    List<PurchaseProduct> findAllByProductId(UUID product_id);
     List<PurchaseProduct> findAllByPurchaseId(UUID purchaseId);
     List<PurchaseProduct> findAllByPurchase_BranchId(UUID branchId);
     List<PurchaseProduct> findAllByPurchase_BranchIdAndPurchase_SupplierId(UUID purchase_branch_id, UUID purchase_supplier_id);
