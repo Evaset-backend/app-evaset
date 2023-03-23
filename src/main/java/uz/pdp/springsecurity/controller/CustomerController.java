@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -39,7 +40,7 @@ public class CustomerController {
     /**
      * CUSTOMERNI EDIT QILSIH ID ORQALI
      *
-     * @id  id
+     * @param id
      * @param customerDto
      * @return ApiResponse(success - > true message - > EDITED)
      */
@@ -53,7 +54,7 @@ public class CustomerController {
     /**
      * ID ORQALI BITTA MIJOZNI CUSTOMERNI OLIB CIQISH
      *
-     * @id id
+     * @param id
      * @return ApiResponse(success - > true object - > value)
      */
     @CheckPermission("VIEW_CUSTOMER")
@@ -88,7 +89,8 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @CheckPermission("VIEW_CUSTOMER_ADMIN")
+
+    @PreAuthorize("hasAnyAuthority('VIEW_CUSTOMER_ADMIN','VIEW_CUSTOMER')")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranchId(@PathVariable UUID branchId) {
         ApiResponse apiResponse = customerService.getAllByBranchId(branchId);
