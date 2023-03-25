@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -285,6 +286,7 @@ public class WarehouseService {
         Page<Warehouse> allWarehouse;
 
         List<GetLessProductDto> getLessProductDtoList = new ArrayList<>();
+        List<Warehouse> warehouses = new ArrayList<>();
 
         if (branchId != null) {
             allWarehouse = warehouseRepository
@@ -295,7 +297,14 @@ public class WarehouseService {
         }
 
         List<Warehouse> warehouseList = allWarehouse.toList();
+
         for (Warehouse warehouse : warehouseList) {
+            if (warehouse.getProduct().getMinQuantity()>=warehouse.getAmount()){
+                warehouses.add(warehouse);
+            }
+        }
+
+        for (Warehouse warehouse : warehouses) {
             GetLessProductDto getLessProductDto = new GetLessProductDto();
             if (warehouse.getProductTypePrice() != null) {
                 getLessProductDto.setName(warehouse.getProductTypePrice().getName());
@@ -306,11 +315,13 @@ public class WarehouseService {
             getLessProductDtoList.add(getLessProductDto);
         }
 
+        Page<Warehouse> newPage = new PageImpl<>(warehouses);
+
         Map<String, Object> response = new HashMap<>();
         response.put("getLessProduct", getLessProductDtoList);
-        response.put("currentPage", allWarehouse.getNumber());
-        response.put("totalItems", allWarehouse.getTotalElements());
-        response.put("totalPages", allWarehouse.getTotalPages());
+        response.put("currentPage", newPage.getNumber());
+        response.put("totalItems", newPage.getTotalElements());
+        response.put("totalPages", newPage.getTotalPages());
         return new ApiResponse("all", true, response);
     }
 }
