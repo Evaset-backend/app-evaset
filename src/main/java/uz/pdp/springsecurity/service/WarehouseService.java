@@ -299,8 +299,14 @@ public class WarehouseService {
         List<Warehouse> warehouseList = allWarehouse.toList();
 
         for (Warehouse warehouse : warehouseList) {
-            if (warehouse.getProduct().getMinQuantity()>=warehouse.getAmount()){
-                warehouses.add(warehouse);
+            if (warehouse.getProduct() != null) {
+                if (warehouse.getProduct().getMinQuantity() >= warehouse.getAmount()) {
+                    warehouses.add(warehouse);
+                }
+            } else {
+                if (warehouse.getProductTypePrice().getProduct().getMinQuantity() >= warehouse.getAmount()) {
+                    warehouses.add(warehouse);
+                }
             }
         }
 
