@@ -98,10 +98,11 @@ public class ProductTypeService {
 //    }
 
 
-    public ApiResponse getProductType() {
+    public ApiResponse getProductType(User user) {
+        UUID id = user.getBusiness().getId();
         List<ProductTypeGetDto> productTypePostDto = new ArrayList<>();
 
-        List<ProductType> all = typeRepository.findAll();
+        List<ProductType> all = typeRepository.findAllByBusinessId(id);
 
         for (ProductType productType : all) {
             ProductTypeGetDto getDto = new ProductTypeGetDto();
