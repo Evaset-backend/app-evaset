@@ -73,10 +73,10 @@ public class PurchaseService {
         if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         Timestamp createdAt = purchase.getCreatedAt();
         long difference = System.currentTimeMillis() - createdAt.getTime();
-        long oneDay = 1000 * 60 * 60 * 24;
+        long oneDay = 1000 * 60 * 60 * 24 * 30;
         if (difference > oneDay){
             purchase.setEditable(false);
-            return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+            return new ApiResponse("YOU CAN NOT EDIT AFTER 30 DAY", false);
         }
         return createOrEditPurchase(purchase, purchaseDto);
     }
