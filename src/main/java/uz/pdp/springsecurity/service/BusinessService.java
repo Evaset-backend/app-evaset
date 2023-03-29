@@ -54,6 +54,7 @@ public class BusinessService {
 
     private final BusinessMapper businessMapper;
     private final PayMethodRepository payMethodRepository;
+    private final InvoiceService invoiceService;
 
     private final NotificationRepository notificationRepository;
 
@@ -110,6 +111,7 @@ public class BusinessService {
         branchDto.setAddressId(address.getId());
         branchDto.setBusinessId(business.getId());
         Branch branch = branchRepository.save(branchMapper.toEntity(branchDto));
+        invoiceService.create(branch);
         List<UUID> branchIds = new ArrayList<>();
         branchIds.add(branch.getId());
         userDto.setBranchId(branchIds);
