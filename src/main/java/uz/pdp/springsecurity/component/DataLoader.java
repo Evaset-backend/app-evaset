@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.service.InvoiceService;
 import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
@@ -76,6 +77,7 @@ public class DataLoader implements CommandLineRunner {
     SubscriptionRepository subscriptionRepository;
 
     private final MeasurementRepository measurementRepository;
+    private final InvoiceService invoiceService;
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -561,6 +563,7 @@ public class DataLoader implements CommandLineRunner {
                             business
                     );
                     branchRepository.save(branch);
+                    invoiceService.create(branch);
                     branches.add(branch);
                 }
             }
