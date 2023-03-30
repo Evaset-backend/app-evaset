@@ -18,6 +18,8 @@ import java.util.UUID;
 public class InvoiceController {
     private final InvoiceService invoiceService;
 
+    // to run
+
     @CheckPermission("EDIT_BRANCH")
     @PutMapping("/{branchId}")
     public HttpEntity<?> edit(@PathVariable UUID branchId, @Valid @RequestBody InvoiceDto invoiceDto) {
